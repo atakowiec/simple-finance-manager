@@ -1,0 +1,21 @@
+services:
+  java_database:
+    image: mysql
+    container_name: java_database
+    environment:
+      MYSQL_ROOT_PASSWORD: pass
+      MYSQL_DATABASE: budget_planner_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+    ports:
+      - "3307:3306"
+  java_phpmyadmin:
+    image: phpmyadmin
+    container_name: java_phpmyadmin
+    environment:
+      PMA_HOST: java_database
+      PMA_PORT: 3306
+    ports:
+      - "6500:80"
+    depends_on:
+      - java_database
