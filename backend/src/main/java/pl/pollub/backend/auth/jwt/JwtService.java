@@ -1,7 +1,6 @@
 package pl.pollub.backend.auth.jwt;
 
 import io.jsonwebtoken.*;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +11,7 @@ import java.util.Date;
 
 @Component
 public class JwtService {
-    public static final String AUTHORIZATION_COOKIE_KEY = "credentials";
+    public static final String AUTHORIZATION_HEADER = "Authorization";
 
     private final String secret;
     private final long expiration;
@@ -56,22 +55,16 @@ public class JwtService {
     }
 
     public String resolveToken(HttpServletRequest request) {
-        for (Cookie cookie : request.getCookies()) {
-            if (cookie.getName().equals(AUTHORIZATION_COOKIE_KEY)) {
-                return cookie.getValue();
-            }
+        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
         }
 
         return null;
     }
 
     public void addTokenToResponse(HttpServletResponse response, String token) {
-        Cookie cookie = new Cookie(AUTHORIZATION_COOKIE_KEY, token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-        cookie.setMaxAge((int) expiration / 1000);
-        response.addCookie(cookie);
+        response.setHeader(AUTHORIZATION_HEADER, "Bearer " + token);
     }
 
     public void addTokenToResponse(HttpServletResponse response, User user) {
@@ -79,11 +72,6 @@ public class JwtService {
     }
 
     public void invalidateToken(HttpServletResponse response) {
-        Cookie cookie = new Cookie(AUTHORIZATION_COOKIE_KEY, "");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
+        response.setHeader(AUTHORIZATION_HEADER, "");
     }
 }
