@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="650" prefWidth="1100" style="-fx-background-color: #eef8f8;"
+            xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="pl.pollub.frontend.controller.RegisterController">
+    <left>
+        <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <ImageView fitHeight="672.0" fitWidth="619.0" layoutY="-20.0" pickOnBounds="true" smooth="false">
+                <Image url="@../../../register-bg.png"/>
+            </ImageView>
+        </AnchorPane>
+    </left>
+    <center>
+        <AnchorPane prefHeight="652.0" prefWidth="485.0" BorderPane.alignment="CENTER">
+            <Label alignment="CENTER" layoutY="52.0" prefHeight="17.0" prefWidth="486.0" text="Rejestracja"
+                   textAlignment="CENTER">
+                <styleClass>
+                    <String fx:value="b"/>
+                    <String fx:value="h2"/>
+                </styleClass>
+            </Label>
+
+            <Label layoutX="47.0" layoutY="134.0" text="Nazwa użytkownika"/>
+            <TextField fx:id="usernameField" layoutX="47.0" layoutY="150.0" prefHeight="25.0" prefWidth="372.0"/>
+            <Label fx:id="usernameError" layoutX="47.0" layoutY="180.0" styleClass="text-danger"/>
+
+            <Label layoutX="47.0" layoutY="204.0" text="E-mail"/>
+            <TextField fx:id="emailField" layoutX="47.0" layoutY="220.0" prefHeight="25.0" prefWidth="372.0"/>
+            <Label fx:id="emailError" layoutX="47.0" layoutY="250.0" styleClass="text-danger"/>
+
+            <Label layoutX="47.0" layoutY="274.0" text="Hasło"/>
+            <PasswordField fx:id="passwordField" layoutX="47.0" layoutY="290.0" prefHeight="25.0" prefWidth="372.0"/>
+            <Label fx:id="passwordError" layoutX="47.0" layoutY="320.0" styleClass="text-danger"/>
+
+            <Label layoutX="47.0" layoutY="344.0" text="Powtórz hasło"/>
+            <PasswordField fx:id="passwordRepeatField" layoutX="47.0" layoutY="360.0" prefHeight="25.0"
+                           prefWidth="372.0"/>
+            <Label fx:id="passwordRepeatError" layoutX="47.0" layoutY="390.0" styleClass="text-danger"/>
+            <Label fx:id="formError" alignment="CENTER" layoutX="5.0" layoutY="399.0" prefHeight="17.0"
+                   prefWidth="477.0"
+                   styleClass="text-danger"/>
+            <HBox alignment="CENTER" layoutX="-1.0" layoutY="428.0" prefHeight="43.0" prefWidth="487.0">
+                <Button contentDisplay="CENTER" mnemonicParsing="false" onAction="#register" prefHeight="25.0"
+                        prefWidth="132.0" text="Zarejestruj">
+                    <styleClass>
+                        <String fx:value="btn-primary"/>
+                        <String fx:value="btn"/>
+                    </styleClass>
+                </Button>
+            </HBox>
+        </AnchorPane>
+    </center>
+</BorderPane>
