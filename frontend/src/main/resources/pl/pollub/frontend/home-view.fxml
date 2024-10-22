@@ -3,7 +3,7 @@
 <?import javafx.scene.layout.StackPane?>
 
 <?import javafx.scene.text.Text?>
-<StackPane xmlns:fx="http://javafx.com/fxml">
+<StackPane xmlns:fx="http://javafx.com/fxml" fx:controller="pl.pollub.frontend.controller.HomeController">
     <Text text="Home View" />
 <!-- todo home view -->
 </StackPane>
