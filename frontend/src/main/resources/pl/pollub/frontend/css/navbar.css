@@ -1,0 +1,15 @@
+.active {
+    -fx-font-weight: bold;
+    -fx-background-color: #CCFF9988 !important;
+    -fx-background-radius: 5px;
+}
+
+.navItem {
+    -fx-cursor: hand;
+    -fx-padding: 0 10px;
+}
+
+.navItem:hover {
+    -fx-background-color: #CCFF9933;
+    -fx-background-radius: 5px;
+}

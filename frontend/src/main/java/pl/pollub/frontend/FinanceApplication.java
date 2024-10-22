@@ -37,6 +37,7 @@ public class FinanceApplication extends Application {
         screenManager.addScreen("register", "register-view.fxml");
         screenManager.addScreen("home", "home-view.fxml");
         screenManager.addScreen("login", "login-view.fxml");
+        screenManager.addScreen("raports", "raports-view.fxml");
     }
 
     public static void main(String[] args) {

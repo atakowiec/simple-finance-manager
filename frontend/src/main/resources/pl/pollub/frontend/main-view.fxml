@@ -1,7 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.StackPane?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<StackPane xmlns:fx="http://javafx.com/fxml" fx:id="mainContainer">
+<AnchorPane prefHeight="383.0" prefWidth="675.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pollub.frontend.controller.MainViewController">
 
-</StackPane>
+    <StackPane fx:id="mainContainer" prefHeight="383.0" prefWidth="675.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0">
+
+    </StackPane>
+
+    <BorderPane fx:id="navBar" prefHeight="45.0" prefWidth="875.0" style="-fx-background-color: #ddd;" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
+        <padding>
+            <Insets bottom="10" left="10" right="10" top="10" />
+        </padding>
+        <left>
+            <AnchorPane prefHeight="25.0" prefWidth="365.0" BorderPane.alignment="CENTER">
+                <HBox alignment="CENTER_LEFT" prefHeight="25.0" prefWidth="348.0" spacing="10.0">
+                    <Label fx:id="home" accessibleRole="BUTTON" onMouseClicked="#onNavItemClick" prefHeight="25.0" styleClass="navItem" text="Strona główna" />
+                </HBox>
+            </AnchorPane>
+        </left>
+        <right>
+            <AnchorPane prefHeight="25.0" prefWidth="340.0" BorderPane.alignment="CENTER">
+                <HBox alignment="CENTER_RIGHT" layoutX="89.0" prefHeight="25.0" prefWidth="330.0">
+                    <Label fx:id="raports" accessibleRole="BUTTON" onMouseClicked="#onNavItemClick" prefHeight="25.0" styleClass="navItem" text="Raporty" />
+                </HBox>
+            </AnchorPane>
+        </right>
+    </BorderPane>
+</AnchorPane>

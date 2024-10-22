@@ -2,23 +2,42 @@ package pl.pollub.frontend.manager;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.kordamp.bootstrapfx.BootstrapFX;
 import pl.pollub.frontend.FinanceApplication;
+import pl.pollub.frontend.annotation.NavBar;
+import pl.pollub.frontend.controller.MainViewController;
 import pl.pollub.frontend.injector.SimpleInjector;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-@RequiredArgsConstructor
 public class ScreenManager {
     @Getter
     private final Stage stage;
     private final Map<String, String> screenMap = new HashMap<>();
+
+    private final MainViewController mainViewController;
+
+    public ScreenManager(Stage stage) {
+        this.stage = stage;
+
+        // on init load main view and prepare hooks for navigation bar and main container elements
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(FinanceApplication.class.getResource("main-view.fxml"));
+            AnchorPane mainView = fxmlLoader.load();
+
+            mainViewController = fxmlLoader.getController();
+            mainViewController.setScreenManager(this);
+
+            stage.setScene(new Scene(mainView, 1100, 650));
+            stage.show();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public void addScreen(String name, String path) {
         screenMap.put(name, path);
@@ -28,27 +47,27 @@ public class ScreenManager {
         return screenMap.get(name);
     }
 
-    public void switchTo(String name) {
+    public void switchTo(String screenName) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(FinanceApplication.class.getResource(getScreen(name)));
-            Scene scene = new Scene(fxmlLoader.load(), 1100, 650);
-            scene.getStylesheets().add(BootstrapFX.bootstrapFXStylesheet());
-            stage.setScene(scene);
-            stage.show();
+            // load FXML file with new screen and set it as a content of the main container
+            FXMLLoader fxmlLoader = new FXMLLoader(FinanceApplication.class.getResource(getScreen(screenName)));
 
-            // simple dependency injection
+            mainViewController.setContent(fxmlLoader.load());
+
             Object controller = fxmlLoader.getController();
-            if(controller == null) {
+            if (controller == null) {
+                mainViewController.hideNavBar();
                 return;
             }
 
-            for (Field field : controller.getClass().getFields()) {
-                Object instance = SimpleInjector.getInstance(field.getType());
-                if (instance != null) {
-                    field.set(controller, instance);
-                }
+            if (controller.getClass().isAnnotationPresent(NavBar.class)) {
+                mainViewController.showNavBar(screenName);
+            } else {
+                mainViewController.hideNavBar();
             }
-        } catch (IOException | IllegalAccessException e) {
+
+            SimpleInjector.inject(controller);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
