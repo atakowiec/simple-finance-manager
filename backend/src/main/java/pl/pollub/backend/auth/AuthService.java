@@ -32,4 +32,8 @@ public class AuthService implements UserDetailsService {
     public boolean isEmailTaken(String email) {
         return usersRepository.findByEmail(email).isPresent();
     }
+
+    public boolean verifyPassword(String hashedPassword, String currentPassword) {
+        return bCryptPasswordEncoder.matches(currentPassword, hashedPassword);
+    }
 }
