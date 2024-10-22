@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import pl.pollub.backend.auth.dto.LoginDto;
 import pl.pollub.backend.auth.dto.RegisterDto;
 import pl.pollub.backend.auth.jwt.JwtService;
 import pl.pollub.backend.auth.user.Role;
@@ -57,5 +58,46 @@ public class AuthController {
                 .add("role", user.getRole().name())
                 .add("token", token)
                 .build();
+    }
+
+    @PostMapping("/login")
+    public Map<?, ?> login(@Valid @RequestBody LoginDto loginDto, HttpServletResponse res) {
+        User user;
+
+        if (loginDto.getIdentifier().contains("@")) {
+            user = authService.getUsersRepository().findByEmail(loginDto.getIdentifier())
+                    .orElseThrow(() -> {
+                        log.warn("User tried to login with non-existing email: {}", loginDto.getIdentifier());
+                        return new HttpException(HttpStatus.UNAUTHORIZED, "Niepoprawne dane logowania");
+                    });
+        } else {
+            user = authService.getUsersRepository().findByUsername(loginDto.getIdentifier())
+                    .orElseThrow(() -> {
+                        log.warn("User tried to login with non-existing username: {}", loginDto.getIdentifier());
+                        return new HttpException(HttpStatus.UNAUTHORIZED, "Niepoprawne dane logowania");
+                    });
+        }
+
+        if (!authService.verifyPassword(user.getPassword(), loginDto.getPassword())) {
+            log.warn("User tried to login with incorrect password: {}", loginDto.getIdentifier());
+            throw new HttpException(HttpStatus.UNAUTHORIZED, "Niepoprawne dane logowania");
+        }
+
+        String token = jwtService.createToken(user);
+        jwtService.addTokenToResponse(res, token);
+        log.info("User logged in: {}", user.getUsername());
+
+        return SimpleJsonBuilder.of("id", user.getId())
+                .add("username", user.getUsername())
+                .add("email", user.getEmail())
+                .add("role", user.getRole().name())
+                .add("token", token)
+                .build();
+    }
+
+    @GetMapping("/logout")
+    public void logout(HttpServletResponse res) {
+        jwtService.invalidateToken(res);
+        res.setStatus(204);
     }
 }

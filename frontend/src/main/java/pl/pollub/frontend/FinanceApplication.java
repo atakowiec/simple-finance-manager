@@ -30,12 +30,13 @@ public class FinanceApplication extends Application {
 
         initViews(screenManager);
 
-        screenManager.switchTo("register"); // default screen
+        screenManager.switchTo("login"); // default screen
     }
 
     private void initViews(ScreenManager screenManager) {
         screenManager.addScreen("register", "register-view.fxml");
         screenManager.addScreen("home", "home-view.fxml");
+        screenManager.addScreen("login", "login-view.fxml");
     }
 
     public static void main(String[] args) {
