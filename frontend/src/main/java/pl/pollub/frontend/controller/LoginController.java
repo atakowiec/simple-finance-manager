@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import pl.pollub.frontend.annotation.Title;
 import pl.pollub.frontend.manager.AuthManager;
 import pl.pollub.frontend.manager.HttpManager;
 import pl.pollub.frontend.manager.ScreenManager;
@@ -14,6 +15,7 @@ import pl.pollub.frontend.util.SimpleJsonBuilder;
 
 import java.net.http.HttpResponse;
 
+@Title("Logowanie")
 public class LoginController {
 
     public ScreenManager screenManager;
