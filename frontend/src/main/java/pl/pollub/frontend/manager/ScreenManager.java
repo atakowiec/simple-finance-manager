@@ -7,6 +7,7 @@ import javafx.stage.Stage;
 import lombok.Getter;
 import pl.pollub.frontend.FinanceApplication;
 import pl.pollub.frontend.annotation.NavBar;
+import pl.pollub.frontend.annotation.Title;
 import pl.pollub.frontend.controller.MainViewController;
 import pl.pollub.frontend.injector.SimpleInjector;
 
@@ -53,11 +54,17 @@ public class ScreenManager {
             FXMLLoader fxmlLoader = new FXMLLoader(FinanceApplication.class.getResource(getScreen(screenName)));
 
             mainViewController.setContent(fxmlLoader.load());
+            this.stage.setTitle("Finance Application");
 
             Object controller = fxmlLoader.getController();
             if (controller == null) {
                 mainViewController.hideNavBar();
                 return;
+            }
+
+            // set title
+            if (controller.getClass().isAnnotationPresent(Title.class)) {
+                this.stage.setTitle(controller.getClass().getAnnotation(Title.class).value());
             }
 
             if (controller.getClass().isAnnotationPresent(NavBar.class)) {
