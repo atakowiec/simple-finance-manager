@@ -1,6 +1,7 @@
-package pl.pollub.frontend.manager;
+package pl.pollub.frontend.service;
 
-import lombok.RequiredArgsConstructor;
+import pl.pollub.frontend.injector.Inject;
+import pl.pollub.frontend.injector.Injectable;
 import pl.pollub.frontend.util.JsonUtil;
 
 import java.io.IOException;
@@ -9,10 +10,12 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-@RequiredArgsConstructor
-public class HttpManager {
+@Injectable
+public class HttpService {
     private static final String BASE_URL = "http://localhost:5000";
-    private final AuthManager authManager;
+
+    @Inject
+    private AuthService authService;
 
     public HttpResponse<String> post(String url, Object body) {
         HttpClient client = HttpClient.newHttpClient();
@@ -21,8 +24,8 @@ public class HttpManager {
                 .POST(HttpRequest.BodyPublishers.ofString(JsonUtil.toJson(body)))
                 .header("Content-Type", "application/json");
 
-        if(authManager.getToken() != null) {
-            request.header("Authorization", "Bearer " + authManager.getToken());
+        if(authService.getToken() != null) {
+            request.header("Authorization", "Bearer " + authService.getToken());
         }
 
         try {
@@ -38,8 +41,8 @@ public class HttpManager {
                 .uri(getNormalizedUri(url))
                 .GET();
 
-        if(authManager.getToken() != null) {
-            request.header("Authorization", "Bearer " + authManager.getToken());
+        if(authService.getToken() != null) {
+            request.header("Authorization", "Bearer " + authService.getToken());
         }
 
         try {

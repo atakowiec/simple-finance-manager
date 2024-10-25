@@ -6,9 +6,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import pl.pollub.frontend.annotation.Title;
-import pl.pollub.frontend.manager.AuthManager;
-import pl.pollub.frontend.manager.HttpManager;
-import pl.pollub.frontend.manager.ScreenManager;
+import pl.pollub.frontend.annotation.View;
+import pl.pollub.frontend.injector.Inject;
+import pl.pollub.frontend.service.AuthService;
+import pl.pollub.frontend.service.HttpService;
+import pl.pollub.frontend.service.ScreenService;
 import pl.pollub.frontend.user.User;
 import pl.pollub.frontend.util.JsonUtil;
 import pl.pollub.frontend.util.SimpleJsonBuilder;
@@ -16,11 +18,17 @@ import pl.pollub.frontend.util.SimpleJsonBuilder;
 import java.net.http.HttpResponse;
 
 @Title("Logowanie")
+@View(name = "login", path = "login-view.fxml")
 public class LoginController {
 
-    public ScreenManager screenManager;
-    public HttpManager httpManager;
-    public AuthManager authManager;
+    @Inject
+    public ScreenService screenService;
+
+    @Inject
+    public HttpService httpService;
+
+    @Inject
+    public AuthService authService;
 
     @FXML
     public TextField identifierField;
@@ -47,7 +55,7 @@ public class LoginController {
             return;
         }
 
-        HttpResponse<String> response = httpManager.post("/auth/login", SimpleJsonBuilder.empty()
+        HttpResponse<String> response = httpService.post("/auth/login", SimpleJsonBuilder.empty()
                 .add("identifier", identifierField.getText())
                 .add("password", passwordField.getText())
                 .build());
@@ -116,8 +124,8 @@ public class LoginController {
         user.setEmail(email);
         user.setToken(token);
 
-        authManager.setUser(user);
+        authService.setUser(user);
 
-        screenManager.switchTo("home");
+        screenService.switchTo("home");
     }
 }

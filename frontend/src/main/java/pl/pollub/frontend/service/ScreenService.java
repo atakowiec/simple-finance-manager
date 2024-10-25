@@ -1,29 +1,41 @@
-package pl.pollub.frontend.manager;
+package pl.pollub.frontend.service;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import lombok.Getter;
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
 import pl.pollub.frontend.FinanceApplication;
 import pl.pollub.frontend.annotation.NavBar;
 import pl.pollub.frontend.annotation.Title;
+import pl.pollub.frontend.annotation.View;
 import pl.pollub.frontend.controller.MainViewController;
-import pl.pollub.frontend.injector.SimpleInjector;
+import pl.pollub.frontend.injector.DependencyInjector;
+import pl.pollub.frontend.injector.Inject;
+import pl.pollub.frontend.injector.Injectable;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
-public class ScreenManager {
-    @Getter
-    private final Stage stage;
+@Injectable
+public class ScreenService {
     private final Map<String, String> screenMap = new HashMap<>();
 
-    private final MainViewController mainViewController;
+    @Inject
+    private DependencyInjector dependencyInjector;
 
-    public ScreenManager(Stage stage) {
+    @Getter
+    private Stage stage;
+    private MainViewController mainViewController;
+
+    public void init(Stage stage) {
         this.stage = stage;
+        this.stage.setResizable(false);
+        this.initViews();
 
         // on init load main view and prepare hooks for navigation bar and main container elements
         try {
@@ -31,12 +43,24 @@ public class ScreenManager {
             AnchorPane mainView = fxmlLoader.load();
 
             mainViewController = fxmlLoader.getController();
-            mainViewController.setScreenManager(this);
+            dependencyInjector.manualInject(mainViewController);
 
             stage.setScene(new Scene(mainView, 1100, 650));
             stage.show();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void initViews() {
+        Reflections reflections = new Reflections("pl.pollub.frontend", Scanners.TypesAnnotated);
+
+        Set<Class<?>> annotatedClasses = reflections.getTypesAnnotatedWith(View.class);
+
+        for (Class<?> clazz : annotatedClasses) {
+            View viewAnnotation = clazz.getAnnotation(View.class);
+
+            addScreen(viewAnnotation.name(), viewAnnotation.path());
         }
     }
 
@@ -73,7 +97,7 @@ public class ScreenManager {
                 mainViewController.hideNavBar();
             }
 
-            SimpleInjector.inject(controller);
+            dependencyInjector.manualInject(controller);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
