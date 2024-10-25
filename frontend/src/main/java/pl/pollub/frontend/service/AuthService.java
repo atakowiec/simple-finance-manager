@@ -1,10 +1,12 @@
-package pl.pollub.frontend.manager;
+package pl.pollub.frontend.service;
 
 import lombok.Getter;
 import lombok.Setter;
+import pl.pollub.frontend.injector.Injectable;
 import pl.pollub.frontend.user.User;
 
-public class AuthManager {
+@Injectable
+public class AuthService {
 
     @Setter
     @Getter

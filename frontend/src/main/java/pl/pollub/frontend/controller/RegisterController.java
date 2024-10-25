@@ -6,9 +6,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import pl.pollub.frontend.annotation.Title;
-import pl.pollub.frontend.manager.AuthManager;
-import pl.pollub.frontend.manager.HttpManager;
-import pl.pollub.frontend.manager.ScreenManager;
+import pl.pollub.frontend.annotation.View;
+import pl.pollub.frontend.injector.Inject;
+import pl.pollub.frontend.service.AuthService;
+import pl.pollub.frontend.service.HttpService;
+import pl.pollub.frontend.service.ScreenService;
 import pl.pollub.frontend.user.User;
 import pl.pollub.frontend.util.JsonUtil;
 import pl.pollub.frontend.util.SimpleJsonBuilder;
@@ -17,12 +19,14 @@ import java.net.http.HttpResponse;
 import java.util.Objects;
 
 @Title("Rejestracja")
+@View(name = "register", path = "register-view.fxml")
 public class RegisterController {
-    public ScreenManager screenManager;
-
-    public HttpManager httpManager;
-
-    public AuthManager authManager;
+    @Inject
+    public ScreenService screenService;
+    @Inject
+    public HttpService httpService;
+    @Inject
+    public AuthService authService;
 
     @FXML
     public TextField usernameField;
@@ -49,7 +53,7 @@ public class RegisterController {
             return;
         }
 
-        HttpResponse<String> response = httpManager.post("/auth/register", SimpleJsonBuilder.empty()
+        HttpResponse<String> response = httpService.post("/auth/register", SimpleJsonBuilder.empty()
                 .add("username", usernameField.getText())
                 .add("email", emailField.getText())
                 .add("password", passwordField.getText())
@@ -156,9 +160,9 @@ public class RegisterController {
         user.setEmail(response.get("email").getAsString());
         user.setToken(token);
 
-        authManager.setUser(user);
+        authService.setUser(user);
 
-        screenManager.switchTo("home");
+        screenService.switchTo("home");
     }
 
     private void handleValidationErrors(JsonObject errors) {

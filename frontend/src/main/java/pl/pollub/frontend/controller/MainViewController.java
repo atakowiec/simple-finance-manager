@@ -7,16 +7,16 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import lombok.Setter;
 import org.kordamp.bootstrapfx.BootstrapFX;
 import pl.pollub.frontend.FinanceApplication;
-import pl.pollub.frontend.manager.ScreenManager;
+import pl.pollub.frontend.injector.Inject;
+import pl.pollub.frontend.service.ScreenService;
 
 import java.net.URL;
 
 public class MainViewController {
-    @Setter
-    private ScreenManager screenManager;
+    @Inject
+    private ScreenService screenService;
 
     @FXML
     public StackPane mainContainer;
@@ -75,6 +75,6 @@ public class MainViewController {
             return;
         }
 
-        screenManager.switchTo(label.getId());
+        screenService.switchTo(label.getId());
     }
 }
