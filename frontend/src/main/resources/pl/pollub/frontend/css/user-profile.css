@@ -1,0 +1,25 @@
+.nav-label {
+    -fx-font-size: 22px;
+    -fx-text-fill: #06a53b;
+    -fx-padding: 10px;
+    -fx-background-color: #2b3e50;;
+}
+
+.nav-label:hover {
+    -fx-background-color: #3b4e60;
+}
+.active {
+    -fx-background-color: #3b4e60;
+    -fx-text-fill: #FFFFFF;
+}
+.button {
+    -fx-background-color: #2b3e50;
+    -fx-text-fill: #ffffff;
+    -fx-pref-width: 150px;
+    -fx-padding: 10px;
+    -fx-font-size: 14px;
+    -fx-border-color: #ffffff;
+    -fx-border-width: 0 0 1px 0;
+    -fx-border-style: solid;
+}
+

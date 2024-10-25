@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="650.0" prefWidth="1100.0" stylesheets="@css/user-profile.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pollub.frontend.controller.UserController">
+    <children>
+        <BorderPane prefHeight="650.0" prefWidth="1100.0">
+            <left>
+                <VBox alignment="TOP_CENTER" prefHeight="650.0" prefWidth="266.0" spacing="15.0" style="-fx-background-color: #2b3e50;">
+                    <children>
+                        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                            <VBox.margin>
+                                <Insets top="50.0" />
+                            </VBox.margin>
+                            <children>
+                                <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@images/icons/profile.jpg" />
+                                    </image>
+                                </ImageView>
+                            </children>
+                        </VBox>
+
+                        <!-- Navigation Links -->
+                        <HBox alignment="CENTER" prefHeight="45.0" prefWidth="200.0">
+                            <children>
+                                <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@images/icons/user.png" />
+                                    </image>
+                                </ImageView>
+                                <Label onMouseClicked="#switchToUsernameEdit" styleClass="nav-label" text="Edytuj nazwę" textAlignment="CENTER" textFill="#1e0101">
+                                    <font>
+                                        <Font size="20.0" />
+                                    </font>
+                                    <padding>
+                                        <Insets left="15.0" />
+                                    </padding>
+                                </Label>
+                            </children>
+                        </HBox>
+
+                        <HBox alignment="CENTER" prefHeight="45.0" prefWidth="200.0">
+                            <children>
+                                <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@images/icons/user.png" />
+                                    </image>
+                                </ImageView>
+                                <Label onMouseClicked="#switchToEmailEdit" styleClass="nav-label" text="Edytuj email" textAlignment="CENTER" textFill="#1e0101">
+                                    <font>
+                                        <Font size="20.0" />
+                                    </font>
+                                    <padding>
+                                        <Insets left="15.0" />
+                                    </padding>
+                                </Label>
+                            </children>
+                        </HBox>
+
+                        <HBox alignment="CENTER" prefHeight="45.0" prefWidth="200.0">
+                            <children>
+                                <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@images/icons/password.png" />
+                                    </image>
+                                </ImageView>
+                                <Label onMouseClicked="#switchToPasswordEdit" styleClass="nav-label" text="Edytuj hasło" textAlignment="CENTER" textFill="#1e0101">
+                                    <font>
+                                        <Font size="20.0" />
+                                    </font>
+                                    <padding>
+                                        <Insets left="15.0" />
+                                    </padding>
+                                </Label>
+                            </children>
+                        </HBox>
+
+                        <HBox alignment="CENTER" prefHeight="45.0" prefWidth="200.0">
+                            <children>
+                                <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@images/icons/settings.png" />
+                                    </image>
+                                </ImageView>
+                                <Label onMouseClicked="#switchToLimitEdit" styleClass="nav-label" text="Ustawienia limitów" textAlignment="CENTER" textFill="#1e0101">
+                                    <font>
+                                        <Font size="20.0" />
+                                    </font>
+                                    <padding>
+                                        <Insets left="15.0" />
+                                    </padding>
+                                </Label>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </left>
+
+            <center>
+                <StackPane prefHeight="650.0" prefWidth="822.0">
+                    <VBox fx:id="editUsernamePane" alignment="CENTER" prefHeight="200.0" prefWidth="300.0" spacing="10.0" style="-fx-padding: 20;" visible="false">
+                        <Label text="Edytuj nazwę użytkownika:" />
+                        <TextField fx:id="usernameField" promptText="Wprowadź nową nazwę" />
+                        <Button fx:id="saveUsernameButton" onAction="#saveUsernameChanges" text="Zapisz" />
+                    </VBox>
+
+                    <VBox fx:id="editEmailPane" alignment="CENTER" prefHeight="200.0" prefWidth="300.0" spacing="10.0" style="-fx-padding: 20;" visible="false">
+                        <Label text="Edytuj email:" />
+                        <TextField fx:id="emailField" promptText="Wprowadź nowy email" />
+                        <Button fx:id="saveEmailButton" onAction="#saveEmailChanges" text="Zapisz" />
+                    </VBox>
+
+                    <VBox fx:id="editPasswordPane" alignment="CENTER" prefHeight="200.0" prefWidth="300.0" spacing="10.0" style="-fx-padding: 20;" visible="false">
+                        <Label text="Edytuj hasło:" />
+                        <PasswordField fx:id="oldPasswordField" promptText="Wprowadź stare hasło" />
+                        <PasswordField fx:id="newPasswordField" promptText="Wprowadź nowe hasło" />
+                        <Button fx:id="savePasswordButton" onAction="#savePasswordChanges" text="Zapisz" />
+                    </VBox>
+
+                    <VBox fx:id="editLimitsPane" alignment="CENTER" prefHeight="200.0" prefWidth="300.0" spacing="10.0" style="-fx-padding: 20;" visible="false">
+                        <Label text="Edytuj limit wydatków:" />
+                        <TextField fx:id="limitField" promptText="Wprowadź nowy limit" />
+                        <Button fx:id="saveLimitsButton" onAction="#saveLimits" text="Zapisz" />
+                    </VBox>
+
+                    <Label fx:id="statusMessageLabel" text="" textFill="red" />
+                </StackPane>
+            </center>
+        </BorderPane>
+    </children>
+</AnchorPane>
