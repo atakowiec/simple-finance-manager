@@ -1,9 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<?import javafx.scene.text.Text?>
-<StackPane xmlns:fx="http://javafx.com/fxml" fx:controller="pl.pollub.frontend.controller.HomeController">
-    <Text text="Home View" />
-<!-- todo home view -->
-</StackPane>
+<HBox alignment="TOP_CENTER" stylesheets="@css/global.css, @css/home.css " xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pollub.frontend.controller.home.HomeController">
+    <padding>
+        <Insets top="100.0" bottom="10" left="10" right="10"/>
+    </padding>
+    <VBox>
+        <HBox alignment="CENTER">
+            <VBox.margin>
+                <Insets bottom="10.0"/>
+            </VBox.margin>
+            <cursor>
+                <Cursor fx:constant="DEFAULT"/>
+            </cursor>
+            <Button mnemonicParsing="false" styleClass="primary-btn" text="Dodaj wydatek"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button mnemonicParsing="false" styleClass="primary-outline-btn" text="Dodaj przychód"/>
+        </HBox>
+        <ListView fx:id="mainList" prefWidth="445.0" styleClass="list"/>
+    </VBox>
+</HBox>

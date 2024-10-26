@@ -15,4 +15,6 @@ public class IncomeCategory {
     private Long id;
 
     private String name;
+
+    private String icon;
 }

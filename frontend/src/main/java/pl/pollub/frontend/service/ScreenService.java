@@ -9,6 +9,7 @@ import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import pl.pollub.frontend.FinanceApplication;
 import pl.pollub.frontend.annotation.NavBar;
+import pl.pollub.frontend.annotation.PostInitialize;
 import pl.pollub.frontend.annotation.Title;
 import pl.pollub.frontend.annotation.View;
 import pl.pollub.frontend.controller.MainViewController;
@@ -17,6 +18,7 @@ import pl.pollub.frontend.injector.Inject;
 import pl.pollub.frontend.injector.Injectable;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -34,7 +36,6 @@ public class ScreenService {
 
     public void init(Stage stage) {
         this.stage = stage;
-        this.stage.setResizable(false);
         this.initViews();
 
         // on init load main view and prepare hooks for navigation bar and main container elements
@@ -98,8 +99,24 @@ public class ScreenService {
             }
 
             dependencyInjector.manualInject(controller);
+
+            runPostInitialize(controller);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void runPostInitialize(Object controller) {
+        for (Method method : controller.getClass().getMethods()) {
+            if (!method.isAnnotationPresent(PostInitialize.class)) {
+                continue;
+            }
+
+            try {
+                method.invoke(controller);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

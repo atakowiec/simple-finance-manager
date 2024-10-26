@@ -1,0 +1,35 @@
+.primary-btn {
+    -fx-padding: 8px 40px;
+}
+
+.primary-outline-btn {
+    -fx-padding: 8px 40px;
+}
+
+.list {
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+}
+
+.list .value {
+    -fx-font-size: 24px;
+}
+
+.list .value.expense {
+    -fx-text-fill: #ff4949;
+}
+
+.list .value.income {
+    -fx-text-fill: #058f33;
+}
+
+.list .name {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0c1a25;
+}
+
+.list .date {
+    -fx-font-size: 12px;
+    -fx-text-fill: rgba(12, 26, 37, 0.6);
+}

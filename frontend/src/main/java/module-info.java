@@ -13,6 +13,7 @@ module pl.pollub.frontend {
     requires com.google.gson;
     requires static lombok;
     requires org.reflections;
+    requires net.bytebuddy;
 
     opens pl.pollub.frontend to javafx.fxml;
     exports pl.pollub.frontend;
@@ -20,4 +21,10 @@ module pl.pollub.frontend {
     opens pl.pollub.frontend.controller to javafx.fxml;
     exports pl.pollub.frontend.service;
     opens pl.pollub.frontend.service to javafx.fxml;
+    exports pl.pollub.frontend.controller.home;
+    opens pl.pollub.frontend.controller.home to javafx.fxml;
+    exports pl.pollub.frontend.model.transaction;
+    opens pl.pollub.frontend.model.transaction to com.google.gson;
+    exports pl.pollub.frontend.controller.home.transaction;
+    opens pl.pollub.frontend.controller.home.transaction to javafx.fxml;
 }
