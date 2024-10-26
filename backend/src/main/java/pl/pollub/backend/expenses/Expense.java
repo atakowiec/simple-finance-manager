@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import pl.pollub.backend.categories.ExpenseCategory;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -20,4 +22,6 @@ public class Expense {
 
     @ManyToOne
     private ExpenseCategory category;
+
+    private LocalDateTime date;
 }

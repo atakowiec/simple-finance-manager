@@ -1,0 +1,64 @@
+.link {
+    -fx-text-fill: #0076a3;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+
+.link:hover {
+    -fx-text-fill: #005c8a;
+    -fx-underline: true;
+}
+
+.primary-btn {
+    -fx-background-color: #06a53b;
+    -fx-text-fill: black;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-background-radius: 5px;
+}
+
+.primary-btn:hover {
+    -fx-background-color: #058f33;
+}
+
+.secondary-btn {
+    -fx-background-color: #0c1a25;
+    -fx-text-fill: #06a53b;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-background-radius: 5px;
+}
+
+.secondary-btn:hover {
+    -fx-background-color: #0a1721;
+}
+
+.primary-outline-btn {
+    -fx-background-color: transparent;
+    -fx-border-color: #06a53b;
+    -fx-text-fill: #06a53b;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.primary-outline-btn:hover {
+    -fx-background-color: #06a53b;
+    -fx-text-fill: black;
+}
+
+.secondary-outline-btn {
+    -fx-background-color: transparent;
+    -fx-border-color: #0c1a25;
+    -fx-text-fill: #0c1a25;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.secondary-outline-btn:hover {
+    -fx-background-color: #0c1a25;
+    -fx-text-fill: #06a53b;
+}

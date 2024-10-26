@@ -17,7 +17,7 @@ public class FinanceApplication extends Application {
 
         screenService.init(stage); // init screen manager
 
-        screenService.switchTo("login"); // default screen
+        screenService.switchTo("home"); // default screen
     }
 
     public static void main(String[] args) {

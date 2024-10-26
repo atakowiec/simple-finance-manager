@@ -15,4 +15,6 @@ public class ExpenseCategory {
     private Long id;
 
     private String name;
+
+    private String icon;
 }

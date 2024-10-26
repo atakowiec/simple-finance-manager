@@ -11,7 +11,7 @@
     <left>
         <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <ImageView fitHeight="672.0" fitWidth="619.0" layoutY="-20.0" pickOnBounds="true" smooth="false">
-                <Image url="@../../../register-bg.png"/>
+                <Image url="@images/register-bg.png"/>
             </ImageView>
         </AnchorPane>
     </left>
