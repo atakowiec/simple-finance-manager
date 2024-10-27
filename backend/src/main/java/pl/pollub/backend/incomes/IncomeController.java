@@ -1,6 +1,11 @@
 package pl.pollub.backend.incomes;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import pl.pollub.backend.auth.user.User;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -14,21 +19,31 @@ public class IncomeController {
 
     @GetMapping
     public List<Income> getIncomes() {
-        return incomeService.getAllIncomes();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        return incomeService.getAllIncomesForUser(user);
     }
 
     @PostMapping
     public Income createIncome(@RequestBody Income income) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        income.setUser(user);
+        income.setDate(LocalDateTime.now());
         return incomeService.addIncome(income);
     }
 
     @PutMapping("/{id}")
     public Income updateIncome(@PathVariable Long id, @RequestBody Income updatedIncome) {
-        return incomeService.updateIncome(id, updatedIncome);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        return incomeService.updateIncome(id, updatedIncome, user);
     }
 
     @DeleteMapping("/{id}")
     public void deleteIncome(@PathVariable Long id) {
-        incomeService.deleteIncome(id);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        incomeService.deleteIncome(id, user);
     }
 }

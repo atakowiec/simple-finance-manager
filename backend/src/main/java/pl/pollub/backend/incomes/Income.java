@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import pl.pollub.backend.categories.IncomeCategory;
+import pl.pollub.backend.auth.user.User;
 
 import java.time.LocalDateTime;
 
@@ -22,6 +23,10 @@ public class Income {
 
     @ManyToOne
     private IncomeCategory category;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     private LocalDateTime date;
 }
