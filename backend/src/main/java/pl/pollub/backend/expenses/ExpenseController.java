@@ -5,8 +5,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.pollub.backend.auth.user.User;
-import pl.pollub.backend.auth.dto.ExpenseUpdateDto;
-import pl.pollub.backend.auth.dto.ExpenseCreateDto;
+import pl.pollub.backend.expenses.dto.ExpenseUpdateDto;
+import pl.pollub.backend.expenses.dto.ExpenseCreateDto;
 import pl.pollub.backend.categories.ExpenseCategory;
 import pl.pollub.backend.categories.ExpenseCategoryRepository;
 import pl.pollub.backend.exception.HttpException;
@@ -33,6 +33,7 @@ public class ExpenseController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public Expense createExpense(@Valid @RequestBody ExpenseCreateDto expenseCreateDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();

@@ -33,3 +33,7 @@
     -fx-font-size: 12px;
     -fx-text-fill: rgba(12, 26, 37, 0.6);
 }
+
+.modalKey {
+    -fx-pref-width: 60px;
+}

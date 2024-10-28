@@ -17,7 +17,7 @@ public class FinanceApplication extends Application {
     @Override
     public void start(Stage stage) {
         DependencyInjector injector = DependencyInjector.init(); // init dependecies with reflection
-        injector.manualInject(this); // maually inject screen manager on app start
+        injector.manualInject(this); // maually inject dependencies on app start
 
         screenService.init(stage); // init screen manager
 

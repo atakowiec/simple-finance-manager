@@ -4,7 +4,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="383.0" prefWidth="675.0" xmlns="http://javafx.com/javafx/17.0.2-ea"
+<AnchorPane fx:id="root" prefHeight="383.0" prefWidth="675.0" xmlns="http://javafx.com/javafx/17.0.2-ea"
+            stylesheets="@css/global.css"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pollub.frontend.controller.MainViewController">
 
     <StackPane fx:id="mainContainer" AnchorPane.bottomAnchor="0.0"
@@ -12,13 +13,28 @@
 
     </StackPane>
 
-    <HBox fx:id="navBar" styleClass="navbar" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+    <HBox fx:id="navBar" styleClass="navbar" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
+          AnchorPane.topAnchor="0">
         <padding>
             <Insets bottom="10" left="10" right="10" top="10"/>
         </padding>
-        <Label id="home" onMouseClicked="#onNavItemClick" prefHeight="25.0" styleClass="navItem" text="Strona główna" accessibleRole="BUTTON"/>
-        <Region HBox.hgrow="ALWAYS" />
-        <Label id="raports" onMouseClicked="#onNavItemClick" prefHeight="25.0" styleClass="navItem" text="Raporty" accessibleRole="BUTTON"/>
-        <Label id="logout" onMouseClicked="#logout" prefHeight="25.0" styleClass="navItem" text="Wyloguj" accessibleRole="BUTTON"/>
+        <Label id="home" onMouseClicked="#onNavItemClick" prefHeight="25.0" styleClass="navItem" text="Strona główna"
+               accessibleRole="BUTTON"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label id="raports" onMouseClicked="#onNavItemClick" prefHeight="25.0" styleClass="navItem" text="Raporty"
+               accessibleRole="BUTTON"/>
+        <Label id="logout" onMouseClicked="#logout" prefHeight="25.0" styleClass="navItem" text="Wyloguj"
+               accessibleRole="BUTTON"/>
     </HBox>
+
+    <VBox id="modalOverlay" style="-fx-background-color: #0008" alignment="CENTER" AnchorPane.bottomAnchor="0.0"
+          AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+          AnchorPane.topAnchor="0.0" visible="false">
+        <HBox alignment="CENTER">
+            <StackPane>
+                <VBox id="modalContainer" styleClass="modalContainer">
+                </VBox>
+            </StackPane>
+        </HBox>
+    </VBox>
 </AnchorPane>

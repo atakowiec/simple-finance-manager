@@ -2,7 +2,7 @@ package pl.pollub.frontend.model.transaction;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 
 @Data
@@ -19,8 +19,8 @@ public abstract class Transaction {
         return String.format("%.2f", amount);
     }
 
-    public LocalDateTime getDate() {
-        return LocalDateTime.parse(date);
+    public LocalDate getDate() {
+        return LocalDate.parse(date);
     }
 
     public abstract String getAmountStyleClass();

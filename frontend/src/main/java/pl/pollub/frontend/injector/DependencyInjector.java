@@ -7,6 +7,7 @@ import pl.pollub.frontend.annotation.PostInitialize;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -14,10 +15,10 @@ import java.util.Set;
 
 public class DependencyInjector {
     @Getter
-    private final Map<Class<?>, Object> instances = new HashMap<>();
+    private final Map<Class<?>, Object> instancesMap = new HashMap<>();
 
     private DependencyInjector() {
-        instances.put(DependencyInjector.class, this);
+        instancesMap.put(DependencyInjector.class, this);
         this.begin();
     }
 
@@ -25,9 +26,12 @@ public class DependencyInjector {
         return new DependencyInjector();
     }
 
+    private <T> T getInstance(Class<T> clazz) {
+        return clazz.cast(instancesMap.get(clazz));
+    }
 
-    private  <T> T getInstance(Class<T> clazz) {
-        return clazz.cast(instances.get(clazz));
+    public Collection<Object> getInstances() {
+        return instancesMap.values();
     }
 
     private void begin() {
@@ -39,25 +43,35 @@ public class DependencyInjector {
             addInstance(clazz);
         }
 
-        for (Object instance : instances.values()) {
+        for (Object instance : instancesMap.values()) {
             manualInject(instance);
         }
 
-        for (Object instance : instances.values()) {
+        for (Object instance : instancesMap.values()) {
             runPostInitialize(instance);
         }
     }
 
     public void addInstance(Class<?> clazz) {
         try {
-            instances.put(clazz, clazz.getDeclaredConstructor().newInstance());
+            instancesMap.put(clazz, clazz.getDeclaredConstructor().newInstance());
         } catch (Exception e) {
             throw new RuntimeException("Cannot create instance of class: " + clazz.getName(), e);
         }
     }
 
     public void manualInject(Object instance) {
-        for (Field field : instance.getClass().getDeclaredFields()) {
+        manualInject(instance, instance.getClass());
+
+        Class<?> clazz = instance.getClass();
+        while (clazz.getSuperclass() != Object.class) {
+            clazz = clazz.getSuperclass();
+            manualInject(instance, clazz);
+        }
+    }
+
+    private void manualInject(Object instance, Class<?> clazz) {
+        for (Field field : clazz.getDeclaredFields()) {
             if(!field.isAnnotationPresent(Inject.class)) {
                 continue;
             }
@@ -76,14 +90,25 @@ public class DependencyInjector {
         }
     }
 
-    private void runPostInitialize(Object controller) {
-        for (Method method : controller.getClass().getMethods()) {
+    public void runPostInitialize(Object controller) {
+        runPostInitialize(controller, controller.getClass());
+
+        Class<?> clazz = controller.getClass();
+        while (clazz.getSuperclass() != Object.class) {
+            clazz = clazz.getSuperclass();
+            runPostInitialize(controller, clazz);
+        }
+    }
+
+    private void runPostInitialize(Object object, Class<?> clazz) {
+        for (Method method : clazz.getDeclaredMethods()) {
             if (!method.isAnnotationPresent(PostInitialize.class)) {
                 continue;
             }
 
             try {
-                method.invoke(controller);
+                method.setAccessible(true);
+                method.invoke(object);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
