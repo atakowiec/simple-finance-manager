@@ -3,8 +3,10 @@ package pl.pollub.frontend.injector;
 import lombok.Getter;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
+import pl.pollub.frontend.annotation.PostInitialize;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -40,6 +42,10 @@ public class DependencyInjector {
         for (Object instance : instances.values()) {
             manualInject(instance);
         }
+
+        for (Object instance : instances.values()) {
+            runPostInitialize(instance);
+        }
     }
 
     public void addInstance(Class<?> clazz) {
@@ -65,6 +71,20 @@ public class DependencyInjector {
                 field.setAccessible(true);
                 field.set(instance, objectToInject);
             } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void runPostInitialize(Object controller) {
+        for (Method method : controller.getClass().getMethods()) {
+            if (!method.isAnnotationPresent(PostInitialize.class)) {
+                continue;
+            }
+
+            try {
+                method.invoke(controller);
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }

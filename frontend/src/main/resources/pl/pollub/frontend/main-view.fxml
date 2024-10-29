@@ -19,5 +19,6 @@
         <Label id="home" onMouseClicked="#onNavItemClick" prefHeight="25.0" styleClass="navItem" text="Strona główna" accessibleRole="BUTTON"/>
         <Region HBox.hgrow="ALWAYS" />
         <Label id="raports" onMouseClicked="#onNavItemClick" prefHeight="25.0" styleClass="navItem" text="Raporty" accessibleRole="BUTTON"/>
+        <Label id="logout" onMouseClicked="#logout" prefHeight="25.0" styleClass="navItem" text="Wyloguj" accessibleRole="BUTTON"/>
     </HBox>
 </AnchorPane>

@@ -25,8 +25,7 @@ public class HttpService {
     }
 
     public HttpResponse<String> get(String url) {
-        HttpRequest.Builder request = HttpRequest.newBuilder()
-                .uri(getNormalizedUri(url))
+        HttpRequest.Builder request = getHttpRequestBuilder(url)
                 .GET();
 
         return sendRequest(request.build());
