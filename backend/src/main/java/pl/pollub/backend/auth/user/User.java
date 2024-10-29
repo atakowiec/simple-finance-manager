@@ -1,6 +1,7 @@
 package pl.pollub.backend.auth.user;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,6 +31,10 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(name = "monthly_limit")
+    @DecimalMin(value = "0.0", message = "Limit musi być większy lub równy 0.")
+    private Double monthlyLimit;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
@@ -53,5 +58,9 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public void setSpendingLimit(@DecimalMin(value = "0.0", message = "Limit musi być większy lub równy 0.") Double spendingLimit) {
+
     }
 }

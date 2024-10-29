@@ -21,6 +21,10 @@ public class AuthService implements UserDetailsService {
         return usersRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
+    public User getUserById(long id) {
+        return usersRepository.findById(id).orElse(null);
+    }
+
     public boolean isUsernameTaken(String username) {
         return usersRepository.findByUsername(username).isPresent();
     }

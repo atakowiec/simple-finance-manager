@@ -12,6 +12,7 @@ module pl.pollub.frontend {
     requires com.fasterxml.jackson.databind;
     requires com.google.gson;
     requires static lombok;
+    requires java.desktop;
     requires org.reflections;
     requires net.bytebuddy;
 

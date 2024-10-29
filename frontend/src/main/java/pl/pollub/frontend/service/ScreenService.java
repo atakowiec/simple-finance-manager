@@ -36,6 +36,7 @@ public class ScreenService {
 
     public void init(Stage stage) {
         this.stage = stage;
+        this.stage.setResizable(false);
         this.initViews();
 
         // on init load main view and prepare hooks for navigation bar and main container elements

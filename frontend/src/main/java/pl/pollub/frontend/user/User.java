@@ -9,4 +9,5 @@ public class User {
     private String email;
     private boolean isAdmin;
     private String token;
+    private Double monthlyLimit;
 }

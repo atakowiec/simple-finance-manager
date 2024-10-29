@@ -35,33 +35,45 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        final String username = tokenClaims.getSubject();
+        final String stringUserId = tokenClaims.getSubject();
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            User user;
-            try {
-                user = this.authService.loadUserByUsername(username);
-            } catch (Exception e) {
-                jwtService.invalidateToken(response);
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                    user,
-                    null,
-                    user.getAuthorities()
-            );
-
-            authToken.setDetails(
-                    new WebAuthenticationDetailsSource().buildDetails(request)
-            );
-
-            SecurityContextHolder.getContext().setAuthentication(authToken);
-
-            // generate new token and set it in response
-            jwtService.addTokenToResponse(response, user);
+        if (stringUserId == null || SecurityContextHolder.getContext().getAuthentication() != null) {
+            filterChain.doFilter(request, response);
+            return;
         }
+
+
+        User user;
+        try {
+            long userId = Long.parseLong(stringUserId);
+            user = this.authService.getUserById(userId);
+        } catch (Exception e) {
+            jwtService.invalidateToken(response);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if(user == null) {
+            jwtService.invalidateToken(response);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                user,
+                null,
+                user.getAuthorities()
+        );
+
+        authToken.setDetails(
+                new WebAuthenticationDetailsSource().buildDetails(request)
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+
+        // generate new token and set it in response
+        jwtService.addTokenToResponse(response, user);
+
         filterChain.doFilter(request, response);
     }
 }

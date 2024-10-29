@@ -18,38 +18,47 @@ public class HttpService {
     private AuthService authService;
 
     public HttpResponse<String> post(String url, Object body) {
-        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest.Builder request = getHttpRequestBuilder(url)
+                .POST(HttpRequest.BodyPublishers.ofString(JsonUtil.toJson(body)));
+
+        return sendRequest(request.build());
+    }
+
+    public HttpResponse<String> get(String url) {
         HttpRequest.Builder request = HttpRequest.newBuilder()
                 .uri(getNormalizedUri(url))
-                .POST(HttpRequest.BodyPublishers.ofString(JsonUtil.toJson(body)))
-                .header("Content-Type", "application/json");
+                .GET();
 
-        if(authService.getToken() != null) {
-            request.header("Authorization", "Bearer " + authService.getToken());
-        }
+        return sendRequest(request.build());
+    }
+
+    public HttpResponse<String> put(String url, Object body) {
+        HttpRequest.Builder request = getHttpRequestBuilder(url)
+                .PUT(HttpRequest.BodyPublishers.ofString(JsonUtil.toJson(body)));
+
+        return sendRequest(request.build());
+    }
+
+    private HttpResponse<String> sendRequest(HttpRequest request) {
+        HttpClient client = HttpClient.newHttpClient();
 
         try {
-            return client.send(request.build(), HttpResponse.BodyHandlers.ofString());
+            return client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public HttpResponse<String> get(String url) {
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest.Builder request = HttpRequest.newBuilder()
-                .uri(getNormalizedUri(url))
-                .GET();
+    private HttpRequest.Builder getHttpRequestBuilder(String url) {
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
+                .header("Content-Type", "application/json")
+                .uri(getNormalizedUri(url));
 
         if(authService.getToken() != null) {
-            request.header("Authorization", "Bearer " + authService.getToken());
+            builder.header("Authorization", "Bearer " + authService.getToken());
         }
 
-        try {
-            return client.send(request.build(), HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        return builder;
     }
 
     private URI getNormalizedUri(String url) {
