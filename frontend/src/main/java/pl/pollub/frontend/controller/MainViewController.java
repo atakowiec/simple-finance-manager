@@ -10,6 +10,7 @@ import javafx.scene.layout.StackPane;
 import org.kordamp.bootstrapfx.BootstrapFX;
 import pl.pollub.frontend.FinanceApplication;
 import pl.pollub.frontend.injector.Inject;
+import pl.pollub.frontend.service.AuthService;
 import pl.pollub.frontend.service.ScreenService;
 
 import java.net.URL;
@@ -17,6 +18,9 @@ import java.net.URL;
 public class MainViewController {
     @Inject
     private ScreenService screenService;
+
+    @Inject
+    private AuthService authService;
 
     @FXML
     public StackPane mainContainer;
@@ -76,5 +80,9 @@ public class MainViewController {
         }
 
         screenService.switchTo(label.getId());
+    }
+
+    public void logout() {
+        authService.logout();
     }
 }

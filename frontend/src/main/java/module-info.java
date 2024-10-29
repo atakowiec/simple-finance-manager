@@ -15,6 +15,7 @@ module pl.pollub.frontend {
     requires java.desktop;
     requires org.reflections;
     requires net.bytebuddy;
+    requires java.prefs;
 
     opens pl.pollub.frontend to javafx.fxml;
     exports pl.pollub.frontend;
@@ -28,4 +29,5 @@ module pl.pollub.frontend {
     opens pl.pollub.frontend.model.transaction to com.google.gson;
     exports pl.pollub.frontend.controller.home.transaction;
     opens pl.pollub.frontend.controller.home.transaction to javafx.fxml;
+    exports pl.pollub.frontend.user;
 }

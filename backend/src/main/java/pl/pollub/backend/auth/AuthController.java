@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.pollub.backend.auth.dto.LoginDto;
 import pl.pollub.backend.auth.dto.RegisterDto;
@@ -95,9 +96,8 @@ public class AuthController {
                 .build();
     }
 
-    @GetMapping("/logout")
-    public void logout(HttpServletResponse res) {
-        jwtService.invalidateToken(res);
-        res.setStatus(204);
+    @PostMapping("/verify")
+    public User verify(@AuthenticationPrincipal User user) {
+        return user;
     }
 }

@@ -48,13 +48,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             long userId = Long.parseLong(stringUserId);
             user = this.authService.getUserById(userId);
         } catch (Exception e) {
-            jwtService.invalidateToken(response);
             filterChain.doFilter(request, response);
             return;
         }
 
         if(user == null) {
-            jwtService.invalidateToken(response);
             filterChain.doFilter(request, response);
             return;
         }

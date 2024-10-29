@@ -70,8 +70,4 @@ public class JwtService {
     public void addTokenToResponse(HttpServletResponse response, User user) {
         addTokenToResponse(response, createToken(user));
     }
-
-    public void invalidateToken(HttpServletResponse response) {
-        response.setHeader(AUTHORIZATION_HEADER, "");
-    }
 }

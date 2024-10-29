@@ -4,11 +4,15 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import pl.pollub.frontend.injector.DependencyInjector;
 import pl.pollub.frontend.injector.Inject;
+import pl.pollub.frontend.service.AuthService;
 import pl.pollub.frontend.service.ScreenService;
 
 public class FinanceApplication extends Application {
     @Inject
     private ScreenService screenService;
+
+    @Inject
+    private AuthService authService;
 
     @Override
     public void start(Stage stage) {
@@ -17,7 +21,11 @@ public class FinanceApplication extends Application {
 
         screenService.init(stage); // init screen manager
 
-        screenService.switchTo("login"); // default screen
+        if (authService.tryLogin()) {
+            screenService.switchTo("home");
+        } else {
+            screenService.switchTo("login");
+        }
     }
 
     public static void main(String[] args) {
