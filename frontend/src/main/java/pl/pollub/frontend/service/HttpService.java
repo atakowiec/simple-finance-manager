@@ -38,6 +38,13 @@ public class HttpService {
         return sendRequest(request.build());
     }
 
+    public HttpResponse<String> delete(String url) {
+        HttpRequest.Builder request = getHttpRequestBuilder(url)
+                .DELETE();
+
+        return sendRequest(request.build());
+    }
+
     private HttpResponse<String> sendRequest(HttpRequest request) {
         HttpClient client = HttpClient.newHttpClient();
 

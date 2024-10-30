@@ -32,7 +32,6 @@ public class UserController {
     private VBox editPasswordPane;
     @FXML
     private VBox editLimitsPane;
-
     @FXML
     private TextField usernameField;
     @FXML
@@ -43,7 +42,6 @@ public class UserController {
     private PasswordField newPasswordField;
     @FXML
     private TextField limitField;
-
     @FXML
     private Label statusMessageLabel;
 
@@ -105,7 +103,6 @@ public class UserController {
         displayStatusMessage("Wystąpił błąd podczas aktualizacji nazwy użytkownika.");
     }
 
-
     @FXML
     private void saveEmailChanges() {
         String email = emailField.getText().trim();
@@ -122,20 +119,20 @@ public class UserController {
 
         HttpResponse<String> response = userService.updateEmail(email);
 
-        if(response.statusCode() == 200) {
+        if (response.statusCode() == 200) {
             displayStatusMessage("Zaktualizowano adres e-mail.");
             return;
         }
 
-        if(response.statusCode() == 409) {
+        if (response.statusCode() == 409) {
             displayStatusMessage("Ten adres e-mail jest już zajęty.");
             return;
         }
 
         JsonObject json = JsonUtil.fromJson(response.body()).getAsJsonObject();
-        if(json.has("message") && "Validation failed".equals(json.get("message").getAsString())) {
+        if (json.has("message") && "Validation failed".equals(json.get("message").getAsString())) {
             JsonObject errors = json.getAsJsonObject("errors");
-            if(errors.has("email")) {
+            if (errors.has("email")) {
                 String emailError = errors.getAsJsonArray("email").get(0).getAsString();
                 displayStatusMessage(emailError);
                 return;
@@ -166,25 +163,25 @@ public class UserController {
 
         HttpResponse<String> response = userService.updateUserPassword(oldPassword, newPassword);
 
-        if(response.statusCode() == 200) {
+        if (response.statusCode() == 200) {
             displayStatusMessage("Zmieniono hasło.");
             return;
         }
 
-        if(response.statusCode() == 401) {
+        if (response.statusCode() == 401) {
             displayStatusMessage("Stare hasło jest nieprawidłowe.");
             return;
         }
 
         JsonObject json = JsonUtil.fromJson(response.body()).getAsJsonObject();
-        if(json.has("message") && "Validation failed".equals(json.get("message").getAsString())) {
+        if (json.has("message") && "Validation failed".equals(json.get("message").getAsString())) {
             JsonObject errors = json.getAsJsonObject("errors");
-            if(errors.has("oldPassword")) {
+            if (errors.has("oldPassword")) {
                 String oldPasswordError = errors.getAsJsonArray("oldPassword").get(0).getAsString();
                 displayStatusMessage(oldPasswordError);
                 return;
             }
-            if(errors.has("newPassword")) {
+            if (errors.has("newPassword")) {
                 String newPasswordError = errors.getAsJsonArray("newPassword").get(0).getAsString();
                 displayStatusMessage(newPasswordError);
                 return;
@@ -193,7 +190,6 @@ public class UserController {
 
         displayStatusMessage("Wystąpił błąd podczas zmiany hasła");
     }
-
 
     @FXML
     private void saveLimits() {
@@ -236,8 +232,6 @@ public class UserController {
 
         displayStatusMessage("Wystąpił błąd podczas aktualizacji limitu wydatków.");
     }
-
-
 
     private void setVisiblePane(VBox pane) {
         editUsernamePane.setVisible(false);

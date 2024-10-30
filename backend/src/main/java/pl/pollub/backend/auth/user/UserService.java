@@ -10,6 +10,8 @@ import pl.pollub.backend.auth.dto.UserPasswordChangeDto;
 import pl.pollub.backend.auth.dto.UserLimitDto;
 import pl.pollub.backend.exception.HttpException;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -47,7 +49,7 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(() -> new HttpException(404, "Użytkownik nie znaleziony"));
         user.setEmail(emailEditDto.getEmail());
         userRepository.save(user);
-        return "Email updated";
+        return "Email został zaktualizowany";
     }
 
     public String updateUserPassword(Long userId, UserPasswordChangeDto passwordChangeDto) {
@@ -76,6 +78,18 @@ public class UserService {
         user.setMonthlyLimit(userEditDto.getSpendingLimit());
         userRepository.save(user);
         return "Limit wydatków został zaktualizowany.";
+    }
+
+    public Optional<User> findById(Long userId) {
+        return userRepository.findById(userId);
+    }
+
+    public void save(User user) {
+        userRepository.save(user);
+    }
+
+    public void delete(User user) {
+        userRepository.delete(user);
     }
 
 }
