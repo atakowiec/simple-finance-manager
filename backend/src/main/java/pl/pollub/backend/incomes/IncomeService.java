@@ -2,7 +2,7 @@ package pl.pollub.backend.incomes;
 
 import org.springframework.stereotype.Service;
 import pl.pollub.backend.auth.user.User;
-import pl.pollub.backend.auth.dto.IncomeUpdateDto;
+import pl.pollub.backend.incomes.dto.IncomeUpdateDto;
 import pl.pollub.backend.categories.IncomeCategory;
 import pl.pollub.backend.categories.IncomeCategoryRepository;
 import pl.pollub.backend.exception.HttpException;

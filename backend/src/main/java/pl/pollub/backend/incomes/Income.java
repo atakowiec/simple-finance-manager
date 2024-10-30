@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import pl.pollub.backend.categories.IncomeCategory;
 import pl.pollub.backend.auth.user.User;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -28,5 +29,5 @@ public class Income {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    private LocalDateTime date;
+    private LocalDate date;
 }

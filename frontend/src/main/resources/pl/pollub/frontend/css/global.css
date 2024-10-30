@@ -62,3 +62,16 @@
     -fx-background-color: #0c1a25;
     -fx-text-fill: #06a53b;
 }
+
+.modalContainer {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 10px;
+    -fx-padding: 20px;
+}
+
+.modalTitle {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0c1a25;
+    -fx-padding: 0 0 20px 0;
+}

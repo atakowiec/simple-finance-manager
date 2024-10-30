@@ -42,7 +42,12 @@ public class HttpService {
         HttpClient client = HttpClient.newHttpClient();
 
         try {
-            return client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if(response.statusCode() >= 400)
+                System.out.println("Error: " + response.body());
+
+            return response;
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }

@@ -1,4 +1,4 @@
-package pl.pollub.backend.auth.dto;
+package pl.pollub.backend.incomes.dto;
 
 import lombok.Data;
 

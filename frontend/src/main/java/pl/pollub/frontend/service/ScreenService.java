@@ -9,16 +9,16 @@ import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import pl.pollub.frontend.FinanceApplication;
 import pl.pollub.frontend.annotation.NavBar;
-import pl.pollub.frontend.annotation.PostInitialize;
 import pl.pollub.frontend.annotation.Title;
 import pl.pollub.frontend.annotation.View;
 import pl.pollub.frontend.controller.MainViewController;
+import pl.pollub.frontend.event.EventEmitter;
+import pl.pollub.frontend.event.EventType;
 import pl.pollub.frontend.injector.DependencyInjector;
 import pl.pollub.frontend.injector.Inject;
 import pl.pollub.frontend.injector.Injectable;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +29,9 @@ public class ScreenService {
 
     @Inject
     private DependencyInjector dependencyInjector;
+
+    @Inject
+    private EventEmitter eventEmitter;
 
     @Getter
     private Stage stage;
@@ -46,6 +49,7 @@ public class ScreenService {
 
             mainViewController = fxmlLoader.getController();
             dependencyInjector.manualInject(mainViewController);
+            dependencyInjector.runPostInitialize(mainViewController);
 
             stage.setScene(new Scene(mainView, 1100, 650));
             stage.show();
@@ -101,23 +105,11 @@ public class ScreenService {
 
             dependencyInjector.manualInject(controller);
 
-            runPostInitialize(controller);
+            eventEmitter.emit(EventType.VIEW_CHANGE, controller);
+
+            dependencyInjector.runPostInitialize(controller);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private void runPostInitialize(Object controller) {
-        for (Method method : controller.getClass().getMethods()) {
-            if (!method.isAnnotationPresent(PostInitialize.class)) {
-                continue;
-            }
-
-            try {
-                method.invoke(controller);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 }

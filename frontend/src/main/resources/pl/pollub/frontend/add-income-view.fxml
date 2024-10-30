@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox alignment="CENTER" stylesheets="@css/home.css" xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pollub.frontend.controller.home.add.AddIncomeController">
+    <Label styleClass="modalTitle" text="Dodaj przychód"/>
+
+    <HBox alignment="CENTER_LEFT" spacing="20.0">
+        <Label styleClass="modalKey" text="Nazwa:">
+            Kwota:
+        </Label>
+        <TextField fx:id="nameInput" prefWidth="200.0"/>
+    </HBox>
+    <HBox alignment="CENTER_LEFT" spacing="20.0">
+        <VBox.margin>
+            <Insets top="20.0"/>
+        </VBox.margin>
+        <Label styleClass="modalKey" text="Kwota:"/>
+        <TextField fx:id="amountInput" prefWidth="200.0"/>
+    </HBox>
+    <HBox alignment="CENTER_LEFT" spacing="20.0">
+        <VBox.margin>
+            <Insets top="20.0"/>
+        </VBox.margin>
+        <Label styleClass="modalKey" text="Data:"/>
+        <DatePicker fx:id="datePicker" prefWidth="200.0"/>
+    </HBox>
+    <HBox alignment="CENTER_LEFT" spacing="20.0">
+        <VBox.margin>
+            <Insets top="20.0"/>
+        </VBox.margin>
+        <Label styleClass="modalKey" text="Kategoria:"/>
+        <ComboBox fx:id="categoryPicker" prefWidth="200.0" visibleRowCount="8"/>
+    </HBox>
+    <Label fx:id="errorLabel">
+        <VBox.margin>
+            <Insets top="10.0"/>
+        </VBox.margin>
+    </Label>
+
+    <Button styleClass="primary-btn" text="Dodaj przychód" onAction="#save">
+        <VBox.margin>
+            <Insets top="10.0"/>
+        </VBox.margin>
+    </Button>
+</VBox>

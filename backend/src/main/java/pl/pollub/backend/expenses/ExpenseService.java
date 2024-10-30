@@ -2,7 +2,7 @@ package pl.pollub.backend.expenses;
 
 import org.springframework.stereotype.Service;
 import pl.pollub.backend.auth.user.User;
-import pl.pollub.backend.auth.dto.ExpenseUpdateDto;
+import pl.pollub.backend.expenses.dto.ExpenseUpdateDto;
 import pl.pollub.backend.categories.ExpenseCategory;
 import pl.pollub.backend.categories.ExpenseCategoryRepository;
 import pl.pollub.backend.exception.HttpException;

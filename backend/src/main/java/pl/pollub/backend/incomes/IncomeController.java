@@ -5,8 +5,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.pollub.backend.auth.user.User;
-import pl.pollub.backend.auth.dto.IncomeCreateDto;
-import pl.pollub.backend.auth.dto.IncomeUpdateDto;
+import pl.pollub.backend.incomes.dto.IncomeCreateDto;
+import pl.pollub.backend.incomes.dto.IncomeUpdateDto;
 import pl.pollub.backend.categories.IncomeCategory;
 import pl.pollub.backend.categories.IncomeCategoryRepository;
 import pl.pollub.backend.exception.HttpException;
@@ -32,6 +32,7 @@ public class IncomeController {
         return incomeService.getAllIncomesForUser(user);
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public Income createIncome(@Valid @RequestBody IncomeCreateDto incomeCreateDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
