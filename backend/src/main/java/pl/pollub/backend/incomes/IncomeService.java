@@ -2,6 +2,9 @@ package pl.pollub.backend.incomes;
 
 import org.springframework.stereotype.Service;
 import pl.pollub.backend.auth.user.User;
+import pl.pollub.backend.auth.dto.IncomeUpdateDto;
+import pl.pollub.backend.categories.IncomeCategory;
+import pl.pollub.backend.categories.IncomeCategoryRepository;
 import pl.pollub.backend.exception.HttpException;
 import org.springframework.http.HttpStatus;
 
@@ -10,9 +13,11 @@ import java.util.List;
 @Service
 public class IncomeService {
     private final IncomeRepository incomeRepository;
+    private final IncomeCategoryRepository categoryRepository;
 
-    public IncomeService(IncomeRepository incomeRepository) {
+    public IncomeService(IncomeRepository incomeRepository, IncomeCategoryRepository categoryRepository) {
         this.incomeRepository = incomeRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     public List<Income> getAllIncomesForUser(User user) {
@@ -23,12 +28,20 @@ public class IncomeService {
         return incomeRepository.save(income);
     }
 
-    public Income updateIncome(Long id, Income updatedIncome, User user) {
+    public Income updateIncome(Long id, IncomeUpdateDto updatedIncome, User user) {
         return incomeRepository.findByIdAndUser(id, user)
                 .map(income -> {
-                    income.setName(updatedIncome.getName());
-                    income.setAmount(updatedIncome.getAmount());
-                    income.setCategory(updatedIncome.getCategory());
+                    if (updatedIncome.getName() != null) {
+                        income.setName(updatedIncome.getName());
+                    }
+                    if (updatedIncome.getAmount() != null) {
+                        income.setAmount(updatedIncome.getAmount());
+                    }
+                    if (updatedIncome.getCategoryId() != null) {
+                        IncomeCategory category = categoryRepository.findById(updatedIncome.getCategoryId())
+                                .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono kategorii o podanym identyfikatorze: " + updatedIncome.getCategoryId()));
+                        income.setCategory(category);
+                    }
                     return incomeRepository.save(income);
                 })
                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono dochodu z identyfikatorem: " + id));
