@@ -83,8 +83,10 @@ public class EventEmitter {
         try {
             if(method.getParameterCount() == 0) {
                 method.invoke(target);
-            } else {
+            } else if (method.getParameterCount() == 1) {
                 method.invoke(target, (Object) data);
+            } else {
+                method.invoke(target, data);
             }
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
