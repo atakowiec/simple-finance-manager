@@ -37,8 +37,6 @@ public class AuthController {
             throw new HttpException(HttpStatus.CONFLICT, "email");
         }
 
-        System.out.println(registerDto);
-
         String hashedPassword = authService.hashPassword(registerDto.getPassword());
 
         User user = new User();

@@ -23,11 +23,14 @@ public class AuthService {
 
     @Inject
     private ScreenService screenService;
+    @Inject
+    private SocketService socketService;
 
     public void setUser(User user) {
         this.user = user;
 
         if (user != null) {
+            socketService.connect();
             saveToken(user.getToken());
         } else {
             logout();
@@ -53,7 +56,7 @@ public class AuthService {
         }
 
         this.user = new User();
-        this.user.setToken(token);
+        user.setToken(token);
 
         HttpResponse<String> response = httpService.post("/auth/verify", token);
 
@@ -64,11 +67,12 @@ public class AuthService {
 
         JsonObject body = JsonUtil.fromJson(response.body()).getAsJsonObject();
 
-        this.user.setUsername(body.get("username").getAsString());
-        this.user.setEmail(body.get("email").getAsString());
-        this.user.setAdmin(Objects.equals(body.get("role").getAsString(), "ADMIN"));
-        this.user.setId(body.get("id").getAsLong());
+        user.setUsername(body.get("username").getAsString());
+        user.setEmail(body.get("email").getAsString());
+        user.setAdmin(Objects.equals(body.get("role").getAsString(), "ADMIN"));
+        user.setId(body.get("id").getAsLong());
 
+        setUser(user);
         return true;
     }
 
@@ -79,6 +83,7 @@ public class AuthService {
     public void logout() {
         this.user = null;
         preferences.remove("token");
+        this.socketService.disconnect();
         this.screenService.switchTo("login");
     }
 }

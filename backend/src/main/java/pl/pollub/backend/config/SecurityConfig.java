@@ -24,6 +24,7 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers("/ws/**").authenticated();
                     auth.requestMatchers("/auth/verify").authenticated();
                     auth.requestMatchers("/auth/**").permitAll();
                     auth.requestMatchers("/expenses/**", "/incomes/**").authenticated();
