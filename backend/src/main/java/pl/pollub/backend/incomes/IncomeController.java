@@ -1,35 +1,35 @@
 package pl.pollub.backend.incomes;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.pollub.backend.auth.user.User;
-import pl.pollub.backend.incomes.dto.IncomeCreateDto;
-import pl.pollub.backend.incomes.dto.IncomeUpdateDto;
 import pl.pollub.backend.categories.IncomeCategory;
 import pl.pollub.backend.categories.IncomeCategoryRepository;
 import pl.pollub.backend.exception.HttpException;
-import org.springframework.http.HttpStatus;
+import pl.pollub.backend.group.GroupService;
+import pl.pollub.backend.group.model.Group;
+import pl.pollub.backend.incomes.dto.IncomeCreateDto;
+import pl.pollub.backend.incomes.dto.IncomeUpdateDto;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/incomes")
+@RequiredArgsConstructor
 public class IncomeController {
     private final IncomeService incomeService;
     private final IncomeCategoryRepository categoryRepository;
+    private final GroupService groupService;
 
-    public IncomeController(IncomeService incomeService, IncomeCategoryRepository categoryRepository) {
-        this.incomeService = incomeService;
-        this.categoryRepository = categoryRepository;
-    }
-
-    @GetMapping
-    public List<Income> getIncomes() {
+    @GetMapping("/{groupId}")
+    public List<Income> getIncomes(@PathVariable Long groupId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
-        return incomeService.getAllIncomesForUser(user);
+        return incomeService.getAllIncomesForGroup(user, groupId);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -41,12 +41,16 @@ public class IncomeController {
         IncomeCategory category = categoryRepository.findById(incomeCreateDto.getCategoryId())
                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono kategorii o podanym identyfikatorze: " + incomeCreateDto.getCategoryId()));
 
+        Group group = groupService.getGroupByIdOrThrow(incomeCreateDto.getGroupId());
+        groupService.checkMembershipOrThrow(user, group);
+
         Income income = new Income();
         income.setName(incomeCreateDto.getName());
         income.setAmount(incomeCreateDto.getAmount());
         income.setCategory(category);
         income.setUser(user);
         income.setDate(incomeCreateDto.getDate());
+        income.setGroup(group);
 
         return incomeService.addIncome(income);
     }

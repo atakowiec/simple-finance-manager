@@ -7,7 +7,7 @@
 
 <HBox alignment="CENTER_LEFT" stylesheets="@../css/home.css" xmlns="http://javafx.com/javafx/8"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="pl.pollub.frontend.controller.home.add.list.CategoryCellController">
+      fx:controller="pl.pollub.frontend.controller.group.add.list.CategoryCellController">
    <ImageView fx:id="categoryIcon" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
       <HBox.margin>
          <Insets right="10.0"/>

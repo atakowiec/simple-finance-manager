@@ -1,6 +1,7 @@
 package pl.pollub.backend.expenses;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -11,25 +12,26 @@ import pl.pollub.backend.categories.ExpenseCategory;
 import pl.pollub.backend.categories.ExpenseCategoryRepository;
 import pl.pollub.backend.exception.HttpException;
 import org.springframework.http.HttpStatus;
+import pl.pollub.backend.group.GroupRepository;
+import pl.pollub.backend.group.GroupService;
+import pl.pollub.backend.group.model.Group;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/expenses")
+@RequiredArgsConstructor
 public class ExpenseController {
     private final ExpenseService expenseService;
     private final ExpenseCategoryRepository categoryRepository;
+    private final GroupRepository groupRepository;
+    private final GroupService groupService;
 
-    public ExpenseController(ExpenseService expenseService, ExpenseCategoryRepository categoryRepository) {
-        this.expenseService = expenseService;
-        this.categoryRepository = categoryRepository;
-    }
-
-    @GetMapping
-    public List<Expense> getExpenses() {
+    @GetMapping("/{groupId}")
+    public List<Expense> getExpenses(@PathVariable Long groupId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
-        return expenseService.getAllExpensesForUser(user);
+        return expenseService.getAllExpensesForGroup(user, groupId);
     }
 
     @PostMapping
@@ -41,12 +43,16 @@ public class ExpenseController {
         ExpenseCategory category = categoryRepository.findById(expenseCreateDto.getCategoryId())
                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono kategorii o podanym identyfikatorze: " + expenseCreateDto.getCategoryId()));
 
+        Group group = groupService.getGroupByIdOrThrow(expenseCreateDto.getGroupId());
+        groupService.checkMembershipOrThrow(user, group);
+
         Expense expense = new Expense();
         expense.setName(expenseCreateDto.getName());
         expense.setAmount(expenseCreateDto.getAmount());
         expense.setCategory(category);
         expense.setUser(user);
         expense.setDate(expenseCreateDto.getDate());
+        expense.setGroup(group);
 
         return expenseService.addExpense(expense);
     }

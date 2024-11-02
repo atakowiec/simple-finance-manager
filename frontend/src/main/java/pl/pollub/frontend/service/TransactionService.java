@@ -19,35 +19,39 @@ public class TransactionService {
     @Inject
     private HttpService httpService;
 
-    public HttpResponse<String> addExpense(String name, double amount, TransactionCategory category, LocalDate date) {
+    public List<Expense> fetchExpenses(long id) {
+        HttpResponse<String> response = httpService.get("/expenses/" + id);
+        Type type = new TypeToken<List<Expense>>() {
+        }.getType();
+        return JsonUtil.GSON.fromJson(response.body(), type);
+    }
+
+    public List<Income> fetchIncomes(long id) {
+        HttpResponse<String> response = httpService.get("/incomes/" + id);
+        Type type = new TypeToken<List<Income>>() {
+        }.getType();
+        return JsonUtil.GSON.fromJson(response.body(), type);
+    }
+
+    public HttpResponse<String> addExpense(String name, double amount, TransactionCategory category, LocalDate date, long groupId) {
         String body = SimpleJsonBuilder.empty()
                 .add("name", name)
                 .add("amount", amount)
                 .add("categoryId", category.getId())
                 .add("date", date.toString())
+                .add("groupId", groupId)
                 .toJson();
 
         return httpService.post("/expenses", body);
     }
 
-    public List<Expense> fetchExpenses() {
-        HttpResponse<String> response = httpService.get("/expenses");
-        Type type = new TypeToken<List<Expense>>() {}.getType();
-        return JsonUtil.GSON.fromJson(response.body(), type);
-    }
-
-    public List<Income> fetchIncomes() {
-        HttpResponse<String> response = httpService.get("/incomes");
-        Type type = new TypeToken<List<Income>>() {}.getType();
-        return JsonUtil.GSON.fromJson(response.body(), type);
-    }
-
-    public HttpResponse<String> addIncome(String name, double amount, TransactionCategory category, LocalDate date) {
+    public HttpResponse<String> addIncome(String name, double amount, TransactionCategory category, LocalDate date, long groupId) {
         String body = SimpleJsonBuilder.empty()
                 .add("name", name)
                 .add("amount", amount)
                 .add("categoryId", category.getId())
                 .add("date", date.toString())
+                .add("groupId", groupId)
                 .toJson();
 
         return httpService.post("/incomes", body);

@@ -12,7 +12,7 @@ import pl.pollub.frontend.injector.DependencyInjector;
 import pl.pollub.frontend.injector.Inject;
 import pl.pollub.frontend.injector.Injectable;
 
-import java.io.IOException;
+import java.util.Map;
 
 @Injectable
 @Setter
@@ -100,8 +100,11 @@ public class ModalService {
             }
         });
     }
-
     public void showModal(String fxmlFile) {
+        showModal(fxmlFile, Map.of());
+    }
+
+    public void showModal(String fxmlFile, Map<String, Object> parameters) {
         try {
             FXMLLoader loader = new FXMLLoader(FinanceApplication.class.getResource(fxmlFile));
 
@@ -112,12 +115,13 @@ public class ModalService {
 
             if (modalController != null) {
                 injector.manualInject(modalController);
+                screenService.injectParameters(modalController, parameters);
                 eventEmitter.registerController(modalController);
                 injector.runPostInitialize(modalController);
             }
 
             runAnimation(true);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

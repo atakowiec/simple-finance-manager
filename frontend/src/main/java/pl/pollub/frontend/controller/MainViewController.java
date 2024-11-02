@@ -9,8 +9,9 @@ import org.kordamp.bootstrapfx.BootstrapFX;
 import pl.pollub.frontend.FinanceApplication;
 import pl.pollub.frontend.annotation.PostInitialize;
 import pl.pollub.frontend.injector.Inject;
-import pl.pollub.frontend.service.ModalService;
 import pl.pollub.frontend.service.AuthService;
+import pl.pollub.frontend.service.GroupInviteService;
+import pl.pollub.frontend.service.ModalService;
 import pl.pollub.frontend.service.ScreenService;
 
 import java.net.URL;
@@ -18,9 +19,10 @@ import java.net.URL;
 public class MainViewController {
     @Inject
     private ScreenService screenService;
-
     @Inject
     private ModalService modalService;
+    @Inject
+    private GroupInviteService groupInviteService;
 
     @FXML
     public AnchorPane root;
@@ -49,6 +51,8 @@ public class MainViewController {
     public void postInitialize() {
         modalService.setModalOverlay((Pane) root.lookup("#modalOverlay"));
         modalService.setModalContainer((VBox) root.lookup("#modalContainer"));
+
+        groupInviteService.setRoot(root);
     }
 
     public void setContent(Node newContent) {
@@ -96,5 +100,9 @@ public class MainViewController {
 
     public void logout() {
         authService.logout();
+    }
+
+    public void onNotificationsClick() {
+        groupInviteService.showNotifications();
     }
 }

@@ -10,7 +10,10 @@ public abstract class Transaction {
     private int id;
     private String name;
     private double amount;
+    private int userId;
+    private String username;
     private TransactionCategory category;
+    private int groupId;
     private String date;
 
     public abstract String getAmountWithSign();

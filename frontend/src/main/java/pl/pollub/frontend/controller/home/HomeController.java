@@ -6,53 +6,47 @@ import pl.pollub.frontend.annotation.NavBar;
 import pl.pollub.frontend.annotation.PostInitialize;
 import pl.pollub.frontend.annotation.Title;
 import pl.pollub.frontend.annotation.View;
-import pl.pollub.frontend.controller.home.transaction.TransactionListCell;
+import pl.pollub.frontend.controller.home.list.GroupListCell;
 import pl.pollub.frontend.event.EventType;
 import pl.pollub.frontend.event.OnEvent;
 import pl.pollub.frontend.injector.Inject;
-import pl.pollub.frontend.model.transaction.Transaction;
+import pl.pollub.frontend.model.group.Group;
+import pl.pollub.frontend.service.GroupsService;
 import pl.pollub.frontend.service.ModalService;
-import pl.pollub.frontend.service.TransactionService;
+import pl.pollub.frontend.service.ScreenService;
 
 @NavBar()
 @Title("Strona główna")
 @View(name = "home", path = "home-view.fxml")
 public class HomeController {
     @FXML
-    public ListView<Transaction> mainList;
+    public ListView<Group> mainList;
 
     @Inject
-    private TransactionService transactionService;
+    private GroupsService groupsService;
+
+    @Inject
+    private ScreenService screenService;
 
     @Inject
     private ModalService modalService;
 
     @PostInitialize
     public void postInitialize() {
+        onGroupsUpdate();
+
+        mainList.setCellFactory(param -> new GroupListCell(screenService));
+    }
+
+    @OnEvent(EventType.GROUPS_UPDATE)
+    public void onGroupsUpdate() {
         mainList.getItems().clear();
-        mainList.getItems().addAll(transactionService.fetchExpenses());
-        mainList.getItems().addAll(transactionService.fetchIncomes());
+        mainList.getItems().addAll(groupsService.fetchGroups());
 
-        mainList.getItems().sort((t1, t2) -> t2.getDate().compareTo(t1.getDate()));
-
-        mainList.setCellFactory(param -> new TransactionListCell());
+        mainList.getItems().sort((t1, t2) -> t2.getId().compareTo(t1.getId()));
     }
 
-    @OnEvent(EventType.TRANSACTION_UPDATE)
-    public void onTransactionUpdate() {
-        mainList.getItems().clear();
-        mainList.getItems().addAll(transactionService.fetchExpenses());
-        mainList.getItems().addAll(transactionService.fetchIncomes());
-
-        mainList.getItems().sort((t1, t2) -> t2.getDate().compareTo(t1.getDate()));
-    }
-
-    public void openAddExpenseModal() {
-        modalService.showModal("add-expense-view.fxml");
-    }
-
-    public void openAddIncomeModal() {
-        modalService.showModal("add-income-view.fxml");
+    public void openAddGroupModal() {
+        modalService.showModal("modal/add-group-view.fxml");
     }
 }
-

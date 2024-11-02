@@ -1,17 +1,24 @@
 .navItem {
     -fx-cursor: hand;
     -fx-padding: 0 10px;
-    -fx-background-radius: 5px;
-    -fx-text-fill: #06a53b;
 }
 
-.active {
+.navItem,
+.navItem > .label {
+    -fx-background-radius: 5px;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+}
+
+.active,
+.active > .label {
     -fx-font-weight: bold;
     -fx-background-color: #06a53b;
     -fx-text-fill: #0c1a25;
 }
 
-.navItem:hover {
+.navItem:hover,
+.navItem:hover > .label {
     -fx-background-color: #058f33;
     -fx-text-fill: #0c1a25;
 }

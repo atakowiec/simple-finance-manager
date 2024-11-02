@@ -1,5 +1,6 @@
 package pl.pollub.backend.socket;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -44,9 +45,10 @@ public class SocketService extends EventWebSocketHandler {
         this.handleEvent(session, "disconnect", null);
     }
 
-    public void emit(WebSocketSession session, String event, String message) {
+    public void emit(WebSocketSession session, String event, Object payload) {
         try {
-            session.sendMessage(new TextMessage(event + ":" + message));
+            String stringMessage = new ObjectMapper().findAndRegisterModules().writeValueAsString(payload);
+            session.sendMessage(new TextMessage(event + ":" + stringMessage));
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -1,27 +1,30 @@
 package pl.pollub.backend.incomes;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import pl.pollub.backend.auth.user.User;
-import pl.pollub.backend.incomes.dto.IncomeUpdateDto;
 import pl.pollub.backend.categories.IncomeCategory;
 import pl.pollub.backend.categories.IncomeCategoryRepository;
 import pl.pollub.backend.exception.HttpException;
-import org.springframework.http.HttpStatus;
+import pl.pollub.backend.group.GroupService;
+import pl.pollub.backend.group.model.Group;
+import pl.pollub.backend.incomes.dto.IncomeUpdateDto;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class IncomeService {
     private final IncomeRepository incomeRepository;
     private final IncomeCategoryRepository categoryRepository;
+    private final GroupService groupService;
 
-    public IncomeService(IncomeRepository incomeRepository, IncomeCategoryRepository categoryRepository) {
-        this.incomeRepository = incomeRepository;
-        this.categoryRepository = categoryRepository;
-    }
+    public List<Income> getAllIncomesForGroup(User user, long groupId) {
+        Group group = groupService.getGroupByIdOrThrow(groupId);
+        groupService.checkMembershipOrThrow(user, group);
 
-    public List<Income> getAllIncomesForUser(User user) {
-        return incomeRepository.findByUser(user);
+        return incomeRepository.findAllByGroup(group);
     }
 
     public Income addIncome(Income income) {

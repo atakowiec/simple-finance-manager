@@ -11,6 +11,7 @@ import pl.pollub.frontend.FinanceApplication;
 import pl.pollub.frontend.annotation.NavBar;
 import pl.pollub.frontend.annotation.Title;
 import pl.pollub.frontend.annotation.View;
+import pl.pollub.frontend.annotation.ViewParameter;
 import pl.pollub.frontend.controller.MainViewController;
 import pl.pollub.frontend.event.EventEmitter;
 import pl.pollub.frontend.event.EventType;
@@ -19,6 +20,7 @@ import pl.pollub.frontend.injector.Inject;
 import pl.pollub.frontend.injector.Injectable;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -75,10 +77,15 @@ public class ScreenService {
     }
 
     public String getScreen(String name) {
+
         return screenMap.get(name);
     }
 
     public void switchTo(String screenName) {
+        switchTo(screenName, Map.of());
+    }
+
+    public void switchTo(String screenName, Map<String, Object> parameters) {
         try {
             // load FXML file with new screen and set it as a content of the main container
             FXMLLoader fxmlLoader = new FXMLLoader(FinanceApplication.class.getResource(getScreen(screenName)));
@@ -105,11 +112,70 @@ public class ScreenService {
 
             dependencyInjector.manualInject(controller);
 
+            injectParameters(controller, parameters);
+
             eventEmitter.emit(EventType.VIEW_CHANGE, controller);
 
             dependencyInjector.runPostInitialize(controller);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void injectParameters(Object controller, Map<String, Object> parameters) {
+        Class<?> clazz = controller.getClass();
+
+        do {
+            injectParameters(controller, parameters, clazz);
+            clazz = clazz.getSuperclass();
+        } while (clazz != Object.class);
+    }
+
+    public void injectParameters(Object controller, Map<String, Object> parameters, Class<?> clazz) {
+        for (Field field : clazz.getDeclaredFields()) {
+            field.setAccessible(true);
+
+            if (!field.isAnnotationPresent(ViewParameter.class))
+                continue;
+
+            String parameterName = field.getAnnotation(ViewParameter.class).value();
+
+            if (!parameters.containsKey(parameterName))
+                continue;
+
+            try {
+                field.set(controller, parameters.get(parameterName));
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public FXMLLoader prepareRawView(String viewName) {
+        return prepareRawView(viewName, Map.of());
+    }
+
+    public FXMLLoader prepareRawView(String viewName, Map<String, Object> parameters) {
+        FXMLLoader loader = new FXMLLoader(FinanceApplication.class.getResource(viewName));
+
+        try {
+            loader.load();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        Object controller = loader.getController();
+        if (controller == null) {
+            return loader;
+        }
+
+        dependencyInjector.manualInject(controller);
+
+        injectParameters(controller, parameters);
+
+        dependencyInjector.runPostInitialize(controller);
+
+
+        return loader;
     }
 }
