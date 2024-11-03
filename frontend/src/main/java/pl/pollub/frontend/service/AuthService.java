@@ -6,7 +6,6 @@ import pl.pollub.frontend.injector.Inject;
 import pl.pollub.frontend.injector.Injectable;
 import pl.pollub.frontend.user.User;
 import pl.pollub.frontend.util.JsonUtil;
-
 import java.net.http.HttpResponse;
 import java.util.Objects;
 import java.util.prefs.Preferences;

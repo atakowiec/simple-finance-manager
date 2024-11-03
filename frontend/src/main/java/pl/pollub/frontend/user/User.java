@@ -4,10 +4,16 @@ import lombok.Data;
 
 @Data
 public class User {
-    private Long id;
+    private long id;
     private String username;
     private String email;
     private boolean isAdmin;
     private String token;
     private Double monthlyLimit;
+
+    private String role;
+
+    public String getRole() {
+        return isAdmin ? "ADMIN" : "USER";
+    }
 }
