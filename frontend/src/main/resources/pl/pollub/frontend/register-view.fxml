@@ -53,6 +53,13 @@
                     </styleClass>
                 </Button>
             </HBox>
+
+            <HBox alignment="CENTER" layoutX="-1.0" layoutY="480.0" prefHeight="43.0" prefWidth="487.0" spacing="5">
+                <Label text="Masz już konto?" />
+                <Label text="Zaloguj się"
+                       style="-fx-text-fill: blue; -fx-underline: true; -fx-cursor: hand;"
+                       onMouseClicked="#goToLogin"/>
+            </HBox>
         </AnchorPane>
     </center>
 </BorderPane>

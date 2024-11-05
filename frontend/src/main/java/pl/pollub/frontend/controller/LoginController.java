@@ -128,4 +128,9 @@ public class LoginController {
 
         screenService.switchTo("home");
     }
+
+    public void goToRegister() {
+        screenService.switchTo("register");
+    }
+
 }

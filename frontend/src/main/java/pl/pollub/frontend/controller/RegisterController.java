@@ -181,4 +181,9 @@ public class RegisterController {
             passwordError.setVisible(true);
         }
     }
+
+    public void goToLogin() {
+        screenService.switchTo("login");
+    }
+
 }
