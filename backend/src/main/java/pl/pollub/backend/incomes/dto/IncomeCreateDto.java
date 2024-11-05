@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 public class IncomeCreateDto {
@@ -19,6 +18,9 @@ public class IncomeCreateDto {
 
     @NotNull(message = "Kategoria dochodu jest wymagana")
     private Long categoryId;
+
+    @NotNull(message = "Grupa jest wymagana")
+    private Long groupId;
 
     private LocalDate date = LocalDate.now();
 }

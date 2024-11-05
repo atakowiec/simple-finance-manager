@@ -28,6 +28,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/auth/verify").authenticated();
                     auth.requestMatchers("/auth/**").permitAll();
                     auth.requestMatchers("/expenses/**", "/incomes/**").authenticated();
+                    auth.requestMatchers("/groups/**").authenticated();
                     auth.anyRequest().permitAll();
                 })
                 .sessionManagement((configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)))

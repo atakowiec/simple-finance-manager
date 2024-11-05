@@ -18,9 +18,8 @@
             <cursor>
                 <Cursor fx:constant="DEFAULT"/>
             </cursor>
-            <Button mnemonicParsing="false" styleClass="primary-btn" text="Dodaj wydatek" onAction="#openAddExpenseModal"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Button mnemonicParsing="false" styleClass="primary-outline-btn" text="Dodaj przychód" onAction="#openAddIncomeModal"/>
+            <Button mnemonicParsing="false" styleClass="primary-outline-btn" text="Dodaj grupę" onAction="#openAddGroupModal"/>
         </HBox>
         <ListView fx:id="mainList" prefWidth="445.0" styleClass="list"/>
     </VBox>

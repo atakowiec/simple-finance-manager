@@ -4,37 +4,46 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane fx:id="root" prefHeight="383.0" prefWidth="675.0" xmlns="http://javafx.com/javafx/17.0.2-ea"
-            stylesheets="@css/global.css"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pollub.frontend.controller.MainViewController">
+<?import javafx.scene.shape.Circle?>
+<AnchorPane fx:id="root" prefHeight="383.0" prefWidth="675.0" stylesheets="@css/global.css, @css/notifications.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pollub.frontend.controller.MainViewController">
 
-    <StackPane fx:id="mainContainer" AnchorPane.bottomAnchor="0.0"
-               AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0">
+    <StackPane fx:id="mainContainer" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0">
 
     </StackPane>
 
-    <HBox fx:id="navBar" styleClass="navbar" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
-          AnchorPane.topAnchor="0">
+    <HBox fx:id="navBar" spacing="5" styleClass="navbar" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
         <padding>
-            <Insets bottom="10" left="10" right="10" top="10"/>
+            <Insets bottom="10" left="10" right="10" top="10" />
         </padding>
-        <Label id="home" onMouseClicked="#onNavItemClick" prefHeight="25.0" styleClass="navItem" text="Strona główna"
-               accessibleRole="BUTTON"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Label id="raports" onMouseClicked="#onNavItemClick" prefHeight="25.0" styleClass="navItem" text="Raporty"
-               accessibleRole="BUTTON"/>
-        <Label id="logout" onMouseClicked="#logout" prefHeight="25.0" styleClass="navItem" text="Wyloguj"
-               accessibleRole="BUTTON"/>
+        <Label id="home" onMouseClicked="#onNavItemClick" prefHeight="25.0" styleClass="navItem" text="Strona główna" />
+        <Region HBox.hgrow="ALWAYS" />
+        <HBox alignment="CENTER" onMouseClicked="#onNotificationsClick" prefHeight="25.0" spacing="5" styleClass="navItem, notificationOption">
+            <Label text="Powiadomienia" />
+            <StackPane id="notificationsIndicatorWrapper" visible="false">
+                <Circle stroke="#06a53b" fill="transparent" radius="9"/>
+                <Label id="notificationsIndicator">
+
+                </Label>
+            </StackPane>
+        </HBox>
+        <Label id="logout" onMouseClicked="#logout" prefHeight="25.0" styleClass="navItem" text="Wyloguj" />
     </HBox>
 
-    <VBox id="modalOverlay" style="-fx-background-color: #0008" alignment="CENTER" AnchorPane.bottomAnchor="0.0"
-          AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-          AnchorPane.topAnchor="0.0" visible="false">
+    <VBox id="modalOverlay" alignment="CENTER" style="-fx-background-color: #0008" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <HBox alignment="CENTER">
             <StackPane>
                 <VBox id="modalContainer" styleClass="modalContainer">
                 </VBox>
             </StackPane>
         </HBox>
+    </VBox>
+
+    <VBox id="notificationOverlay" styleClass="notificationOverlay" visible="false" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" />
+    <VBox id="notificationContainer" minWidth="400.0" styleClass="notificationContainer" visible="false" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="60.0">
+        <Label styleClass="title" text="Powiadomienia" />
+        <Label id="noNotificationsText" text="Brak powiadomień" VBox.vgrow="ALWAYS" />
+        <VBox id="notifications" VBox.vgrow="ALWAYS">
+
+        </VBox>
     </VBox>
 </AnchorPane>

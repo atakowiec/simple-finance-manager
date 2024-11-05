@@ -1,5 +1,6 @@
 package pl.pollub.backend.auth.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import lombok.Data;
@@ -21,6 +22,7 @@ public class User implements UserDetails {
     @Column(name = "username")
     private String username;
 
+    @JsonIgnore
     @Column(name = "password")
     private String password;
 
@@ -60,7 +62,7 @@ public class User implements UserDetails {
         return true;
     }
 
-    public void setSpendingLimit(@DecimalMin(value = "0.0", message = "Limit musi być większy lub równy 0.") Double spendingLimit) {
-
+    public boolean equals(User user) {
+        return user.getId().equals(getId());
     }
 }

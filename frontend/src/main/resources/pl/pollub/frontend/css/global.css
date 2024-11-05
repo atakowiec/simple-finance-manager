@@ -75,3 +75,34 @@
     -fx-text-fill: #0c1a25;
     -fx-padding: 0 0 20px 0;
 }
+
+.danger-outline-btn {
+    -fx-background-color: transparent;
+    -fx-border-color: #FF4949;
+    -fx-text-fill: #FF4949;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.danger-outline-btn:hover {
+    -fx-background-color: #ff5a5a;
+    -fx-text-fill: white;
+}
+
+.danger-btn {
+    -fx-background-color: #FF4949;
+    -fx-border-color: #FF4949;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.danger-btn:hover {
+    -fx-background-color: #ff5a5a;
+    -fx-border-color: #ff5a5a;
+}
+

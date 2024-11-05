@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<BorderPane prefHeight="650" prefWidth="1100" stylesheets="@../css/global.css, @../css/group.css"
+            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="pl.pollub.frontend.controller.group.GroupController">
+    <left>
+        <VBox maxWidth="300.0" minWidth="200.0" prefHeight="650.0" styleClass="sidenav" BorderPane.alignment="CENTER" fx:id="navbar">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="70.0"/>
+            </padding>
+            <Label styleClass="groupName" fx:id="groupName"/>
+            <VBox spacing="10.0" VBox.vgrow="ALWAYS">
+                <VBox.margin>
+                    <Insets top="30.0"/>
+                </VBox.margin>
+                <HBox alignment="CENTER_LEFT" styleClass="sidenavItem" onMouseClicked="#onSidenavItemClick" id="transactions">
+                    <VBox alignment="CENTER_LEFT" styleClass="sidenavIconWrapper">
+                        <FontIcon iconLiteral="fas-money-check" iconSize="24" iconColor="white"/>
+                    </VBox>
+                    <Label text="Transakcje" HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="20.0"/>
+                        </HBox.margin>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" styleClass="sidenavItem" onMouseClicked="#onSidenavItemClick" id="members">
+                    <VBox alignment="CENTER_LEFT" styleClass="sidenavIconWrapper">
+                        <FontIcon iconLiteral="fas-users" iconSize="24" iconColor="white"/>
+                    </VBox>
+                    <Label text="Członkowie" HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="20.0"/>
+                        </HBox.margin>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" styleClass="sidenavItem" onMouseClicked="#onSidenavItemClick" id="settings">
+                    <VBox alignment="CENTER_LEFT" styleClass="sidenavIconWrapper">
+                        <FontIcon iconLiteral="fas-wrench" iconSize="24" iconColor="white"/>
+                    </VBox>
+                    <Label text="Ustawienia" HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="20.0"/>
+                        </HBox.margin>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" styleClass="sidenavItem" onMouseClicked="#onSidenavItemClick" id="reports">
+                    <VBox alignment="CENTER_LEFT" styleClass="sidenavIconWrapper">
+                        <FontIcon iconLiteral="fas-chart-bar" iconSize="24" iconColor="white"/>
+                    </VBox>
+                    <Label text="Raporty" HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="20.0"/>
+                        </HBox.margin>
+                    </Label>
+                </HBox>
+                <Region nodeOrientation="LEFT_TO_RIGHT" prefHeight="200.0" prefWidth="200.0"
+                        VBox.vgrow="ALWAYS"/>
+                <HBox alignment="CENTER_LEFT" styleClass="sidenavItem" onMouseClicked="#onSidenavItemClick" id="add_expense">
+                    <VBox alignment="CENTER_LEFT" styleClass="sidenavIconWrapper">
+                        <FontIcon iconLiteral="fas-plus" iconSize="24" iconColor="white"/>
+                    </VBox>
+                    <Label text="Dodaj wydatek" HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="20.0"/>
+                        </HBox.margin>
+                    </Label>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" styleClass="sidenavItem" onMouseClicked="#onSidenavItemClick" id="add_income">
+                    <VBox alignment="CENTER_LEFT" styleClass="sidenavIconWrapper">
+                        <FontIcon iconLiteral="fas-plus" iconSize="24" iconColor="white"/>
+                    </VBox>
+                    <Label text="Dodaj przychód" HBox.hgrow="ALWAYS">
+                        <HBox.margin>
+                            <Insets left="20.0"/>
+                        </HBox.margin>
+                    </Label>
+                </HBox>
+            </VBox>
+        </VBox>
+    </left>
+    <center>
+        <StackPane fx:id="contentContainer"/>
+    </center>
+</BorderPane>

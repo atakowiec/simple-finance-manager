@@ -1,5 +1,6 @@
 package pl.pollub.backend.expenses;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.expenses.dto.ExpenseUpdateDto;
@@ -7,21 +8,23 @@ import pl.pollub.backend.categories.ExpenseCategory;
 import pl.pollub.backend.categories.ExpenseCategoryRepository;
 import pl.pollub.backend.exception.HttpException;
 import org.springframework.http.HttpStatus;
+import pl.pollub.backend.group.GroupService;
+import pl.pollub.backend.group.model.Group;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final ExpenseCategoryRepository categoryRepository;
+    private final GroupService groupService;
 
-    public ExpenseService(ExpenseRepository expenseRepository, ExpenseCategoryRepository categoryRepository) {
-        this.expenseRepository = expenseRepository;
-        this.categoryRepository = categoryRepository;
-    }
+    public List<Expense> getAllExpensesForGroup(User user, long groupId) {
+        Group group = groupService.getGroupByIdOrThrow(groupId);
+        groupService.checkMembershipOrThrow(user, group);
 
-    public List<Expense> getAllExpensesForUser(User user) {
-        return expenseRepository.findByUser(user);
+        return expenseRepository.findAllByGroup(group);
     }
 
     public Expense addExpense(Expense expense) {

@@ -1,5 +1,6 @@
 package pl.pollub.backend.auth.user;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,10 +16,15 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-
+    @Getter
     private final UsersRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
+
+
+    public User getUserById(long id) {
+        return userRepository.findById(id).orElse(null);
+    }
 
     public boolean emailExists(String email) {
         return userRepository.existsByEmail(email);

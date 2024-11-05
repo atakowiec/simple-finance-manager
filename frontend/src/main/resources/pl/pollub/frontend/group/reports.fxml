@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox alignment="TOP_CENTER" stylesheets="@../css/global.css, @../css/group.css, @../css/home.css"
+      xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="pl.pollub.frontend.controller.group.ReportsController">
+    <padding>
+        <Insets bottom="10" left="10" right="10" top="100.0" />
+    </padding>
+    <VBox alignment="TOP_CENTER">
+        <Label styleClass="contentTitle">
+            Raporty
+        </Label>
+    </VBox>
+</HBox>

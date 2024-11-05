@@ -45,6 +45,14 @@ public class HttpService {
         return sendRequest(request.build());
     }
 
+
+    public HttpResponse<String> patch(String url, Object body) {
+        HttpRequest.Builder request = getHttpRequestBuilder(url)
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(JsonUtil.toJson(body)));
+
+        return sendRequest(request.build());
+    }
+
     private HttpResponse<String> sendRequest(HttpRequest request) {
         HttpClient client = HttpClient.newHttpClient();
 

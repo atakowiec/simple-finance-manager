@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox alignment="TOP_CENTER" stylesheets="@../css/global.css, @../css/group.css, @../css/home.css"
+      xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="pl.pollub.frontend.controller.group.search.SearchUsersController">
+    <padding>
+        <Insets bottom="10" left="10" right="10" top="10.0"/>
+    </padding>
+    <VBox alignment="TOP_CENTER">
+        <Label styleClass="contentTitle">
+            Wyszukaj
+        </Label>
+
+        <ListView prefHeight="250" fx:id="mainList"/>
+
+        <HBox alignment="CENTER_LEFT" spacing="5.0">
+            <padding>
+                <Insets top="20"/>
+            </padding>
+            <TextField fx:id="queryInput" prefWidth="400" onKeyReleased="#onInputChange"/>
+        </HBox>
+    </VBox>
+</HBox>

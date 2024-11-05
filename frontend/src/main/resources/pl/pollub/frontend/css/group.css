@@ -1,0 +1,94 @@
+.sidenav {
+    -fx-background-color: #142738;
+}
+
+.groupName {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 24px;
+}
+
+.sidenavItem.active {
+    -fx-background-color: #06a53b;
+}
+
+.sidenavItem.active:hover {
+    -fx-background-color: #06a53b;
+}
+
+.sidenavItem {
+    -fx-background-radius: 5px;
+    -fx-padding: 5px;
+}
+
+.sidenavItem:hover {
+    -fx-background-color: #173048;
+}
+
+.sidenavItem.active .label {
+    -fx-text-fill: #142738;
+}
+
+.sidenavItem .label {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+}
+
+.sidenavIconWrapper {
+    -fx-pref-width: 30px;
+}
+
+.contentTitle {
+    -fx-font-size: 24px;
+    -fx-text-alignment: center;
+    -fx-padding: 0 0 20px 0;
+    -fx-font-weight: bold;
+}
+
+.removeMemberButton {
+    -fx-background-color: #FF4949;
+    -fx-text-fill: white;
+    -fx-padding: 5px 10px;
+}
+
+#membershipButton {
+    -fx-cursor: hand;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 5px 10px;
+}
+
+.inviteButton:hover {
+    -fx-border-color: #06a53b;
+    -fx-background-color: #06a53b;
+    -fx-text-fill: white;
+}
+
+.invitedButton:hover {
+    -fx-border-color: #FF4949;
+    -fx-background-color: #FF4949;
+    -fx-text-fill: white;
+}
+
+.inGroupButton:hover {
+    -fx-border-color: #bbb;
+    -fx-text-fill: #bbb;
+}
+
+.inviteButton {
+    -fx-background-color: transparent;
+    -fx-border-color: #06a53b;
+    -fx-text-fill: #06a53b;
+}
+
+.invitedButton {
+    -fx-background-color: transparent;
+    -fx-border-color: #FF4949;
+    -fx-text-fill: #FF4949;
+}
+
+.inGroupButton {
+    -fx-background-color: transparent;
+    -fx-border-color: #aaa;
+    -fx-text-fill: #aaa;
+}

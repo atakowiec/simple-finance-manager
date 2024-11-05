@@ -19,6 +19,9 @@ public class ExpenseCreateDto {
     @NotNull(message = "Kategoria wydatku jest wymagana")
     private Long categoryId;
 
+    @NotNull(message = "Grupa jest wymagana")
+    private Long groupId;
+
     private LocalDate date = LocalDate.now();
 }
 
