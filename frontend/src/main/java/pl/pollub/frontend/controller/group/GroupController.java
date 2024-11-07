@@ -7,12 +7,14 @@ import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import pl.pollub.frontend.annotation.*;
+import pl.pollub.frontend.annotation.NavBar;
+import pl.pollub.frontend.annotation.PostInitialize;
+import pl.pollub.frontend.annotation.Title;
+import pl.pollub.frontend.annotation.View;
 import pl.pollub.frontend.event.EventEmitter;
 import pl.pollub.frontend.event.EventType;
 import pl.pollub.frontend.event.OnEvent;
 import pl.pollub.frontend.injector.Inject;
-import pl.pollub.frontend.model.group.Group;
 import pl.pollub.frontend.service.ScreenService;
 
 import java.util.Map;
@@ -20,7 +22,7 @@ import java.util.Map;
 @NavBar
 @Title("Szczegóły grupy")
 @View(name = "group", path = "group/layout.fxml")
-public class GroupController {
+public class GroupController extends AbstractGroupController {
     private final static Map<String, String> CONTENT_VIEWS = Map.of(
             "transactions", "group/transactions.fxml",
             "members", "group/members.fxml",
@@ -30,12 +32,8 @@ public class GroupController {
             "reports", "group/reports.fxml"
     );
 
-    @ViewParameter("group")
-    private Group group;
-
     @Inject
     private EventEmitter eventEmitter;
-
     @Inject
     private ScreenService screenService;
 
@@ -50,20 +48,20 @@ public class GroupController {
 
     @PostInitialize
     public void postInitialize() {
-        groupName.setText(group.getName());
+        groupName.setText(getGroup().getName());
         setActive("transactions");
     }
 
     @OnEvent(EventType.GROUPS_UPDATE)
-    private void onGroupUpdate() {
-        groupName.setText(group.getName());
+    public void onGroupUpdate() {
+        groupName.setText(getGroup().getName());
     }
 
     public void setActive(String viewName) {
         if (!CONTENT_VIEWS.containsKey(viewName))
             throw new RuntimeException(viewName + " not found");
 
-        FXMLLoader fxmlLoader = screenService.prepareRawView(CONTENT_VIEWS.get(viewName), Map.of("group", group));
+        FXMLLoader fxmlLoader = screenService.prepareRawView(CONTENT_VIEWS.get(viewName), Map.of("groupId", groupId));
 
         setContentController(fxmlLoader.getController());
 

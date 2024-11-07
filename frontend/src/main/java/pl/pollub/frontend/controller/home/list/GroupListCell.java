@@ -43,6 +43,6 @@ public class GroupListCell extends ListCell<Group> {
     }
 
     private void onClick(Group group) {
-        screenService.switchTo("group", Map.of("group", group));
+        screenService.switchTo("group", Map.of("groupId", group.getId()));
     }
 }

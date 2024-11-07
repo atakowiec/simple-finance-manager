@@ -6,7 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.WebSocketSession;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.auth.user.UserService;
 import pl.pollub.backend.exception.HttpException;
@@ -15,7 +14,6 @@ import pl.pollub.backend.group.dto.InviteTargetDto;
 import pl.pollub.backend.group.enums.MembershipStatus;
 import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.group.model.GroupInvite;
-import pl.pollub.backend.socket.SocketService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -27,21 +25,6 @@ public class GroupInviteService {
     private final GroupInviteRepository inviteRepository;
     private final GroupService groupService;
     private final UserService userService;
-    private final SocketService socketService;
-
-    @PostConstruct
-    private void postConstruct() {
-        socketService.addEventListener("connect", event -> sendGameInvites(event.getSession()));
-    }
-
-    public void sendGameInvites(WebSocketSession session) {
-        UsernamePasswordAuthenticationToken authenticationToken = (UsernamePasswordAuthenticationToken) session.getPrincipal();
-        assert authenticationToken != null;
-
-        User user = (User) authenticationToken.getPrincipal();
-        List<GroupInviteDto> dtos = getActiveInvitations(user).stream().map(GroupInvite::toDto).toList();
-        socketService.emit(session, "set_game_invites", dtos);
-    }
 
     public MembershipStatus inviteUser(User user, Long groupId, Long userId) {
         Group group = groupService.getGroupByIdOrThrow(groupId);

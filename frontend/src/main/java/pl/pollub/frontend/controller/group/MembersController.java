@@ -3,22 +3,18 @@ package pl.pollub.frontend.controller.group;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import pl.pollub.frontend.annotation.PostInitialize;
-import pl.pollub.frontend.annotation.ViewParameter;
 import pl.pollub.frontend.controller.group.member.GroupMemberListCell;
 import pl.pollub.frontend.event.EventType;
 import pl.pollub.frontend.event.OnEvent;
 import pl.pollub.frontend.injector.DependencyInjector;
 import pl.pollub.frontend.injector.Inject;
-import pl.pollub.frontend.model.group.Group;
 import pl.pollub.frontend.model.group.GroupMember;
 import pl.pollub.frontend.service.ModalService;
 
+import java.util.List;
 import java.util.Map;
 
-public class MembersController {
-    @ViewParameter("group")
-    private Group group;
-
+public class MembersController extends AbstractGroupController {
     @Inject
     private DependencyInjector dependencyInjector;
     @Inject
@@ -29,13 +25,13 @@ public class MembersController {
 
     @PostInitialize
     public void postInitialize() {
-        onTransactionUpdate();
+        onGroupUpdate();
 
         mainList.setCellFactory(param -> getGroupMemberListCell());
     }
 
     private GroupMemberListCell getGroupMemberListCell() {
-        GroupMemberListCell listCell = new GroupMemberListCell(group);
+        GroupMemberListCell listCell = new GroupMemberListCell(getGroup());
         dependencyInjector.manualInject(listCell);
         dependencyInjector.runPostInitialize(listCell);
 
@@ -43,14 +39,12 @@ public class MembersController {
     }
 
     @OnEvent(EventType.GROUPS_UPDATE)
-    public void onTransactionUpdate() {
-        mainList.getItems().clear();
-        mainList.getItems().addAll(group.getUsers());
-
-        mainList.getItems().sort((t1, t2) -> t1.isOwner() ? -1 : Long.compare(t1.getId(), t2.getId()));
+    private void onGroupUpdate() {
+        List<GroupMember> newMembers = getGroup().getUsers().stream().sorted((t1, t2) -> t1.isOwner() ? -1 : Long.compare(t1.getId(), t2.getId())).toList();
+        mainList.getItems().setAll(newMembers);
     }
 
     public void openUsersModal() {
-        modalService.showModal("group/search-users-modal.fxml", Map.of("group", group));
+        modalService.showModal("group/search-users-modal.fxml", Map.of("group", getGroup()));
     }
 }
