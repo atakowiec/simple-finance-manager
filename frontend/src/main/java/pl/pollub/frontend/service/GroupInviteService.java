@@ -8,10 +8,9 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import pl.pollub.frontend.FinanceApplication;
+import pl.pollub.frontend.annotation.PostInitialize;
 import pl.pollub.frontend.controller.component.NotificationController;
 import pl.pollub.frontend.controller.group.search.InviteTarget;
-import pl.pollub.frontend.event.EventType;
-import pl.pollub.frontend.event.OnEvent;
 import pl.pollub.frontend.injector.DependencyInjector;
 import pl.pollub.frontend.injector.Inject;
 import pl.pollub.frontend.injector.Injectable;
@@ -28,13 +27,13 @@ import java.util.Map;
 @Injectable
 public class GroupInviteService {
     @Inject
-    private GroupsService groupsService;
-    @Inject
     private ScreenService screenService;
     @Inject
     private HttpService httpService;
     @Inject
     private DependencyInjector dependencyInjector;
+    @Inject
+    private PollingService pollingService;
 
     private VBox notificationOverlay;
     private VBox notificationContainer;
@@ -42,6 +41,16 @@ public class GroupInviteService {
     private AnchorPane root;
 
     private final List<GroupInvite> inviteList = new ArrayList<>();
+
+    @PostInitialize
+    private void postInitialize() {
+        pollingService.addTask(() -> {
+            HttpResponse<String> response = httpService.get("/groups/invites");
+
+            if (response.statusCode() == 200)
+                setGameInvites(response.body());
+        });
+    }
 
     public List<InviteTarget> findInviteTargets(Long groupId, String query) {
         if (query.isBlank())
@@ -56,13 +65,6 @@ public class GroupInviteService {
         }.getType();
 
         return JsonUtil.GSON.fromJson(response.body(), type);
-    }
-
-    @OnEvent(EventType.WEBSOCKET_MESSAGE)
-    private void handleWebsocketMessage(String event, String payload) {
-        switch (event) {
-            case "set_game_invites" -> setGameInvites(payload);
-        }
     }
 
     public void setRoot(AnchorPane root) {
@@ -149,8 +151,7 @@ public class GroupInviteService {
     public void onInviteAccept(GroupInvite groupInvite) {
         deleteInvite(groupInvite);
 
-        // todo fetch new group or something because this getGroup() returns group without new member
-        screenService.switchTo("group", Map.of("group", groupInvite.getGroup()));
+        screenService.switchTo("group", Map.of("groupId", groupInvite.getGroup().getId()));
         hideNotifications();
     }
 }

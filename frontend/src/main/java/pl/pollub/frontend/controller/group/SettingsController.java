@@ -6,7 +6,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import pl.pollub.frontend.annotation.PostInitialize;
-import pl.pollub.frontend.annotation.ViewParameter;
 import pl.pollub.frontend.controller.home.add.ColorListCell;
 import pl.pollub.frontend.event.EventEmitter;
 import pl.pollub.frontend.event.EventType;
@@ -18,10 +17,7 @@ import pl.pollub.frontend.util.JsonUtil;
 
 import java.net.http.HttpResponse;
 
-public class SettingsController {
-    @ViewParameter("group")
-    private Group group;
-
+public class SettingsController extends AbstractGroupController {
     @Inject
     private ColorsService colorsService;
     @Inject
@@ -44,6 +40,7 @@ public class SettingsController {
 
     @PostInitialize
     public void postInitialize() {
+        Group group = getGroup();
         colorPicker.getItems().addAll(colorsService.getColors());
 
         colorPicker.setCellFactory(param -> new ColorListCell());
@@ -62,7 +59,7 @@ public class SettingsController {
             return;
         }
 
-        HttpResponse<String> response = httpService.patch("/groups/" + group.getId() + "/name", groupNameField.getText());
+        HttpResponse<String> response = httpService.patch("/groups/" + getGroup().getId() + "/name", groupNameField.getText());
 
         if (response.statusCode() != 200) {
             nameError.setText("Wystąpił błąd podczas zmiany nazwy!");
@@ -71,7 +68,7 @@ public class SettingsController {
 
         JsonObject jsonResponse = JsonUtil.fromJson(response.body()).getAsJsonObject();
 
-        group.setName(jsonResponse.get("name").getAsString());
+        getGroup().setName(jsonResponse.get("name").getAsString());
         nameError.setText("Zapisano!");
         eventEmitter.emit(EventType.GROUPS_UPDATE);
     }
@@ -82,7 +79,7 @@ public class SettingsController {
             return;
         }
 
-        HttpResponse<String> response = httpService.patch("/groups/" + group.getId() + "/color", colorPicker.getValue());
+        HttpResponse<String> response = httpService.patch("/groups/" + getGroup().getId() + "/color", colorPicker.getValue());
 
         if (response.statusCode() != 200) {
             colorError.setText("Wystąpił błąd podczas zmiany koloru!");
@@ -91,9 +88,8 @@ public class SettingsController {
 
         JsonObject jsonResponse = JsonUtil.fromJson(response.body()).getAsJsonObject();
 
-        group.setColor(jsonResponse.get("color").getAsString());
+        getGroup().setColor(jsonResponse.get("color").getAsString());
         colorError.setText("Zapisano!");
-        eventEmitter.emit(EventType.GROUPS_UPDATE);
     }
 
     public void saveExpenseLimit() {
@@ -110,7 +106,7 @@ public class SettingsController {
                 return;
             }
 
-            HttpResponse<String> response = httpService.patch("/groups/" + group.getId() + "/expense-limit", limit);
+            HttpResponse<String> response = httpService.patch("/groups/" + getGroup().getId() + "/expense-limit", limit);
 
             if (response.statusCode() != 200) {
                 expenseLimitError.setText("Wystąpił błąd podczas zmiany limitu!");
@@ -119,9 +115,8 @@ public class SettingsController {
 
             JsonObject jsonResponse = JsonUtil.fromJson(response.body()).getAsJsonObject();
 
-            group.setExpenseLimit(jsonResponse.get("limit").getAsDouble());
+            getGroup().setExpenseLimit(jsonResponse.get("expenseLimit").getAsDouble());
             expenseLimitError.setText("Zapisano!");
-            eventEmitter.emit(EventType.GROUPS_UPDATE);
         } catch (NumberFormatException ignored) {
             expenseLimitError.setText("Limit musi być liczbą!");
         }

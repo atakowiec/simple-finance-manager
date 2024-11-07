@@ -18,6 +18,9 @@ public class EventEmitter {
 
     private final Set<Object> activeControllers = new HashSet<>();
 
+    private boolean emitActive = false;
+    private final LinkedList<EventEmitRequest> pendingEmitsQueue = new LinkedList<>();
+
     @PostInitialize
     private void scanForListeners() {
         for (Object instance : dependencyInjector.getInstances()) {
@@ -52,8 +55,23 @@ public class EventEmitter {
     }
 
     public void emit(EventType eventType, Object... data) {
+        // we need to block nested event calls because the event emitter won't be able to
+        // invoke handler method after exiting nested event handler
+        if (emitActive) {
+            pendingEmitsQueue.add(new EventEmitRequest(eventType, data));
+            return;
+        }
+
+        emitActive = true;
         emitToControllers(eventType, data);
         emitToListeners(eventType, data);
+        emitActive = false;
+
+        if (pendingEmitsQueue.isEmpty())
+            return;
+
+        EventEmitRequest nextRequest = pendingEmitsQueue.poll();
+        emit(nextRequest.getEventType(), nextRequest.getData());
     }
 
     private void emitToListeners(EventType eventType, Object... data) {
@@ -79,9 +97,9 @@ public class EventEmitter {
         }
     }
 
-    private void invokeListenerMethod(Method method, Object target, Object[] data) {
+    private void invokeListenerMethod(Method method, Object target, Object... data) {
         try {
-            if(method.getParameterCount() == 0) {
+            if (method.getParameterCount() == 0) {
                 method.invoke(target);
             } else if (method.getParameterCount() == 1) {
                 method.invoke(target, (Object) data);

@@ -5,14 +5,12 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import lombok.Getter;
 import pl.pollub.frontend.annotation.PostInitialize;
-import pl.pollub.frontend.annotation.ViewParameter;
+import pl.pollub.frontend.controller.group.AbstractGroupController;
 import pl.pollub.frontend.controller.group.add.list.CategoryListCell;
 import pl.pollub.frontend.event.EventEmitter;
 import pl.pollub.frontend.event.EventType;
 import pl.pollub.frontend.injector.Inject;
-import pl.pollub.frontend.model.group.Group;
 import pl.pollub.frontend.model.transaction.TransactionCategory;
 import pl.pollub.frontend.service.TransactionService;
 
@@ -20,11 +18,7 @@ import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.util.List;
 
-public abstract class AbstractAddTransactionController {
-    @ViewParameter("group")
-    @Getter
-    private Group group;
-
+public abstract class AbstractAddTransactionController extends AbstractGroupController {
     @FXML
     private TextField nameInput;
 

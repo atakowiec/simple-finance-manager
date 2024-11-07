@@ -2,6 +2,8 @@ package pl.pollub.frontend.service;
 
 import com.google.gson.JsonObject;
 import lombok.Getter;
+import pl.pollub.frontend.event.EventEmitter;
+import pl.pollub.frontend.event.EventType;
 import pl.pollub.frontend.injector.Inject;
 import pl.pollub.frontend.injector.Injectable;
 import pl.pollub.frontend.user.User;
@@ -23,13 +25,13 @@ public class AuthService {
     @Inject
     private ScreenService screenService;
     @Inject
-    private SocketService socketService;
+    private EventEmitter eventEmitter;
 
     public void setUser(User user) {
         this.user = user;
 
         if (user != null) {
-            socketService.connect();
+            eventEmitter.emit(EventType.LOGIN);
             saveToken(user.getToken());
         } else {
             logout();
@@ -82,7 +84,7 @@ public class AuthService {
     public void logout() {
         this.user = null;
         preferences.remove("token");
-        this.socketService.disconnect();
+        eventEmitter.emit(EventType.LOGOUT);
         this.screenService.switchTo("login");
     }
 }

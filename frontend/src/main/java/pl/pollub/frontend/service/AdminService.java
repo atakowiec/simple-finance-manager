@@ -17,6 +17,7 @@ public class AdminService {
     @Inject
     private HttpService httpService;
 
+    @SuppressWarnings("unchecked")
     public List<User> getAllUsers() {
         HttpResponse<String> response = httpService.get("/api/admin/users");
         if (response.statusCode() != 200) {

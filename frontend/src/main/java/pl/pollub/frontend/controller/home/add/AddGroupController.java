@@ -62,6 +62,8 @@ public class AddGroupController {
             return;
         }
 
+        groupsService.updateGroups();
+
         eventEmitter.emit(EventType.GROUPS_UPDATE);
 
         modalService.hideModal();

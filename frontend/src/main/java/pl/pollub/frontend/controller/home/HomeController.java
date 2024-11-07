@@ -24,10 +24,8 @@ public class HomeController {
 
     @Inject
     private GroupsService groupsService;
-
     @Inject
     private ScreenService screenService;
-
     @Inject
     private ModalService modalService;
 
@@ -39,9 +37,8 @@ public class HomeController {
     }
 
     @OnEvent(EventType.GROUPS_UPDATE)
-    public void onGroupsUpdate() {
-        mainList.getItems().clear();
-        mainList.getItems().addAll(groupsService.fetchGroups());
+    private void onGroupsUpdate() {
+        mainList.getItems().setAll(groupsService.getGroups());
 
         mainList.getItems().sort((t1, t2) -> t2.getId().compareTo(t1.getId()));
     }
