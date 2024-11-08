@@ -45,6 +45,9 @@ public class ExpenseService {
                                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono kategorii o podanym identyfikatorze: " + updatedExpense.getCategoryId()));
                         expense.setCategory(category);
                     }
+                    if (updatedExpense.getDate() != null) {
+                        expense.setDate(updatedExpense.getDate());
+                    }
                     return expenseRepository.save(expense);
                 })
                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono wydatku o podanym identyfikatorze: " + id));
