@@ -11,7 +11,10 @@ import pl.pollub.backend.expenses.dto.ExpenseUpdateDto;
 import pl.pollub.backend.group.GroupService;
 import pl.pollub.backend.group.model.Group;
 
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -59,5 +62,36 @@ public class ExpenseService {
         } else {
             throw new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono wydatku o podanym identyfikatorze: " + id);
         }
+    }
+
+    public Map<String, Double> getThisMonthCategoryStats(User user, Long groupId) {
+        Group group = groupService.getGroupByIdOrThrow(groupId);
+        groupService.checkMembershipOrThrow(user, group);
+
+        LocalDate now = LocalDate.now();
+        List<Object[]> result = expenseRepository.sumAllByGroupAndMinDate(group, LocalDate.of(now.getYear(), now.getMonthValue(), 1));
+        Map<String, Double> stats = new HashMap<>();
+
+        for (Object[] row : result) {
+            stats.compute(row[0].toString(), (k, v) -> v == null ? (Double) row[1] : v + (Double) row[1]);
+        }
+
+        return stats;
+    }
+
+    public Map<String, Double> getThisMonthStatsByDay(User user, Long groupId) {
+        Group group = groupService.getGroupByIdOrThrow(groupId);
+        groupService.checkMembershipOrThrow(user, group);
+
+        LocalDate now = LocalDate.now();
+        List<Object[]> result = expenseRepository.findAllByGroupAndMinDateAndGroupByDate(group, LocalDate.of(now.getYear(), now.getMonthValue(), 1));
+
+        Map<String, Double> stats = new HashMap<>();
+
+        for (Object[] row : result) {
+            stats.compute(row[0].toString(), (k, v) -> v == null ? (Double) row[1] : v + (Double) row[1]);
+        }
+
+        return stats;
     }
 }

@@ -4,15 +4,39 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
 <HBox alignment="TOP_CENTER" stylesheets="@../css/global.css, @../css/group.css, @../css/home.css"
       xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="pl.pollub.frontend.controller.group.ReportsController">
     <padding>
         <Insets bottom="10" left="10" right="10" top="100.0" />
     </padding>
-    <VBox alignment="TOP_CENTER">
-        <Label styleClass="contentTitle">
-            Raporty
-        </Label>
+    <VBox alignment="TOP_CENTER" spacing="20">
+        <Label text="Raporty z ostatniego miesiąca" styleClass="contentTitle" />
+
+        <VBox alignment="TOP_CENTER" spacing="10">
+            <LineChart fx:id="incomeExpenseLineChart" title="Przychody i wydatki" animated="true">
+                <xAxis>
+                    <CategoryAxis label="Dzień" />
+                </xAxis>
+                <yAxis>
+                    <NumberAxis label="Kwota" />
+                </yAxis>
+            </LineChart>
+        </VBox>
+
+        <VBox alignment="TOP_CENTER" spacing="10">
+            <BarChart fx:id="categoryExpenseBarChart" title="Wydatki według kategorii" animated="true">
+                <xAxis>
+                    <CategoryAxis label="Kategoria" />
+                </xAxis>
+                <yAxis>
+                    <NumberAxis label="Kwota" />
+                </yAxis>
+            </BarChart>
+        </VBox>
     </VBox>
 </HBox>

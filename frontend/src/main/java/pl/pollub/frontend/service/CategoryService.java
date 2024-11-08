@@ -7,8 +7,6 @@ import pl.pollub.frontend.event.EventType;
 import pl.pollub.frontend.event.OnEvent;
 import pl.pollub.frontend.injector.Inject;
 import pl.pollub.frontend.injector.Injectable;
-import pl.pollub.frontend.model.transaction.Expense;
-import pl.pollub.frontend.model.transaction.Income;
 import pl.pollub.frontend.model.transaction.Transaction;
 import pl.pollub.frontend.model.transaction.TransactionCategory;
 import pl.pollub.frontend.util.JsonUtil;
@@ -62,12 +60,20 @@ public class CategoryService {
         return JsonUtil.GSON.fromJson(response.body(), type);
     }
 
-    public List<TransactionCategory> getCategories(Transaction transaction) {
-        if (transaction instanceof Income) {
-            return incomeCategories;
-        } else if (transaction instanceof Expense) {
-            return expenseCategories;
+    public TransactionCategory getExpenseCategoryById(int id) {
+        for (TransactionCategory expenseCategory : expenseCategories) {
+            if (expenseCategory.getId() == id) {
+                return expenseCategory;
+            }
         }
-        throw new IllegalArgumentException();
+
+        throw new RuntimeException("Category with id: " + id + " not found");
+    }
+
+    public List<TransactionCategory> getCategories(Transaction transaction) {
+        return switch (transaction.getCategory().getCategoryType()) {
+            case EXPENSE -> expenseCategories;
+            case INCOME -> incomeCategories;
+        };
     }
 }

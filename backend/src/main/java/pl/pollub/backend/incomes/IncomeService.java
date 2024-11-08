@@ -11,7 +11,10 @@ import pl.pollub.backend.group.GroupService;
 import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.incomes.dto.IncomeUpdateDto;
 
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -59,5 +62,21 @@ public class IncomeService {
         } else {
             throw new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono dochodu z identyfikatorem: " + id);
         }
+    }
+
+    public Map<String, Double> getThisMonthStatsByDay(User user, Long groupId) {
+        Group group = groupService.getGroupByIdOrThrow(groupId);
+        groupService.checkMembershipOrThrow(user, group);
+
+        LocalDate now = LocalDate.now();
+        List<Object[]> result = incomeRepository.findAllByGroupAndMinDateAndGroupByDate(group, LocalDate.of(now.getYear(), now.getMonthValue(), 1));
+
+        Map<String, Double> stats = new HashMap<>();
+
+        for (Object[] row : result) {
+            stats.compute(row[0].toString(), (k, v) -> v == null ? (Double) row[1] : v + (Double) row[1]);
+        }
+
+        return stats;
     }
 }

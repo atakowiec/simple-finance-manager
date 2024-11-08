@@ -2,21 +2,23 @@ package pl.pollub.backend.expenses;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.pollub.backend.auth.user.User;
-import pl.pollub.backend.expenses.dto.ExpenseUpdateDto;
-import pl.pollub.backend.expenses.dto.ExpenseCreateDto;
 import pl.pollub.backend.categories.model.TransactionCategory;
 import pl.pollub.backend.categories.CategoryRepository;
 import pl.pollub.backend.exception.HttpException;
-import org.springframework.http.HttpStatus;
+import pl.pollub.backend.expenses.dto.ExpenseCreateDto;
+import pl.pollub.backend.expenses.dto.ExpenseUpdateDto;
 import pl.pollub.backend.group.GroupRepository;
 import pl.pollub.backend.group.GroupService;
 import pl.pollub.backend.group.model.Group;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/expenses")
@@ -69,5 +71,15 @@ public class ExpenseController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         expenseService.deleteExpense(id, user);
+    }
+
+    @GetMapping("/{groupId}/stats/by-day")
+    public Map<String, Double> getThisMonthStatsByDay(@AuthenticationPrincipal User user, @PathVariable Long groupId) {
+        return expenseService.getThisMonthStatsByDay(user, groupId);
+    }
+
+    @GetMapping("/{groupId}/stats/categories")
+    public Map<String, Double> getThisMonthCategoryStats(@AuthenticationPrincipal User user, @PathVariable Long groupId) {
+        return expenseService.getThisMonthCategoryStats(user, groupId);
     }
 }
