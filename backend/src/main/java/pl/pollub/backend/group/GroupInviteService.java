@@ -1,15 +1,12 @@
 package pl.pollub.backend.group;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.auth.user.UserService;
 import pl.pollub.backend.exception.HttpException;
-import pl.pollub.backend.group.dto.GroupInviteDto;
 import pl.pollub.backend.group.dto.InviteTargetDto;
 import pl.pollub.backend.group.enums.MembershipStatus;
 import pl.pollub.backend.group.model.Group;
@@ -137,5 +134,4 @@ public class GroupInviteService {
     public List<GroupInvite> getActiveInvitations(User user) {
         return inviteRepository.findAllByInvitee(user);
     }
-
 }

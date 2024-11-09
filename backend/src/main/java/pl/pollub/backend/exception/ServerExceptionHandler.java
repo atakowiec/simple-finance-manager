@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ServerExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleHttpException(Exception ex) {
+        ex.printStackTrace();
         return new HttpException(500, ex.getMessage()).toResponseEntity();
     }
 }

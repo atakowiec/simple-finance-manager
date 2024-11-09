@@ -1,12 +1,14 @@
 package pl.pollub.backend.incomes.dto;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import pl.pollub.backend.categories.dto.CategoryDto;
 import pl.pollub.backend.incomes.Income;
 
 import java.time.LocalDate;
 
 @Data
+@NoArgsConstructor
 public class IncomeDto {
     private Long id;
     private String name;

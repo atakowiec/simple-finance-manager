@@ -1,12 +1,14 @@
 package pl.pollub.backend.expenses.dto;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import pl.pollub.backend.categories.dto.CategoryDto;
 import pl.pollub.backend.expenses.Expense;
 
 import java.time.LocalDate;
 
 @Data
+@NoArgsConstructor
 public class ExpenseDto {
     private Long id;
     private String name;
