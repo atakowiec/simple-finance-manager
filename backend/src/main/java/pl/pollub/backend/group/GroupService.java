@@ -5,9 +5,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import pl.pollub.backend.auth.user.User;
+import pl.pollub.backend.categories.CategoryRepository;
+import pl.pollub.backend.categories.model.TransactionCategory;
 import pl.pollub.backend.exception.HttpException;
+import pl.pollub.backend.expenses.Expense;
+import pl.pollub.backend.expenses.ExpenseRepository;
+import pl.pollub.backend.expenses.dto.ExpenseDto;
 import pl.pollub.backend.group.dto.GroupCreateDto;
+import pl.pollub.backend.group.dto.ImportExportDto;
 import pl.pollub.backend.group.model.Group;
+import pl.pollub.backend.incomes.IncomeRepository;
+import pl.pollub.backend.incomes.dto.IncomeDto;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,6 +26,9 @@ import java.util.Objects;
 public class GroupService {
     @Getter
     private final GroupRepository groupRepository;
+    private final IncomeRepository incomeRepository;
+    private final ExpenseRepository expenseRepository;
+    private final CategoryRepository categoryRepository;
 
     public Group getGroupByIdOrThrow(long groupId) {
         return groupRepository.findById(groupId)
@@ -25,7 +36,7 @@ public class GroupService {
     }
 
     public void checkMembershipOrThrow(User user, Group group) {
-        if(group.getUsers().stream().noneMatch(u -> u.getId().equals(user.getId()))) {
+        if (group.getUsers().stream().noneMatch(u -> u.getId().equals(user.getId()))) {
             throw new HttpException(HttpStatus.FORBIDDEN, "Nie masz dostępu do tej grupy");
         }
     }
@@ -83,7 +94,7 @@ public class GroupService {
         Group group = getGroupByIdOrThrow(groupId);
         checkMembershipOrThrow(user, group);
 
-        if(!Objects.equals(group.getOwner().getId(), user.getId()))
+        if (!Objects.equals(group.getOwner().getId(), user.getId()))
             throw new HttpException(HttpStatus.FORBIDDEN, "Musisz być właścicielem grupy aby to zrobić!");
 
         group.getUsers().removeIf(member -> Objects.equals(member.getId(), memberId));
@@ -91,5 +102,40 @@ public class GroupService {
         groupRepository.save(group);
 
         return null;
+    }
+
+    public void importTransactions(User user, Long groupId, ImportExportDto importExportDto) {
+        Group group = getGroupByIdOrThrow(groupId);
+        checkMembershipOrThrow(user, group);
+
+        for (ExpenseDto expense : importExportDto.getExpenses()) {
+            TransactionCategory category = categoryRepository.findById(expense.getCategory().getId())
+                    .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono kategorii o podanym identyfikatorze: " + expense.getCategory().getId()));
+
+            Expense newExpense = new Expense();
+            newExpense.setName(expense.getName());
+            newExpense.setAmount(expense.getAmount());
+            newExpense.setCategory(category);
+            newExpense.setDate(expense.getDate());
+            newExpense.setGroup(group);
+            newExpense.setUser(user);
+
+            expenseRepository.save(newExpense);
+        }
+
+        for (IncomeDto income : importExportDto.getIncomes()) {
+            TransactionCategory category = categoryRepository.findById(income.getCategory().getId())
+                    .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono kategorii o podanym identyfikatorze: " + income.getCategory().getId()));
+
+            Expense newIncome = new Expense();
+            newIncome.setName(income.getName());
+            newIncome.setAmount(income.getAmount());
+            newIncome.setCategory(category);
+            newIncome.setDate(income.getDate());
+            newIncome.setGroup(group);
+            newIncome.setUser(user);
+
+            expenseRepository.save(newIncome);
+        }
     }
 }

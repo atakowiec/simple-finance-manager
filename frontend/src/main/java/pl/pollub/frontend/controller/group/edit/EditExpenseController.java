@@ -60,7 +60,7 @@ public class EditExpenseController {
     private void loadExpenseData() {
         nameInput.setText(transaction.getName());
         amountInput.setText(String.valueOf(transaction.getAmount()));
-        datePicker.setValue(transaction.getDate());
+        datePicker.setValue(transaction.getLocalDate());
     }
 
     private void loadCategories() {

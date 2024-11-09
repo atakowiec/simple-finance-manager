@@ -47,7 +47,7 @@ public class TransactionCellController {
         this.transaction = transaction;
 
         nameLabel.setText(transaction.getName());
-        dateLabel.setText(transaction.getDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        dateLabel.setText(transaction.getLocalDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
         amountLabel.setText(transaction.getAmountWithSign() + " zł");
         amountLabel.getStyleClass().add(transaction.getAmountStyleClass());
         categoryIcon.setImage(transaction.getCategory() == null ? null : transaction.getCategory().getImageIcon());

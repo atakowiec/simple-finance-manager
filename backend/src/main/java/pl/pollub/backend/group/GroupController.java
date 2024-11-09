@@ -7,6 +7,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.group.dto.GroupCreateDto;
+import pl.pollub.backend.group.dto.ImportExportDto;
 import pl.pollub.backend.group.dto.InviteTargetDto;
 import pl.pollub.backend.group.enums.MembershipStatus;
 import pl.pollub.backend.group.model.Group;
@@ -80,5 +81,10 @@ public class GroupController {
     @GetMapping("/invites")
     public List<GroupInvite> getActiveInvitations(@AuthenticationPrincipal User user) {
         return groupInviteService.getActiveInvitations(user);
+    }
+
+    @PostMapping("/{groupId}/import")
+    public void handleImport(@AuthenticationPrincipal User user, @PathVariable Long groupId, @RequestBody ImportExportDto importExportDto) {
+        groupService.importTransactions(user, groupId, importExportDto);
     }
 }

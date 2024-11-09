@@ -8,12 +8,20 @@
       xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="pl.pollub.frontend.controller.group.TransactionsController">
     <padding>
-        <Insets bottom="10" left="10" right="10" top="100.0" />
+        <Insets bottom="10" left="10" right="10" top="100.0"/>
     </padding>
     <VBox alignment="TOP_CENTER">
         <Label styleClass="contentTitle">
             Transakcje
         </Label>
-        <ListView fx:id="mainList" prefWidth="445.0" styleClass="list" />
+        <HBox>
+            <Button styleClass="primary-btn" onMouseClicked="#openImport" text="Importuj transakcje" HBox.hgrow="ALWAYS"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button styleClass="primary-outline-btn" onMouseClicked="#openExport" text="Exportuj transakcje" HBox.hgrow="ALWAYS"/>
+            <VBox.margin>
+                <Insets bottom="10.0"/>
+            </VBox.margin>
+        </HBox>
+        <ListView fx:id="mainList" prefWidth="445.0" styleClass="list"/>
     </VBox>
 </HBox>

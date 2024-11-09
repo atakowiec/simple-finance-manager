@@ -58,7 +58,7 @@ public class EditIncomeController {
     private void loadIncomeData() {
         nameInput.setText(transaction.getName());
         amountInput.setText(String.valueOf(transaction.getAmount()));
-        datePicker.setValue(transaction.getDate());
+        datePicker.setValue(transaction.getLocalDate());
     }
 
 

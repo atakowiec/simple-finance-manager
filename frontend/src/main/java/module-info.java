@@ -31,6 +31,7 @@ module pl.pollub.frontend {
     exports pl.pollub.frontend.model.group;
     exports pl.pollub.frontend.user;
     exports pl.pollub.frontend.enums;
+    exports pl.pollub.frontend.controller.group.transaction.dto;
 
     // open controllers to fxml
     exports pl.pollub.frontend.service;
@@ -66,12 +67,15 @@ module pl.pollub.frontend {
     exports pl.pollub.frontend.controller.group.search;
     opens pl.pollub.frontend.controller.group.search to javafx.fxml, com.google.gson;
 
+    exports pl.pollub.frontend.controller.component;
+    opens pl.pollub.frontend.controller.component to javafx.fxml;
+
+    exports pl.pollub.frontend.controller.group.edit;
+    opens pl.pollub.frontend.controller.group.edit to javafx.fxml;
+
     // open to gson
     opens pl.pollub.frontend.model.transaction to com.google.gson;
     opens pl.pollub.frontend.model.group to com.google.gson;
     opens pl.pollub.frontend.enums to com.google.gson;
-    exports pl.pollub.frontend.controller.component;
-    opens pl.pollub.frontend.controller.component to javafx.fxml;
-    exports pl.pollub.frontend.controller.group.edit;
-    opens pl.pollub.frontend.controller.group.edit to javafx.fxml;
+    opens pl.pollub.frontend.controller.group.transaction.dto to com.google.gson;
 }

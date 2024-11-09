@@ -1,13 +1,13 @@
 package pl.pollub.backend.expenses;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import pl.pollub.backend.auth.user.User;
-import pl.pollub.backend.expenses.dto.ExpenseUpdateDto;
-import pl.pollub.backend.categories.model.TransactionCategory;
 import pl.pollub.backend.categories.CategoryRepository;
+import pl.pollub.backend.categories.model.TransactionCategory;
 import pl.pollub.backend.exception.HttpException;
-import org.springframework.http.HttpStatus;
+import pl.pollub.backend.expenses.dto.ExpenseUpdateDto;
 import pl.pollub.backend.group.GroupService;
 import pl.pollub.backend.group.model.Group;
 

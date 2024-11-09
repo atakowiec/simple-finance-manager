@@ -1,5 +1,6 @@
 package pl.pollub.frontend.model.transaction;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -16,15 +17,19 @@ public abstract class Transaction {
     private int groupId;
     private String date;
 
+    @JsonIgnore
     public abstract String getAmountWithSign();
 
+    @JsonIgnore
     protected String getAmountFormatted() {
         return String.format("%.2f", amount);
     }
 
-    public LocalDate getDate() {
+    @JsonIgnore
+    public LocalDate getLocalDate() {
         return LocalDate.parse(date);
     }
 
+    @JsonIgnore
     public abstract String getAmountStyleClass();
 }

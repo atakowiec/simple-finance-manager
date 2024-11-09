@@ -1,6 +1,7 @@
 package pl.pollub.frontend.service;
 
 import com.google.gson.reflect.TypeToken;
+import pl.pollub.frontend.controller.group.transaction.dto.ImportExportDto;
 import pl.pollub.frontend.injector.Inject;
 import pl.pollub.frontend.injector.Injectable;
 import pl.pollub.frontend.model.transaction.Expense;
@@ -90,4 +91,7 @@ public class TransactionService {
         return httpService.delete("/incomes/" + incomeId);
     }
 
+    public HttpResponse<String> importTransactions(Long groupId, ImportExportDto dto) {
+        return httpService.post("/groups/" + groupId + "/import", JsonUtil.GSON.toJson(dto));
+    }
 }

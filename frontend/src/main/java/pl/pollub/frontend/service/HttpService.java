@@ -54,12 +54,10 @@ public class HttpService {
     }
 
     private HttpResponse<String> sendRequest(HttpRequest request) {
-        HttpClient client = HttpClient.newHttpClient();
-
-        try {
+        try (HttpClient client = HttpClient.newHttpClient()) {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            if(response.statusCode() >= 400)
+            if (response.statusCode() >= 400)
                 System.out.println("Error: " + response.body());
 
             return response;
@@ -73,7 +71,7 @@ public class HttpService {
                 .header("Content-Type", "application/json")
                 .uri(getNormalizedUri(url));
 
-        if(authService.getToken() != null) {
+        if (authService.getToken() != null) {
             builder.header("Authorization", "Bearer " + authService.getToken());
         }
 
@@ -81,7 +79,7 @@ public class HttpService {
     }
 
     private URI getNormalizedUri(String url) {
-        if(url.startsWith("/")) {
+        if (url.startsWith("/")) {
             url = url.substring(1);
         }
         return URI.create(BASE_URL + "/" + url);
