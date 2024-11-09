@@ -8,6 +8,8 @@ import javafx.scene.layout.*;
 import org.kordamp.bootstrapfx.BootstrapFX;
 import pl.pollub.frontend.FinanceApplication;
 import pl.pollub.frontend.annotation.PostInitialize;
+import pl.pollub.frontend.event.EventType;
+import pl.pollub.frontend.event.OnEvent;
 import pl.pollub.frontend.injector.Inject;
 import pl.pollub.frontend.service.AuthService;
 import pl.pollub.frontend.service.GroupInviteService;
@@ -35,6 +37,8 @@ public class MainViewController {
 
     @FXML
     public HBox navBar;
+    @FXML
+    public Label admin;
 
     @FXML
     public void initialize() {
@@ -53,6 +57,11 @@ public class MainViewController {
         modalService.setModalContainer((VBox) root.lookup("#modalContainer"));
 
         groupInviteService.setRoot(root);
+    }
+
+    @OnEvent(EventType.LOGIN)
+    public void onLogin() {
+        admin.setVisible(authService.isAdmin());
     }
 
     public void setContent(Node newContent) {

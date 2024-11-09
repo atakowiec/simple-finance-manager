@@ -3,6 +3,8 @@ package pl.pollub.frontend.service;
 import com.google.gson.reflect.TypeToken;
 import lombok.Getter;
 import pl.pollub.frontend.annotation.PostInitialize;
+import pl.pollub.frontend.event.EventType;
+import pl.pollub.frontend.event.OnEvent;
 import pl.pollub.frontend.injector.Inject;
 import pl.pollub.frontend.injector.Injectable;
 import pl.pollub.frontend.model.transaction.Expense;
@@ -26,19 +28,31 @@ public class CategoryService {
     private HttpService httpService;
 
     @PostInitialize
+    @OnEvent(EventType.CATEGORIES_UPDATE)
     public void postInitialize() {
+        List<TransactionCategory> categories = fetchCategories();
         expenseCategories.clear();
-        expenseCategories.addAll(fetchCategories("expenses"));
-
         incomeCategories.clear();
-        incomeCategories.addAll(fetchCategories("incomes"));
+
+        for (TransactionCategory category : categories) {
+            switch (category.getCategoryType()) {
+                case EXPENSE:
+                    expenseCategories.add(category);
+                    break;
+                case INCOME:
+                    incomeCategories.add(category);
+                    break;
+                default:
+                    throw new RuntimeException("Unknown category type: " + category.getCategoryType());
+            }
+        }
     }
 
-    private List<TransactionCategory> fetchCategories(String categoryType) {
-        HttpResponse<String> response = httpService.get("/categories/" + categoryType);
+    private List<TransactionCategory> fetchCategories() {
+        HttpResponse<String> response = httpService.get("/categories");
 
         if (response.statusCode() != 200) {
-            throw new RuntimeException("Failed to fetch categories of type: " + categoryType);
+            throw new RuntimeException("Failed to fetch categories");
         }
 
         Type type = new TypeToken<List<TransactionCategory>>() {

@@ -16,6 +16,7 @@
             <Insets bottom="10" left="10" right="10" top="10" />
         </padding>
         <Label id="home" onMouseClicked="#onNavItemClick" prefHeight="25.0" styleClass="navItem" text="Strona główna" />
+        <Label fx:id="admin" id="admin" onMouseClicked="#onNavItemClick" prefHeight="25.0" styleClass="navItem" text="Panel admina" />
         <Region HBox.hgrow="ALWAYS" />
         <HBox alignment="CENTER" onMouseClicked="#onNotificationsClick" prefHeight="25.0" spacing="5" styleClass="navItem, notificationOption">
             <Label text="Powiadomienia" />

@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.expenses.dto.ExpenseUpdateDto;
-import pl.pollub.backend.categories.ExpenseCategory;
-import pl.pollub.backend.categories.ExpenseCategoryRepository;
+import pl.pollub.backend.categories.model.TransactionCategory;
+import pl.pollub.backend.categories.CategoryRepository;
 import pl.pollub.backend.exception.HttpException;
 import org.springframework.http.HttpStatus;
 import pl.pollub.backend.group.GroupService;
@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ExpenseService {
     private final ExpenseRepository expenseRepository;
-    private final ExpenseCategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
     private final GroupService groupService;
 
     public List<Expense> getAllExpensesForGroup(User user, long groupId) {
@@ -41,7 +41,7 @@ public class ExpenseService {
                         expense.setAmount(updatedExpense.getAmount());
                     }
                     if (updatedExpense.getCategoryId() != null) {
-                        ExpenseCategory category = categoryRepository.findById(updatedExpense.getCategoryId())
+                        TransactionCategory category = categoryRepository.findById(updatedExpense.getCategoryId())
                                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono kategorii o podanym identyfikatorze: " + updatedExpense.getCategoryId()));
                         expense.setCategory(category);
                     }

@@ -53,6 +53,8 @@ public class ScreenService {
             dependencyInjector.manualInject(mainViewController);
             dependencyInjector.runPostInitialize(mainViewController);
 
+            eventEmitter.registerPersistentController(mainViewController);
+
             stage.setScene(new Scene(mainView, 1100, 650));
             stage.show();
         } catch (IOException e) {
@@ -149,10 +151,6 @@ public class ScreenService {
                 throw new RuntimeException(e);
             }
         }
-    }
-
-    public FXMLLoader prepareRawView(String viewName) {
-        return prepareRawView(viewName, Map.of());
     }
 
     public FXMLLoader prepareRawView(String viewName, Map<String, Object> parameters) {

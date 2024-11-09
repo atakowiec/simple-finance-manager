@@ -16,6 +16,8 @@ public class AdminService {
 
     @Inject
     private HttpService httpService;
+    @Inject
+    private CategoryService categoryService;
 
     @SuppressWarnings("unchecked")
     public List<User> getAllUsers() {
@@ -23,6 +25,7 @@ public class AdminService {
         if (response.statusCode() != 200) {
             throw new RuntimeException("Błąd pobierania użytkowników: " + response.statusCode());
         }
+
         List<User> userList = new ArrayList<>();
         try {
             String responseBody = response.body();
@@ -92,77 +95,22 @@ public class AdminService {
     }
 
     public List<TransactionCategory> getExpenseCategories() {
-        HttpResponse<String> response = httpService.get("categories/expenses");
-        if (response.statusCode() != 200) {
-            throw new RuntimeException("Błąd pobierania kategorii wydatków: " + response.statusCode());
-        }
-        List<TransactionCategory> expenseCategoryList = new ArrayList<>();
-        try {
-            String responseBody = response.body();
-            Map<String, Object>[] categoriesArray = JsonUtil.GSON.fromJson(responseBody, Map[].class);
-            for (Map<String, Object> categoryMap : categoriesArray) {
-                TransactionCategory category = new TransactionCategory();
-                category.setId(((Number) categoryMap.get("id")).intValue());
-                category.setName((String) categoryMap.get("name"));
-                category.setIcon((String) categoryMap.get("icon"));
-                expenseCategoryList.add(category);
-            }
-            return expenseCategoryList;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Błąd przy konwersji JSON do listy kategorii wydatków");
-        }
-
+        return categoryService.getExpenseCategories();
     }
 
     public List<TransactionCategory> getIncomeCategories() {
-        HttpResponse<String> response = httpService.get("categories/incomes");
-        if (response.statusCode() != 200) {
-            throw new RuntimeException("Błąd pobierania kategorii przychodów: " + response.statusCode());
-        }
-        List<TransactionCategory> incomeCategoryList = new ArrayList<>();
-        try {
-            String responseBody = response.body();
-            Map<String, Object>[] categoriesArray = JsonUtil.GSON.fromJson(responseBody, Map[].class);
-            for (Map<String, Object> categoryMap : categoriesArray) {
-                TransactionCategory category = new TransactionCategory();
-                category.setId(((Number) categoryMap.get("id")).intValue());
-                category.setName((String) categoryMap.get("name"));
-                category.setIcon((String) categoryMap.get("icon"));
-                incomeCategoryList.add(category);
-            }
-            return incomeCategoryList;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Błąd przy konwersji JSON do listy kategorii przychodów");
-        }
-
+        return categoryService.getIncomeCategories();
     }
 
-    public HttpResponse<String> addExpenseCategory(TransactionCategory category) {
-        String json = JsonUtil.GSON.toJson(category);
-        return httpService.post("/categories/expenses", json);
+    public HttpResponse<String> addCategory(TransactionCategory category) {
+        return httpService.post("/categories", category);
     }
 
-    public HttpResponse<String> addIncomeCategory(TransactionCategory category) {
-        String json = JsonUtil.GSON.toJson(category);
-        return httpService.post("/categories/incomes", json);
+    public HttpResponse<String> updateCategory(TransactionCategory category) {
+        return httpService.put("/categories/" + category.getId(), category);
     }
 
-    public HttpResponse<String> updateExpenseCategory(TransactionCategory category) {
-        return httpService.put("/categories/expenses/" + category.getId(), category);
+    public HttpResponse<String> deleteCategory(Long id) {
+        return httpService.delete("/categories/" + id);
     }
-
-    public HttpResponse<String> deleteExpenseCategory(Long id) {
-        return httpService.delete("/categories/expenses/" + id);
-    }
-
-    public HttpResponse<String> updateIncomeCategory(TransactionCategory category) {
-        return httpService.put("/categories/incomes/" + category.getId(), category);
-    }
-
-    public HttpResponse<String> deleteIncomeCategory(Long id) {
-        return httpService.delete("/categories/incomes/" + id);
-    }
-
 }

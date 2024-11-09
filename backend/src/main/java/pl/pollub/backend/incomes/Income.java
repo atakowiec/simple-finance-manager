@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.pollub.backend.auth.user.User;
-import pl.pollub.backend.categories.IncomeCategory;
+import pl.pollub.backend.categories.model.TransactionCategory;
 import pl.pollub.backend.conversion.DtoConvertible;
 import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.incomes.dto.IncomeDto;
@@ -25,7 +25,7 @@ public class Income implements DtoConvertible<IncomeDto> {
     private Double amount;
 
     @ManyToOne
-    private IncomeCategory category;
+    private TransactionCategory category;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

@@ -67,6 +67,7 @@ public class TransactionListCell extends ListCell<Transaction> {
         }
         if (transaction instanceof Income) {
             modalService.showModal("group/edit-income.fxml", Map.of("transaction", transaction));
+            return;
         }
 
         throw new IllegalArgumentException("Unknown transaction type");

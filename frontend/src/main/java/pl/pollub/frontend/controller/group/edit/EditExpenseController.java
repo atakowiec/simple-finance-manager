@@ -1,7 +1,10 @@
 package pl.pollub.frontend.controller.group.edit;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import pl.pollub.frontend.annotation.PostInitialize;
 import pl.pollub.frontend.annotation.ViewParameter;
 import pl.pollub.frontend.controller.group.add.list.CategoryListCell;
@@ -54,13 +57,11 @@ public class EditExpenseController {
         loadCategories();
     }
 
-
     private void loadExpenseData() {
         nameInput.setText(transaction.getName());
         amountInput.setText(String.valueOf(transaction.getAmount()));
         datePicker.setValue(transaction.getDate());
     }
-
 
     private void loadCategories() {
         List<TransactionCategory> expenseCategories = categoryService.getCategories(transaction);
@@ -68,7 +69,6 @@ public class EditExpenseController {
 
         categoryPicker.setValue(transaction.getCategory());
     }
-
 
     @FXML
     private void save() {

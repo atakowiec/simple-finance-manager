@@ -5,8 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pollub.backend.auth.user.User;
-import pl.pollub.backend.categories.IncomeCategory;
-import pl.pollub.backend.categories.IncomeCategoryRepository;
+import pl.pollub.backend.categories.model.TransactionCategory;
+import pl.pollub.backend.categories.CategoryRepository;
 import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.GroupService;
 import pl.pollub.backend.group.model.Group;
@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class IncomeService {
     private final IncomeRepository incomeRepository;
-    private final IncomeCategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
     private final GroupService groupService;
 
     public List<Income> getAllIncomesForGroup(User user, long groupId) {
@@ -42,7 +42,7 @@ public class IncomeService {
                         income.setAmount(updatedIncome.getAmount());
                     }
                     if (updatedIncome.getCategoryId() != null) {
-                        IncomeCategory category = categoryRepository.findById(updatedIncome.getCategoryId())
+                        TransactionCategory category = categoryRepository.findById(updatedIncome.getCategoryId())
                                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono kategorii o podanym identyfikatorze: " + updatedIncome.getCategoryId()));
                         income.setCategory(category);
                     }

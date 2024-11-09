@@ -1,11 +1,11 @@
-package pl.pollub.backend.auth.dto;
+package pl.pollub.backend.categories.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class AdminDto {
+public class UserDto {
     private Long id;
     private String username;
     private String email;

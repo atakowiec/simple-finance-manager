@@ -23,6 +23,7 @@ public class TransactionService {
         HttpResponse<String> response = httpService.get("/expenses/" + id);
         Type type = new TypeToken<List<Expense>>() {
         }.getType();
+
         return JsonUtil.GSON.fromJson(response.body(), type);
     }
 

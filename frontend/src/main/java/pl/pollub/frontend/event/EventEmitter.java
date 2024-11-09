@@ -16,6 +16,7 @@ public class EventEmitter {
 
     private final Map<EventType, List<EventListener>> listeners = new HashMap<>();
 
+    private final Set<Object> persistentControllers = new HashSet<>();
     private final Set<Object> activeControllers = new HashSet<>();
 
     private boolean emitActive = false;
@@ -54,6 +55,10 @@ public class EventEmitter {
         activeControllers.remove(controller);
     }
 
+    public void registerPersistentController(Object controller) {
+        persistentControllers.add(controller);
+    }
+
     public void emit(EventType eventType, Object... data) {
         // we need to block nested event calls because the event emitter won't be able to
         // invoke handler method after exiting nested event handler
@@ -63,7 +68,8 @@ public class EventEmitter {
         }
 
         emitActive = true;
-        emitToControllers(eventType, data);
+        emitToControllers(persistentControllers, eventType, data);
+        emitToControllers(activeControllers, eventType, data);
         emitToListeners(eventType, data);
         emitActive = false;
 
@@ -83,8 +89,8 @@ public class EventEmitter {
         }
     }
 
-    private void emitToControllers(EventType eventType, Object... data) {
-        for (Object controller : activeControllers) {
+    private void emitToControllers(Collection<Object> controllers, EventType eventType, Object... data) {
+        for (Object controller : controllers) {
             for (Method method : controller.getClass().getDeclaredMethods()) {
                 if (!method.isAnnotationPresent(OnEvent.class))
                     continue;

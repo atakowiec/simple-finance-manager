@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.expenses.dto.ExpenseUpdateDto;
 import pl.pollub.backend.expenses.dto.ExpenseCreateDto;
-import pl.pollub.backend.categories.ExpenseCategory;
-import pl.pollub.backend.categories.ExpenseCategoryRepository;
+import pl.pollub.backend.categories.model.TransactionCategory;
+import pl.pollub.backend.categories.CategoryRepository;
 import pl.pollub.backend.exception.HttpException;
 import org.springframework.http.HttpStatus;
 import pl.pollub.backend.group.GroupRepository;
@@ -23,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ExpenseController {
     private final ExpenseService expenseService;
-    private final ExpenseCategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
     private final GroupRepository groupRepository;
     private final GroupService groupService;
 
@@ -40,7 +40,7 @@ public class ExpenseController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
-        ExpenseCategory category = categoryRepository.findById(expenseCreateDto.getCategoryId())
+        TransactionCategory category = categoryRepository.findById(expenseCreateDto.getCategoryId())
                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono kategorii o podanym identyfikatorze: " + expenseCreateDto.getCategoryId()));
 
         Group group = groupService.getGroupByIdOrThrow(expenseCreateDto.getGroupId());
