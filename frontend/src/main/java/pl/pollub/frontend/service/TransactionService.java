@@ -56,4 +56,37 @@ public class TransactionService {
 
         return httpService.post("/incomes", body);
     }
+
+    public HttpResponse<String> updateIncome(Long incomeId, String name, double amount, TransactionCategory category, LocalDate date, long groupId) {
+        String body = SimpleJsonBuilder.empty()
+                .add("name", name)
+                .add("amount", amount)
+                .add("categoryId", category.getId())
+                .add("date", date.toString())
+                .add("groupId", groupId)
+                .toJson();
+
+        return httpService.put("/incomes/" + incomeId, body);
+    }
+
+    public HttpResponse<String> updateExpense(Long expenseId, String name, double amount, TransactionCategory category, LocalDate date, long groupId) {
+        String body = SimpleJsonBuilder.empty()
+                .add("name", name)
+                .add("amount", amount)
+                .add("categoryId", category.getId())
+                .add("date", date.toString())
+                .add("groupId", groupId)
+                .toJson();
+
+        return httpService.put("/expenses/" + expenseId, body);
+    }
+
+    public HttpResponse<String> deleteExpense(Long expenseId) {
+        return httpService.delete("/expenses/" + expenseId);
+    }
+
+    public HttpResponse<String> deleteIncome(Long incomeId) {
+        return httpService.delete("/incomes/" + incomeId);
+    }
+
 }

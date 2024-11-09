@@ -1,12 +1,14 @@
 package pl.pollub.frontend.model.transaction;
 
 import javafx.scene.image.Image;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import pl.pollub.frontend.FinanceApplication;
 
 import java.net.URL;
 
-@Data
+@Setter
+@Getter
 public class TransactionCategory {
     private int id;
     private String name;
@@ -18,5 +20,10 @@ public class TransactionCategory {
             return null;
 
         return new Image(resource.toExternalForm());
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 }

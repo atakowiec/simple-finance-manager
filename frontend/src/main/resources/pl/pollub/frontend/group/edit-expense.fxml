@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox alignment="TOP_CENTER" stylesheets="@../css/global.css, @../css/group.css, @../css/home.css"
+      xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="pl.pollub.frontend.controller.group.edit.EditExpenseController">
+    <padding>
+        <Insets bottom="10" left="10" right="10" top="10.0"/>
+    </padding>
+    <VBox alignment="TOP_CENTER">
+        <Label styleClass="contentTitle">
+            Edytuj wydatek
+        </Label>
+
+        <HBox alignment="CENTER_LEFT" spacing="20.0">
+            <Label styleClass="modalKey" text="Nazwa:"/>
+            <TextField fx:id="nameInput" prefWidth="200.0"/>
+        </HBox>
+
+        <HBox alignment="CENTER_LEFT" spacing="20.0">
+            <VBox.margin>
+                <Insets top="20.0"/>
+            </VBox.margin>
+            <Label styleClass="modalKey" text="Kwota:"/>
+            <TextField fx:id="amountInput" prefWidth="200.0"/>
+        </HBox>
+
+        <HBox alignment="CENTER_LEFT" spacing="20.0">
+            <VBox.margin>
+                <Insets top="20.0"/>
+            </VBox.margin>
+            <Label styleClass="modalKey" text="Data:"/>
+            <DatePicker fx:id="datePicker" prefWidth="200.0"/>
+        </HBox>
+
+        <HBox alignment="CENTER_LEFT" spacing="20.0">
+            <VBox.margin>
+                <Insets top="20.0"/>
+            </VBox.margin>
+            <Label styleClass="modalKey" text="Kategoria:"/>
+            <ComboBox fx:id="categoryPicker" prefWidth="200.0" visibleRowCount="8"/>
+        </HBox>
+
+        <Label fx:id="errorLabel" textFill="red">
+            <VBox.margin>
+                <Insets top="10.0"/>
+            </VBox.margin>
+        </Label>
+
+        <Button styleClass="primary-btn" text="Zapisz zmiany" onAction="#save">
+            <VBox.margin>
+                <Insets top="10.0"/>
+            </VBox.margin>
+        </Button>
+    </VBox>
+</HBox>

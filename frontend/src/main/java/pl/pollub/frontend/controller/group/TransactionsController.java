@@ -6,12 +6,11 @@ import pl.pollub.frontend.annotation.PostInitialize;
 import pl.pollub.frontend.controller.group.transaction.TransactionListCell;
 import pl.pollub.frontend.event.EventType;
 import pl.pollub.frontend.event.OnEvent;
+import pl.pollub.frontend.injector.DependencyInjector;
 import pl.pollub.frontend.injector.Inject;
 import pl.pollub.frontend.model.group.Group;
 import pl.pollub.frontend.model.transaction.Transaction;
 import pl.pollub.frontend.service.TransactionService;
-
-import java.util.Objects;
 
 public class TransactionsController extends AbstractGroupController {
     @FXML
@@ -19,19 +18,24 @@ public class TransactionsController extends AbstractGroupController {
 
     @Inject
     private TransactionService transactionService;
+    @Inject
+    private DependencyInjector dependencyInjector;
 
     @PostInitialize
     public void postInitialize() {
-        onTransactionUpdate(getGroup().getId());
+        onTransactionUpdate();
 
-        mainList.setCellFactory(param -> new TransactionListCell());
+        mainList.setCellFactory(param -> {
+            TransactionListCell transactionListCell = new TransactionListCell();
+            dependencyInjector.manualInject(transactionListCell);
+            dependencyInjector.runPostInitialize(transactionListCell);
+            return transactionListCell;
+        });
     }
 
     @OnEvent(EventType.TRANSACTION_UPDATE)
-    public void onTransactionUpdate(Long groupId) {
+    public void onTransactionUpdate() {
         Group group = getGroup();
-        if(!Objects.equals(group.getId(), groupId))
-            return;
 
         mainList.getItems().clear();
         mainList.getItems().addAll(transactionService.fetchExpenses(group.getId()));

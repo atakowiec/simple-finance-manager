@@ -72,4 +72,6 @@ module pl.pollub.frontend {
     opens pl.pollub.frontend.enums to com.google.gson;
     exports pl.pollub.frontend.controller.component;
     opens pl.pollub.frontend.controller.component to javafx.fxml;
+    exports pl.pollub.frontend.controller.group.edit;
+    opens pl.pollub.frontend.controller.group.edit to javafx.fxml;
 }

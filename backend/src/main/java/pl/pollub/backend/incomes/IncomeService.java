@@ -3,6 +3,7 @@ package pl.pollub.backend.incomes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.categories.IncomeCategory;
 import pl.pollub.backend.categories.IncomeCategoryRepository;
@@ -44,6 +45,9 @@ public class IncomeService {
                         IncomeCategory category = categoryRepository.findById(updatedIncome.getCategoryId())
                                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono kategorii o podanym identyfikatorze: " + updatedIncome.getCategoryId()));
                         income.setCategory(category);
+                    }
+                    if (updatedIncome.getDate() != null) {
+                        income.setDate(updatedIncome.getDate());
                     }
                     return incomeRepository.save(income);
                 })
