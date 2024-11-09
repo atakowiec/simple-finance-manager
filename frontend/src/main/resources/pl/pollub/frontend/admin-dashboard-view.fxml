@@ -27,7 +27,7 @@
         <AnchorPane fx:id="usersPane" layoutX="306.0" layoutY="100.0" prefHeight="580.0" prefWidth="700.0">
             <TableView fx:id="usersTable" layoutX="10.0" layoutY="10.0" onMouseClicked="#selectUser" prefHeight="400.0" prefWidth="680.0">
                 <columns>
-                    <TableColumn fx:id="userIdCol" prefWidth="80.0" text="ID" />
+                    <TableColumn fx:id="userIdCol" text="ID" />
                     <TableColumn fx:id="userEmailCol" prefWidth="174.4" text="Email" />
                     <TableColumn fx:id="userNameCol" prefWidth="173.6" text="Nazwa" />
                     <TableColumn fx:id="userRoleCol" prefWidth="127.2" text="Rola" />
@@ -52,7 +52,7 @@
                 <Button onAction="#deleteUser" styleClass="crud-button" text="Usuń" />
                 <Button onAction="#clearUserForm" styleClass="crud-button" text="Wyczyść" />
             </HBox>
-            <Label fx:id="statusMessageLabel" layoutX="10.0" layoutY="500.0" prefWidth="680.0" style="-fx-text-fill: red;" text="" />
+            <Label fx:id="statusMessageLabel" layoutX="10.0" layoutY="500.0" prefWidth="680.0" style="-fx-text-fill: red;"/>
         </AnchorPane>
 
         <AnchorPane fx:id="categoriesPane" layoutX="306.0" layoutY="54.0" prefHeight="640.0" prefWidth="700.0" visible="false">
@@ -67,14 +67,14 @@
 
             <HBox layoutX="7.0" layoutY="216.0" spacing="10.0">
                 <TextField fx:id="expenseCategoryNameField" prefWidth="339.0" promptText="Nazwa kategorii wydatków" HBox.hgrow="ALWAYS" />
-                <TextField fx:id="expenseCategoryIconField" prefHeight="26.0" prefWidth="327.0" promptText="Ikona" HBox.hgrow="ALWAYS" />
+                <Button fx:id="expenseCategorySelectorButton" prefHeight="26.0" prefWidth="327.0" onMouseClicked="#openExpenseCategorySelector" HBox.hgrow="ALWAYS" text="Wybierz ikonę" />
             </HBox>
             <HBox layoutX="10.0" layoutY="251.0" spacing="10.0">
                 <Button onAction="#addExpenseCategory" styleClass="crud-button" text="Dodaj kategorię wydatków" />
                 <Button onAction="#updateExpenseCategory" styleClass="crud-button" text="Aktualizuj kategorię wydatków" />
                 <Button onAction="#deleteExpenseCategory" styleClass="crud-button" text="Usuń kategorię wydatków" />
             </HBox>
-            <Label fx:id="expenseCategoryStatusMessageLabel" layoutX="10.0" layoutY="294.0" prefWidth="680.0" style="-fx-text-fill: red;" text="" />
+            <Label fx:id="expenseCategoryStatusMessageLabel" layoutX="10.0" layoutY="294.0" prefWidth="680.0" style="-fx-text-fill: red;"/>
 
             <Label layoutX="14.0" layoutY="320.0" text="Kategorie przychodów" />
             <TableView fx:id="incomeCategoriesTable" layoutX="10.0" layoutY="351.0" prefHeight="154.0" prefWidth="680.0">
@@ -87,14 +87,14 @@
 
             <HBox layoutX="7.0" layoutY="514.0" spacing="10.0">
                 <TextField fx:id="incomeCategoryNameField" prefHeight="26.0" prefWidth="340.0" promptText="Nazwa kategorii przychodów" HBox.hgrow="ALWAYS" />
-                <TextField fx:id="incomeCategoryIconField" prefHeight="26.0" prefWidth="326.0" promptText="Ikona" HBox.hgrow="ALWAYS" />
+                <Button fx:id="incomeCategorySelectorButton" prefWidth="326.0" prefHeight="26.0" onMouseClicked="#openIncomeCategorySelector" HBox.hgrow="ALWAYS" text="Wybierz ikonę" />
             </HBox>
             <HBox layoutX="10.0" layoutY="547.0" spacing="10.0">
                 <Button onAction="#addIncomeCategory" styleClass="crud-button" text="Dodaj kategorię przychodów" />
                 <Button onAction="#updateIncomeCategory" styleClass="crud-button" text="Aktualizuj kategorię przychodów" />
                 <Button onAction="#deleteIncomeCategory" styleClass="crud-button" text="Usuń kategorię przychodów" />
             </HBox>
-            <Label fx:id="incomeCategoryStatusMessageLabel" layoutX="10.0" layoutY="592.0" prefWidth="680.0" style="-fx-text-fill: red;" text="" />
+            <Label fx:id="incomeCategoryStatusMessageLabel" layoutX="10.0" layoutY="592.0" prefWidth="680.0" style="-fx-text-fill: red;"/>
         </AnchorPane>
     </AnchorPane>
 </AnchorPane>

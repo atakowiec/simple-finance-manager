@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<HBox alignment="CENTER_LEFT" stylesheets="@../css/home.css" xmlns="http://javafx.com/javafx/8"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="pl.pollub.frontend.controller.group.add.list.CategoryCellController">
+<HBox alignment="CENTER_LEFT" prefWidth="160.0" stylesheets="@../css/home.css" HBox.hgrow="ALWAYS" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pollub.frontend.controller.group.add.list.CategoryCellController">
    <ImageView fx:id="categoryIcon" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
       <HBox.margin>
-         <Insets right="10.0"/>
+         <Insets right="10.0" />
       </HBox.margin>
    </ImageView>
-   <Label fx:id="nameLabel" style="-fx-font-size: 14px; -fx-text-fill: black;"/>
+   <Label fx:id="nameLabel" style="-fx-font-size: 14px; -fx-text-fill: black;" HBox.hgrow="ALWAYS" />
 </HBox>

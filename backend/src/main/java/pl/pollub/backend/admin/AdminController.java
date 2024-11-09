@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.pollub.backend.auth.dto.*;
+import pl.pollub.backend.categories.dto.UserDto;
 
 import java.util.List;
 
@@ -15,8 +16,8 @@ public class AdminController {
     private final AdminService adminService;
 
     @GetMapping("/users")
-    public ResponseEntity<List<AdminDto>> getUsers() {
-        List<AdminDto> users = adminService.getAllUsers();
+    public ResponseEntity<List<UserDto>> getUsers() {
+        List<UserDto> users = adminService.getAllUsers();
         return ResponseEntity.ok(users);
     }
 

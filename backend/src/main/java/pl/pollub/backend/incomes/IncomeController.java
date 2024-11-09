@@ -7,8 +7,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.pollub.backend.auth.user.User;
-import pl.pollub.backend.categories.IncomeCategory;
-import pl.pollub.backend.categories.IncomeCategoryRepository;
+import pl.pollub.backend.categories.model.TransactionCategory;
+import pl.pollub.backend.categories.CategoryRepository;
 import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.GroupService;
 import pl.pollub.backend.group.model.Group;
@@ -22,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class IncomeController {
     private final IncomeService incomeService;
-    private final IncomeCategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
     private final GroupService groupService;
 
     @GetMapping("/{groupId}")
@@ -38,7 +38,7 @@ public class IncomeController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
 
-        IncomeCategory category = categoryRepository.findById(incomeCreateDto.getCategoryId())
+        TransactionCategory category = categoryRepository.findById(incomeCreateDto.getCategoryId())
                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono kategorii o podanym identyfikatorze: " + incomeCreateDto.getCategoryId()));
 
         Group group = groupService.getGroupByIdOrThrow(incomeCreateDto.getGroupId());

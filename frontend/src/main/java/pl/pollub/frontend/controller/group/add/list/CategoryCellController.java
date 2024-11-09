@@ -14,6 +14,6 @@ public class CategoryCellController {
 
     public void setCategory(TransactionCategory category) {
         nameLabel.setText(category.getName());
-        categoryIcon.setImage(category.getIcon());
+        categoryIcon.setImage(category.getImageIcon());
     }
 }

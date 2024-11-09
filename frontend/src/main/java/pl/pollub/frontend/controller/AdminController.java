@@ -3,22 +3,31 @@ package pl.pollub.frontend.controller;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import pl.pollub.frontend.annotation.NavBar;
+import pl.pollub.frontend.annotation.PostInitialize;
 import pl.pollub.frontend.annotation.Title;
 import pl.pollub.frontend.annotation.View;
+import pl.pollub.frontend.controller.component.ImageTableCell;
+import pl.pollub.frontend.event.EventEmitter;
+import pl.pollub.frontend.event.EventType;
 import pl.pollub.frontend.injector.Inject;
 import pl.pollub.frontend.model.transaction.TransactionCategory;
+import pl.pollub.frontend.model.transaction.TransactionCategoryType;
 import pl.pollub.frontend.service.AdminService;
-import pl.pollub.frontend.annotation.PostInitialize;
 import pl.pollub.frontend.user.User;
+
+import java.io.File;
+import java.io.IOException;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
 import java.util.List;
 
 
@@ -26,10 +35,10 @@ import java.util.List;
 @Title("Panel administratora")
 @View(name = "admin", path = "admin-dashboard-view.fxml")
 public class AdminController {
-
-
     @Inject
     private AdminService adminService;
+    @Inject
+    private EventEmitter eventEmitter;
 
     @FXML
     private AnchorPane usersPane;
@@ -60,21 +69,17 @@ public class AdminController {
     @FXML
     public TextField incomeCategoryNameField;
     @FXML
-    public TextField incomeCategoryIconField;
-    @FXML
     public TableColumn<TransactionCategory, String> incomeCategoryNameCol;
     @FXML
-    public TableColumn<TransactionCategory, String> incomeCategoryIconCol;
+    public TableColumn<TransactionCategory, Integer> incomeCategoryIconCol;
     @FXML
     public TableView<TransactionCategory> incomeCategoriesTable;
     @FXML
     public TableColumn<TransactionCategory, String> expenseCategoryNameCol;
     @FXML
-    public TableColumn<TransactionCategory, String> expenseCategoryIconCol;
+    public TableColumn<TransactionCategory, Integer> expenseCategoryIconCol;
     @FXML
     public TextField expenseCategoryNameField;
-    @FXML
-    public TextField expenseCategoryIconField;
     @FXML
     public TableView<TransactionCategory> expenseCategoriesTable;
     @FXML
@@ -85,6 +90,13 @@ public class AdminController {
     private Label expenseCategoryStatusMessageLabel;
     @FXML
     private Label incomeCategoryStatusMessageLabel;
+    @FXML
+    public Button incomeCategorySelectorButton;
+    @FXML
+    public Button expenseCategorySelectorButton;
+
+    private File incomeCategoryIconFile;
+    private File expenseCategoryIconFile;
 
 
     private ObservableList<User> userList;
@@ -110,11 +122,13 @@ public class AdminController {
 
         expenseCategoryIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         expenseCategoryNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        expenseCategoryIconCol.setCellValueFactory(new PropertyValueFactory<>("icon"));
+        expenseCategoryIconCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+        expenseCategoryIconCol.setCellFactory(param -> new ImageTableCell());
 
         incomeCategoryIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         incomeCategoryNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        incomeCategoryIconCol.setCellValueFactory(new PropertyValueFactory<>("icon"));
+        incomeCategoryIconCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+        incomeCategoryIconCol.setCellFactory(param -> new ImageTableCell());
 
         expenseCategoryList = FXCollections.observableArrayList();
         incomeCategoryList = FXCollections.observableArrayList();
@@ -363,7 +377,8 @@ public class AdminController {
             return;
         }
         expenseCategoryNameField.setText(selectedCategory.getName());
-        //todo handle icon
+        expenseCategorySelectorButton.setText("Wybierz ikonę");
+        expenseCategoryIconFile = null;
     }
 
     @FXML
@@ -373,16 +388,19 @@ public class AdminController {
             return;
         }
         incomeCategoryNameField.setText(selectedCategory.getName());
-        //todo handle icon
+        incomeCategorySelectorButton.setText("Wybierz ikonę");
+        incomeCategoryIconFile = null;
     }
 
     private void refreshExpenseCategories() {
+        eventEmitter.emit(EventType.CATEGORIES_UPDATE);
         List<TransactionCategory> categories = adminService.getExpenseCategories();
         expenseCategoriesTable.getItems().clear();
         expenseCategoriesTable.getItems().addAll(categories);
     }
 
     private void refreshIncomeCategories() {
+        eventEmitter.emit(EventType.CATEGORIES_UPDATE);
         List<TransactionCategory> categories = adminService.getIncomeCategories();
         incomeCategoriesTable.getItems().clear();
         incomeCategoriesTable.getItems().addAll(categories);
@@ -391,27 +409,31 @@ public class AdminController {
     @FXML
     private void clearCategoryForm() {
         expenseCategoryNameField.clear();
-        expenseCategoryIconField.clear();
         incomeCategoryNameField.clear();
-        incomeCategoryIconField.clear();
+
+        incomeCategorySelectorButton.setText("Wybierz ikonę");
+        expenseCategorySelectorButton.setText("Wybierz ikonę");
+
+        incomeCategoryIconFile = null;
+        expenseCategoryIconFile = null;
     }
 
     @FXML
     public void addExpenseCategory() {
         String name = expenseCategoryNameField.getText();
-        String icon = expenseCategoryIconField.getText();
 
-        if (name.isEmpty() || icon.isEmpty()) {
+        if (name.isEmpty() || expenseCategoryIconFile == null) {
             displayExpenseCategoryStatusMessage("Nazwa i ikona kategorii nie mogą być puste.");
             return;
         }
 
         TransactionCategory newCategory = new TransactionCategory();
         newCategory.setName(name);
-        newCategory.setIcon(icon);
+        newCategory.setIcon(getFileBytes(expenseCategoryIconFile));
+        newCategory.setCategoryType(TransactionCategoryType.EXPENSE);
 
         try {
-            HttpResponse<String> response = adminService.addExpenseCategory(newCategory);
+            HttpResponse<String> response = adminService.addCategory(newCategory);
             if (response.statusCode() == 200) {
                 displayExpenseCategoryStatusMessage("Kategoria wydatków została dodana.");
                 clearCategoryForm();
@@ -432,19 +454,19 @@ public class AdminController {
     @FXML
     public void addIncomeCategory() {
         String name = incomeCategoryNameField.getText();
-        String icon = incomeCategoryIconField.getText();
 
-        if (name.isEmpty() || icon.isEmpty()) {
+        if (name.isEmpty() || incomeCategoryIconFile == null) {
             displayIncomeCategoryStatusMessage("Nazwa i ikona kategorii nie mogą być puste.");
             return;
         }
 
         TransactionCategory newCategory = new TransactionCategory();
         newCategory.setName(name);
-        newCategory.setIcon(icon);
+        newCategory.setIcon(getFileBytes(incomeCategoryIconFile));
+        newCategory.setCategoryType(TransactionCategoryType.INCOME);
 
         try {
-            HttpResponse<String> response = adminService.addIncomeCategory(newCategory);
+            HttpResponse<String> response = adminService.addCategory(newCategory);
             if (response.statusCode() == 200) {
                 displayIncomeCategoryStatusMessage("Kategoria wydatków została dodana.");
                 clearCategoryForm();
@@ -472,18 +494,18 @@ public class AdminController {
         }
 
         String name = expenseCategoryNameField.getText().trim();
-        String icon = expenseCategoryIconField.getText().trim();
 
-        if (name.isEmpty() || icon.isEmpty()) {
-            displayExpenseCategoryStatusMessage("Nazwa i ikona kategorii nie mogą być puste.");
+        if (name.isEmpty()) {
+            displayExpenseCategoryStatusMessage("Nazwa nie może być pusta.");
             return;
         }
 
         selectedCategory.setName(name);
-        selectedCategory.setIcon(icon);
+        selectedCategory.setIcon(getFileBytes(expenseCategoryIconFile));
+        selectedCategory.setCategoryType(TransactionCategoryType.EXPENSE);
 
         try {
-            HttpResponse<String> response = adminService.updateExpenseCategory(selectedCategory);
+            HttpResponse<String> response = adminService.updateCategory(selectedCategory);
             if (response.statusCode() == 200) {
                 displayExpenseCategoryStatusMessage("Kategoria wydatków została zaktualizowana.");
                 clearCategoryForm();
@@ -492,6 +514,7 @@ public class AdminController {
                 displayExpenseCategoryStatusMessage("Błąd podczas aktualizacji kategorii wydatków.");
             }
         } catch (Exception e) {
+            e.printStackTrace();
             displayExpenseCategoryStatusMessage("Wystąpił błąd: " + e.getMessage());
         }
     }
@@ -507,18 +530,18 @@ public class AdminController {
         }
 
         String name = incomeCategoryNameField.getText().trim();
-        String icon = incomeCategoryIconField.getText().trim();
 
-        if (name.isEmpty() || icon.isEmpty()) {
-            displayIncomeCategoryStatusMessage("Nazwa i ikona kategorii nie mogą być puste.");
+        if (name.isEmpty()) {
+            displayIncomeCategoryStatusMessage("Nazwa nie może być pusta.");
             return;
         }
 
         selectedCategory.setName(name);
-        selectedCategory.setIcon(icon);
+        selectedCategory.setIcon(getFileBytes(incomeCategoryIconFile));
+        selectedCategory.setCategoryType(TransactionCategoryType.INCOME);
 
         try {
-            HttpResponse<String> response = adminService.updateIncomeCategory(selectedCategory);
+            HttpResponse<String> response = adminService.updateCategory(selectedCategory);
             if (response.statusCode() == 200) {
                 displayIncomeCategoryStatusMessage("Kategoria przychodów została zaktualizowana.");
                 clearCategoryForm();
@@ -541,7 +564,7 @@ public class AdminController {
         }
 
         try {
-            HttpResponse<String> response = adminService.deleteExpenseCategory((long) selectedCategory.getId());
+            HttpResponse<String> response = adminService.deleteCategory((long) selectedCategory.getId());
             if (response.statusCode() == 200) {
                 displayExpenseCategoryStatusMessage("Kategoria wydatków została usunięta.");
                 clearCategoryForm();
@@ -563,7 +586,7 @@ public class AdminController {
         }
 
         try {
-            HttpResponse<String> response = adminService.deleteIncomeCategory((long) selectedCategory.getId());
+            HttpResponse<String> response = adminService.deleteCategory((long) selectedCategory.getId());
             if (response.statusCode() == 200) {
                 displayIncomeCategoryStatusMessage("Kategoria przychodów została usunięta.");
                 clearCategoryForm();
@@ -594,5 +617,49 @@ public class AdminController {
         timeline.play();
     }
 
+    private File getImage() {
+        FileChooser fileChooser = new FileChooser();
+
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
+        fileChooser.setTitle("Wybierz ikonę kategorii przychodów");
+
+        // open
+        return fileChooser.showOpenDialog(null);
+    }
+
+    private byte[] getFileBytes(File file) {
+        if(file == null) {
+            return null;
+        }
+
+        try {
+            return Files.readAllBytes(file.toPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void openIncomeCategorySelector() {
+        File file = getImage();
+
+        incomeCategoryIconFile = file;
+        if (file != null) {
+            incomeCategorySelectorButton.setText(file.getName());
+        } else {
+            incomeCategorySelectorButton.setText("Wybierz ikonę");
+        }
+    }
+
+    public void openExpenseCategorySelector() {
+        File file = getImage();
+
+        expenseCategoryIconFile = file;
+        if (file != null) {
+            expenseCategorySelectorButton.setText(file.getName());
+        } else {
+            expenseCategorySelectorButton.setText("Wybierz ikonę");
+        }
+    }
 }
 

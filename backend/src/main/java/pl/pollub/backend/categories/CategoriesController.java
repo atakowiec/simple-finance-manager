@@ -1,11 +1,16 @@
 package pl.pollub.backend.categories;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.pollub.backend.admin.AdminService;
-import pl.pollub.backend.auth.dto.CategoryDto;
-import pl.pollub.backend.auth.dto.CategoryUpdateDto;
+import pl.pollub.backend.categories.dto.CategoryCreateDto;
+import pl.pollub.backend.categories.dto.CategoryUpdateDto;
+import pl.pollub.backend.categories.model.TransactionCategory;
+import pl.pollub.backend.exception.HttpException;
 
 import java.util.List;
 
@@ -14,53 +19,40 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoriesController {
 
-    private final ExpenseCategoryRepository expenseCategoryRepository;
-    private final IncomeCategoryRepository incomeCategoryRepository;
+    private final CategoryRepository categoryRepository;
     private final AdminService adminService;
 
-    @GetMapping("expenses")
-    public List<ExpenseCategory> getExpenseCategories() {
-        return expenseCategoryRepository.findAll();
+    @GetMapping
+    public List<TransactionCategory> getCategories() {
+        return categoryRepository.findAll();
     }
 
-    @GetMapping("incomes")
-    public List<IncomeCategory> getIncomeCategories() {
-        return incomeCategoryRepository.findAll();
-    }
-
-    @PostMapping("/expenses")
-    public ResponseEntity<String> addExpenseCategory(@RequestBody CategoryDto categoryDto) {
-        String message = adminService.addExpenseCategory(categoryDto);
+    @PostMapping
+    public ResponseEntity<String> addCategory(@RequestBody CategoryCreateDto categoryDto) {
+        String message = adminService.addCategory(categoryDto);
         return ResponseEntity.ok(message);
     }
 
-    @PostMapping("/incomes")
-    public ResponseEntity<String> addIncomeCategory(@RequestBody CategoryDto categoryDto) {
-        String message = adminService.addIncomeCategory(categoryDto);
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateCategory(@PathVariable Long id, @RequestBody CategoryUpdateDto categoryUpdateDto) {
+        String message = adminService.updateCategory(id, categoryUpdateDto);
         return ResponseEntity.ok(message);
     }
 
-    @PutMapping("/expenses/{id}")
-    public ResponseEntity<String> updateExpenseCategory(@PathVariable Long id, @RequestBody CategoryUpdateDto categoryUpdateDto) {
-        String message = adminService.updateExpenseCategory(id, categoryUpdateDto);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
+        String message = adminService.deleteCategory(id);
         return ResponseEntity.ok(message);
     }
 
-    @DeleteMapping("/expenses/{id}")
-    public ResponseEntity<String> deleteExpenseCategory(@PathVariable Long id) {
-        String message = adminService.deleteExpenseCategory(id);
-        return ResponseEntity.ok(message);
-    }
+    @GetMapping("/icon/{id}")
+    public ResponseEntity<byte[]> getIcon(@PathVariable Long id) {
+        TransactionCategory category = categoryRepository.findById(id).orElseThrow(() -> new HttpException(404, "Category not found"));
 
-    @PutMapping("/incomes/{id}")
-    public ResponseEntity<String> updateIncomeCategory(@PathVariable Long id, @RequestBody CategoryUpdateDto categoryUpdateDto) {
-        String message = adminService.updateIncomeCategory(id, categoryUpdateDto);
-        return ResponseEntity.ok(message);
-    }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        headers.setContentLength(category.getIcon().length);
 
-    @DeleteMapping("/incomes/{id}")
-    public ResponseEntity<String> deleteIncomeCategory(@PathVariable Long id) {
-        String message = adminService.deleteIncomeCategory(id);
-        return ResponseEntity.ok(message);
+        return new ResponseEntity<>(category.getIcon(), headers, HttpStatus.OK);
     }
 }

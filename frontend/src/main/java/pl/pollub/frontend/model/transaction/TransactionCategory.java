@@ -1,25 +1,21 @@
 package pl.pollub.frontend.model.transaction;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.scene.image.Image;
 import lombok.Getter;
 import lombok.Setter;
-import pl.pollub.frontend.FinanceApplication;
-
-import java.net.URL;
 
 @Setter
 @Getter
 public class TransactionCategory {
     private int id;
     private String name;
-    private String icon;
+    private TransactionCategoryType categoryType;
+    private byte[] icon;
 
-    public Image getIcon() {
-        URL resource = FinanceApplication.class.getResource("images/categories/"+icon);
-        if(resource == null)
-            return null;
-
-        return new Image(resource.toExternalForm());
+    @JsonIgnore
+    public Image getImageIcon() {
+        return new Image("http://localhost:5000/categories/icon/" + getId());
     }
 
     @Override

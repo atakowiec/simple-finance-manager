@@ -50,7 +50,7 @@ public class TransactionCellController {
         dateLabel.setText(transaction.getDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
         amountLabel.setText(transaction.getAmountWithSign() + " zł");
         amountLabel.getStyleClass().add(transaction.getAmountStyleClass());
-        categoryIcon.setImage(transaction.getCategory() == null ? null : transaction.getCategory().getIcon());
+        categoryIcon.setImage(transaction.getCategory() == null ? null : transaction.getCategory().getImageIcon());
 
         deleteButton.setOnAction(event -> deleteTransaction());
 
