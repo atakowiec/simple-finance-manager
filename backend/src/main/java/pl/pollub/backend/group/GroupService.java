@@ -14,6 +14,7 @@ import pl.pollub.backend.expenses.dto.ExpenseDto;
 import pl.pollub.backend.group.dto.GroupCreateDto;
 import pl.pollub.backend.group.dto.ImportExportDto;
 import pl.pollub.backend.group.model.Group;
+import pl.pollub.backend.incomes.Income;
 import pl.pollub.backend.incomes.IncomeRepository;
 import pl.pollub.backend.incomes.dto.IncomeDto;
 
@@ -26,8 +27,8 @@ import java.util.Objects;
 public class GroupService {
     @Getter
     private final GroupRepository groupRepository;
-    private final IncomeRepository incomeRepository;
     private final ExpenseRepository expenseRepository;
+    private final IncomeRepository incomeRepository;
     private final CategoryRepository categoryRepository;
 
     public Group getGroupByIdOrThrow(long groupId) {
@@ -97,11 +98,16 @@ public class GroupService {
         if (!Objects.equals(group.getOwner().getId(), user.getId()))
             throw new HttpException(HttpStatus.FORBIDDEN, "Musisz być właścicielem grupy aby to zrobić!");
 
-        group.getUsers().removeIf(member -> Objects.equals(member.getId(), memberId));
+        if(Objects.equals(group.getOwner().getId(), memberId))
+            throw new HttpException(HttpStatus.FORBIDDEN, "Nie możesz usunąć właściciela grupy!");
+
+        boolean anyRemoved = group.getUsers().removeIf(member -> Objects.equals(member.getId(), memberId));
+        if(!anyRemoved)
+            throw new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono użytkownika o podanym identyfikatorze: " + memberId);
 
         groupRepository.save(group);
 
-        return null;
+        return group;
     }
 
     public void importTransactions(User user, Long groupId, ImportExportDto importExportDto) {
@@ -127,7 +133,7 @@ public class GroupService {
             TransactionCategory category = categoryRepository.findById(income.getCategory().getId())
                     .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono kategorii o podanym identyfikatorze: " + income.getCategory().getId()));
 
-            Expense newIncome = new Expense();
+            Income newIncome = new Income();
             newIncome.setName(income.getName());
             newIncome.setAmount(income.getAmount());
             newIncome.setCategory(category);
@@ -135,7 +141,7 @@ public class GroupService {
             newIncome.setGroup(group);
             newIncome.setUser(user);
 
-            expenseRepository.save(newIncome);
+            incomeRepository.save(newIncome);
         }
     }
 }
