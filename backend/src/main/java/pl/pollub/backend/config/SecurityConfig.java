@@ -16,6 +16,13 @@ import pl.pollub.backend.auth.jwt.JwtAuthenticationFilter;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+    private static final String[] SWAGGER_WHITELIST = {
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/swagger-resources",
+    };
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthenticationProvider authenticationProvider;
 
@@ -24,6 +31,7 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers(SWAGGER_WHITELIST).permitAll();
                     auth.requestMatchers("/ws/**").authenticated();
                     auth.requestMatchers("/auth/verify").authenticated();
                     auth.requestMatchers("/auth/**").permitAll();
