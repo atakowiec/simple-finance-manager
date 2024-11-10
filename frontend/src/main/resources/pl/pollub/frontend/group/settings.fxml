@@ -4,11 +4,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<HBox alignment="TOP_CENTER" stylesheets="@../css/global.css, @../css/group.css, @../css/home.css"
-      xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="pl.pollub.frontend.controller.group.SettingsController">
+<HBox alignment="TOP_CENTER" stylesheets="@../css/global.css, @../css/group.css, @../css/home.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pollub.frontend.controller.group.SettingsController">
     <padding>
-        <Insets bottom="10" left="10" right="10" top="100.0"/>
+        <Insets bottom="10" left="10" right="10" top="100.0" />
     </padding>
     <VBox alignment="TOP_CENTER" spacing="10.0">
         <Label styleClass="contentTitle">
@@ -19,26 +17,32 @@
                 <Label>
                     Nazwa grupy:
                 </Label>
-                <TextField HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" fx:id="groupNameField"/>
-                <Button text="Zapisz" onAction="#saveName"/>
+                <TextField fx:id="groupNameField" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" />
+                <Button onAction="#saveName" text="Zapisz" />
             </HBox>
-            <Label fx:id="nameError"/>
+            <Label fx:id="nameError" />
         </VBox>
         <VBox alignment="CENTER">
             <HBox alignment="CENTER_LEFT" spacing="10.0">
-                <Label text="Kolor"/>
-                <ComboBox prefWidth="300.0" HBox.hgrow="ALWAYS" fx:id="colorPicker"/>
-                <Button text="Zapisz" onAction="#saveColor"/>
+                <Label text="Kolor" />
+                <ComboBox fx:id="colorPicker" prefWidth="300.0" HBox.hgrow="ALWAYS" />
+                <Button onAction="#saveColor" text="Zapisz" />
             </HBox>
-            <Label fx:id="colorError"/>
+            <Label fx:id="colorError" />
         </VBox>
         <VBox alignment="CENTER">
             <HBox alignment="CENTER_LEFT" spacing="10.0">
-                <Label text="Limit wydatków"/>
-                <TextField HBox.hgrow="ALWAYS" fx:id="expenseLimitField"/>
-                <Button text="Zapisz" onAction="#saveExpenseLimit"/>
+                <Label text="Limit wydatków" />
+                <TextField fx:id="expenseLimitField" HBox.hgrow="ALWAYS" />
+                <Button onAction="#saveExpenseLimit" text="Zapisz" />
             </HBox>
-            <Label fx:id="expenseLimitError"/>
+            <Label fx:id="expenseLimitError" />
         </VBox>
+        <HBox alignment="CENTER" prefHeight="0.0" VBox.vgrow="ALWAYS">
+            <VBox.margin>
+                <Insets top="50.0"/>
+            </VBox.margin>
+            <Button onAction="#handleDeleteGroup" mnemonicParsing="false" styleClass="danger-btn" text="Usuń grupę"/>
+        </HBox>
     </VBox>
 </HBox>

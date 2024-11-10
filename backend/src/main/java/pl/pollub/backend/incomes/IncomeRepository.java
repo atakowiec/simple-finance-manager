@@ -18,4 +18,6 @@ public interface IncomeRepository extends JpaRepository<Income, Long> {
 
     @Query("SELECT i.date, SUM(i.amount) FROM Income i WHERE i.group = :group AND i.date >= :minDate GROUP BY i.date ORDER BY i.date")
     List<Object[]> findAllByGroupAndMinDateAndGroupByDate(Group group, LocalDate minDate);
+
+    void deleteAllByGroup(Group group);
 }

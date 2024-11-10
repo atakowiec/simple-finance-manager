@@ -24,4 +24,6 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
     @Query("SELECT SUM(e.amount) FROM Expense e WHERE e.group = :group AND e.date >= :minDate")
     Double getTotalExpensesByGroupAndMinDate(Group group, LocalDate minDate);
+
+    void deleteAllByGroup(Group group);
 }

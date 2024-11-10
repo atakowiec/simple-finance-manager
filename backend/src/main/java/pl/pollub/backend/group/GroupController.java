@@ -117,4 +117,11 @@ public class GroupController {
     public void handleImport(@AuthenticationPrincipal User user, @PathVariable Long groupId, @RequestBody ImportExportDto importExportDto) {
         groupService.importTransactions(user, groupId, importExportDto);
     }
+
+    @Operation(summary = "Usuń grupę")
+    @ApiResponse(responseCode = "200", description = "Usunięto grupę")
+    @DeleteMapping("/{groupId}")
+    public void removeGroup(@AuthenticationPrincipal User user, @PathVariable Long groupId) {
+        groupService.removeGroup(user, groupId);
+    }
 }
