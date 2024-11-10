@@ -41,6 +41,8 @@ class GroupServiceTest {
     @Mock
     private IncomeRepository incomeRepository;
     @Mock
+    private GroupInviteRepository groupInviteRepository;
+    @Mock
     private CategoryRepository categoryRepository;
 
     @InjectMocks
@@ -74,6 +76,8 @@ class GroupServiceTest {
         otherUserGroup.setId(2L);
         otherUserGroup.setUsers(new ArrayList<>(List.of(ownerUser, otherUser)));
         otherUserGroup.setOwner(ownerUser);
+
+        Mockito.doNothing().when(groupInviteRepository).deleteAllByGroup(loggedUserGroup);
 
         Mockito.when(groupRepository.findById(loggedUserGroup.getId())).thenReturn(Optional.of(loggedUserGroup));
         Mockito.when(groupRepository.findById(otherUserGroup.getId())).thenReturn(Optional.of(otherUserGroup));
@@ -389,5 +393,45 @@ class GroupServiceTest {
         Assertions.assertEquals(403, httpException.getHttpStatus().value());
 
         Mockito.verifyNoInteractions(expenseRepository);
+    }
+
+    @Test
+    void deleteGroup_EverythingOk_DeletesGroup() {
+        groupService.removeGroup(ownerUser, loggedUserGroup.getId());
+    }
+
+    @Test
+    void deleteGroup_UserNotInGroup_ThrowsHttp403Exception() {
+        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> groupService.removeGroup(otherUser, loggedUserGroup.getId()));
+
+        Assertions.assertEquals(403, httpException.getHttpStatus().value());
+
+        Mockito.verify(groupRepository, Mockito.times(0)).deleteById(Mockito.any());
+    }
+
+    @Test
+    void deleteGroup_GroupDoesNotExist_ThrowsHttp404Exception() {
+        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> groupService.removeGroup(ownerUser, 4L));
+
+        Assertions.assertEquals(404, httpException.getHttpStatus().value());
+
+        Mockito.verify(groupRepository, Mockito.times(0)).deleteById(Mockito.any());
+    }
+
+    @Test
+    void deleteGroup_UserIsNotOwner_ThrowsHttp403Exception() {
+        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> groupService.removeGroup(loggedUser, loggedUserGroup.getId()));
+
+        Assertions.assertEquals(403, httpException.getHttpStatus().value());
+
+        Mockito.verify(groupRepository, Mockito.times(0)).deleteById(Mockito.any());
+    }
+
+    @Test
+    void deleteGroup_GroupHasExpensesAndIncomes_DeletesGroupAndTransactions() {
+        groupService.removeGroup(ownerUser, loggedUserGroup.getId());
+
+        Mockito.verify(expenseRepository, Mockito.times(1)).deleteAllByGroup(loggedUserGroup);
+        Mockito.verify(incomeRepository, Mockito.times(1)).deleteAllByGroup(loggedUserGroup);
     }
 }

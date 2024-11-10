@@ -13,9 +13,11 @@ import pl.pollub.frontend.injector.Inject;
 import pl.pollub.frontend.model.group.Group;
 import pl.pollub.frontend.service.ColorsService;
 import pl.pollub.frontend.service.HttpService;
+import pl.pollub.frontend.service.ModalService;
 import pl.pollub.frontend.util.JsonUtil;
 
 import java.net.http.HttpResponse;
+import java.util.Map;
 
 public class SettingsController extends AbstractGroupController {
     @Inject
@@ -24,6 +26,8 @@ public class SettingsController extends AbstractGroupController {
     private HttpService httpService;
     @Inject
     private EventEmitter eventEmitter;
+    @Inject
+    private ModalService modalService;
 
     @FXML
     private TextField groupNameField;
@@ -120,5 +124,9 @@ public class SettingsController extends AbstractGroupController {
         } catch (NumberFormatException ignored) {
             expenseLimitError.setText("Limit musi być liczbą!");
         }
+    }
+
+    public void handleDeleteGroup() {
+        modalService.showModal("modal/remove-group-view.fxml", Map.of("groupId", groupId));
     }
 }

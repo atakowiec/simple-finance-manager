@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.categories.CategoryRepository;
 import pl.pollub.backend.categories.model.TransactionCategory;
@@ -29,6 +30,7 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final ExpenseRepository expenseRepository;
     private final IncomeRepository incomeRepository;
+    private final GroupInviteRepository groupInviteRepository;
     private final CategoryRepository categoryRepository;
 
     public Group getGroupByIdOrThrow(long groupId) {
@@ -143,5 +145,19 @@ public class GroupService {
 
             incomeRepository.save(newIncome);
         }
+    }
+
+    @Transactional
+    public void removeGroup(User user, Long groupId) {
+        Group group = getGroupByIdOrThrow(groupId);
+        checkMembershipOrThrow(user, group);
+
+        if (!Objects.equals(group.getOwner().getId(), user.getId()))
+            throw new HttpException(HttpStatus.FORBIDDEN, "Musisz być właścicielem grupy aby to zrobić!");
+
+        groupInviteRepository.deleteAllByGroup(group);
+        expenseRepository.deleteAllByGroup(group);
+        incomeRepository.deleteAllByGroup(group);
+        groupRepository.delete(group);
     }
 }

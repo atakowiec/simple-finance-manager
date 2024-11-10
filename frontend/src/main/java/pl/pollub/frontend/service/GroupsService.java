@@ -33,6 +33,8 @@ public class GroupsService {
     private CategoryService categoryService;
     @Inject
     private PollingService pollingService;
+    @Inject
+    private ScreenService screenService;
 
     @Getter
     private List<Group> groups = new ArrayList<>();
@@ -132,5 +134,16 @@ public class GroupsService {
         }
 
         return result;
+    }
+
+    public void removeGroup(Long groupId) {
+        HttpResponse<String> response = httpService.delete("/groups/" + groupId);
+
+        if (response.statusCode() != 200) {
+            return;
+        }
+
+        updateGroups();
+        screenService.switchTo("home");
     }
 }
