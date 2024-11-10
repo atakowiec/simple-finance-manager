@@ -3,14 +3,17 @@ package pl.pollub.frontend.controller.group.transaction;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListCell;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import pl.pollub.frontend.FinanceApplication;
+import pl.pollub.frontend.injector.Inject;
 import pl.pollub.frontend.annotation.PostInitialize;
 import pl.pollub.frontend.injector.DependencyInjector;
 import pl.pollub.frontend.injector.Inject;
 import pl.pollub.frontend.model.transaction.Expense;
 import pl.pollub.frontend.model.transaction.Income;
 import pl.pollub.frontend.model.transaction.Transaction;
+import pl.pollub.frontend.service.ModalService;
 import pl.pollub.frontend.service.ModalService;
 
 import javafx.scene.input.MouseEvent;
