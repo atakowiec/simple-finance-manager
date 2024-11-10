@@ -54,9 +54,9 @@ public class HttpService {
     }
 
     private HttpResponse<String> sendRequest(HttpRequest request) {
-        HttpClient client = HttpClient.newHttpClient();
-        try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpClient client = HttpClient.newHttpClient();
+            try {
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() >= 400)
                 System.out.println("Error: " + response.body());
