@@ -1,5 +1,8 @@
 package pl.pollub.backend.auth;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +24,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/auth")
 @Slf4j(topic = "AuthController")
+@Tag(name = "Autoryzacja", description = "Zarządzanie autoryzacją")
 public class AuthController {
     private final AuthService authService;
     private final JwtService jwtService;
 
+    @Operation(description = "Rejestracja nowego użytkownika")
+    @ApiResponse(responseCode = "201", description = "Zarejestrowano użytkownika")
     @PostMapping("/register")
     public Map<?, ?> register(@Valid @RequestBody RegisterDto registerDto, HttpServletResponse res) {
         if (authService.isUsernameTaken(registerDto.getUsername())) {
@@ -59,6 +65,8 @@ public class AuthController {
                 .build();
     }
 
+    @Operation(description = "Logowanie użytkownika")
+    @ApiResponse(responseCode = "200", description = "Zalogowano użytkownika")
     @PostMapping("/login")
     public Map<?, ?> login(@Valid @RequestBody LoginDto loginDto, HttpServletResponse res) {
         User user;
@@ -94,6 +102,8 @@ public class AuthController {
                 .build();
     }
 
+    @Operation(description = "Weryfikacja tokenu użytkownika")
+    @ApiResponse(responseCode = "200", description = "Zweryfikowano token poprawnie")
     @PostMapping("/verify")
     public User verify(@AuthenticationPrincipal User user) {
         return user;

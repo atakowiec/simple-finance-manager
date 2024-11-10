@@ -9,6 +9,7 @@ import pl.pollub.backend.auth.dto.UserUsernameEditDto;
 import pl.pollub.backend.auth.user.Role;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.auth.user.UserService;
+import pl.pollub.backend.auth.user.UsersRepository;
 import pl.pollub.backend.categories.CategoryRepository;
 import pl.pollub.backend.categories.dto.CategoryCreateDto;
 import pl.pollub.backend.categories.dto.CategoryUpdateDto;
@@ -23,13 +24,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AdminService {
 
-    private final AdminRepository adminRepository;
+    private final UsersRepository usersRepository;
     private final UserService userService;
 
     private final CategoryRepository categoryRepository;
 
     public List<UserDto> getAllUsers() {
-        return adminRepository.findAll().stream()
+        return usersRepository.findAll().stream()
                 .map(user -> new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getRole().name(), user.getMonthlyLimit()))
                 .collect(Collectors.toList());
     }
