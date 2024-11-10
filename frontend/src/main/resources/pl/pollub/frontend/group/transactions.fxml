@@ -14,14 +14,29 @@
         <Label styleClass="contentTitle">
             Transakcje
         </Label>
-        <HBox>
-            <Button styleClass="primary-btn" onMouseClicked="#openImport" text="Importuj transakcje" HBox.hgrow="ALWAYS"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Button styleClass="primary-outline-btn" onMouseClicked="#openExport" text="Exportuj transakcje" HBox.hgrow="ALWAYS"/>
+        <HBox prefHeight="0.0" prefWidth="0.0">
             <VBox.margin>
                 <Insets bottom="10.0"/>
             </VBox.margin>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                <Label style="-fx-font-size: 26px;" fx:id="expensesTotalLabel"/>
+                <Label text="Wydatki w tym miesiącu"/>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                <Label style="-fx-font-size: 26px;" fx:id="incomesTotalLabel"/>
+                <Label text="Przychody w tym miesiącu"/>
+            </VBox>
         </HBox>
-        <ListView fx:id="mainList" prefWidth="445.0" styleClass="list"/>
+        <ListView fx:id="mainList" prefWidth="445.0" styleClass="list" prefHeight="350"/>
+        <HBox>
+            <Button onMouseClicked="#openImport" styleClass="primary-btn" text="Importuj transakcje"
+                    HBox.hgrow="ALWAYS"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button onMouseClicked="#openExport" styleClass="primary-outline-btn" text="Exportuj transakcje"
+                    HBox.hgrow="ALWAYS"/>
+            <VBox.margin>
+                <Insets top="10.0"/>
+            </VBox.margin>
+        </HBox>
     </VBox>
 </HBox>

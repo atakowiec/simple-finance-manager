@@ -18,7 +18,9 @@ import pl.pollub.backend.expenses.dto.ExpenseCreateDto;
 import pl.pollub.backend.expenses.dto.ExpenseUpdateDto;
 import pl.pollub.backend.group.GroupService;
 import pl.pollub.backend.group.model.Group;
+import pl.pollub.backend.notifications.MailService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +32,7 @@ public class ExpenseController {
     private final ExpenseService expenseService;
     private final CategoryRepository categoryRepository;
     private final GroupService groupService;
+    private final MailService mailService;
 
     @Operation(summary = "Pobierz wszystkie wydatki dla grupy")
     @ApiResponse(responseCode = "200", description = "Lista wydatków")
@@ -49,7 +52,7 @@ public class ExpenseController {
         User user = (User) authentication.getPrincipal();
 
         TransactionCategory category = categoryRepository.findById(expenseCreateDto.getCategoryId())
-                .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono kategorii o podanym identyfikatorze: " + expenseCreateDto.getCategoryId()));
+                .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono kategorii"));
 
         Group group = groupService.getGroupByIdOrThrow(expenseCreateDto.getGroupId());
         groupService.checkMembershipOrThrow(user, group);
@@ -62,8 +65,15 @@ public class ExpenseController {
         expense.setDate(expenseCreateDto.getDate());
         expense.setGroup(group);
 
-        return expenseService.addExpense(expense);
+        Expense newExpense = expenseService.addExpense(expense);
+
+        // we want to send a warning mail only if the expense was created for the current month
+        if (expenseCreateDto.getDate().isAfter(LocalDate.now().withDayOfMonth(1)))
+            mailService.trySendLimitWarningMail(user, group);
+
+        return newExpense;
     }
+
 
     @Operation(summary = "Aktualizuj wydatek")
     @ApiResponse(responseCode = "200", description = "Zaktualizowano wydatek")
