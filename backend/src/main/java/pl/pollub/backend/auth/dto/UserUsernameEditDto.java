@@ -4,6 +4,9 @@ import lombok.Data;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.Length;
 
+/**
+ * Data transfer object for editing user username.
+ */
 @Data
 public class UserUsernameEditDto {
 

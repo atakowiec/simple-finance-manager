@@ -14,12 +14,24 @@ import pl.pollub.backend.group.model.Group;
 
 import java.time.LocalDate;
 
+/**
+ * Service for sending e-mails. It uses JavaMailSender to send e-mails.
+ */
 @Service
 @RequiredArgsConstructor
 public class MailService {
     private final JavaMailSender javaMailSender;
     private final ExpenseRepository expenseRepository;
 
+    /**
+     * Sends an e-mail to the specified address.
+     *
+     * @param to            target e-mail address
+     * @param subject       e-mail subject
+     * @param text          e-mail content
+     * @param isHtmlContent whether the content is HTML
+     * @throws MessagingException if an error occurs while sending the e-mail
+     */
     public void sendMail(String to, String subject, String text, boolean isHtmlContent) throws MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 
@@ -31,6 +43,12 @@ public class MailService {
         javaMailSender.send(mimeMessage);
     }
 
+    /**
+     * Checks all the conditions, decides whether to send a warning e-mail and sends it if necessary.
+     *
+     * @param user  user to whom the e-mail will be sent
+     * @param group group for which the e-mail will be sent
+     */
     public void trySendLimitWarningMail(User user, Group group) {
         if (group.getExpenseLimit() <= 0)
             return;

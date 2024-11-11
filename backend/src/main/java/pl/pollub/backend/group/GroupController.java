@@ -18,6 +18,9 @@ import pl.pollub.backend.group.model.GroupInvite;
 
 import java.util.List;
 
+/**
+ * Controller for group management.
+ */
 @RestController
 @RequestMapping("/groups")
 @RequiredArgsConstructor

@@ -24,6 +24,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controller for managing expenses.
+ */
 @RestController
 @RequestMapping("/expenses")
 @RequiredArgsConstructor

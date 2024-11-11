@@ -4,6 +4,9 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
+/**
+ * Data transfer object for registration data.
+ */
 @Data
 public class RegisterDto {
     @NotBlank(message = "Nazwa użytkownika jest wymagana")

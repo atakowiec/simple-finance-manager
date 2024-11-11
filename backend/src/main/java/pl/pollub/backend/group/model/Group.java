@@ -11,6 +11,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 
+/**
+ * Entity representing group. It holds information about group.
+ */
 @Entity
 @Table(name = "`groups`")
 @Data

@@ -7,6 +7,9 @@ import lombok.AllArgsConstructor;
 import pl.pollub.backend.categories.dto.CategoryDto;
 import pl.pollub.backend.conversion.DtoConvertible;
 
+/**
+ * Entity representing transaction category. It is used to categorize transactions.
+ */
 @Entity
 @Data
 @NoArgsConstructor

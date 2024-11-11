@@ -11,6 +11,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import pl.pollub.backend.auth.AuthService;
 
+/**
+ * Configuration class for application.
+ */
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {

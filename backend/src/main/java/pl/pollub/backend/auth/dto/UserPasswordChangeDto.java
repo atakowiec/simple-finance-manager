@@ -4,6 +4,9 @@ import lombok.Data;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.Length;
 
+/**
+ * Data transfer object for changing user password.
+ */
 @Data
 public class UserPasswordChangeDto {
     @NotBlank(message = "Obecne hasło jest wymagane.")

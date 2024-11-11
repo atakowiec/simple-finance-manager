@@ -17,6 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Exception handler for validation exceptions.
+ */
 @RestControllerAdvice
 @Order(0)
 public class ValidationExceptionHandler {

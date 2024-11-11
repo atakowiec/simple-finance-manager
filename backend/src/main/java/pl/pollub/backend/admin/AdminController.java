@@ -11,6 +11,9 @@ import pl.pollub.backend.categories.dto.UserDto;
 
 import java.util.List;
 
+/**
+ * Controller for managing users by the administrator.
+ */
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor

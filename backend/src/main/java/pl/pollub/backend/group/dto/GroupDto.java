@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * DTO for group. It holds information about group that can be sent back to client.
+ */
 @Data
 public class GroupDto {
     private Long id;

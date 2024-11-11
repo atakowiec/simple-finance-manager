@@ -18,6 +18,9 @@ import pl.pollub.backend.auth.user.User;
 
 import java.io.IOException;
 
+/**
+ * Filter for JWT authentication. It extracts the JWT token from the request, validates it and sets the user in the security context.
+ */
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {

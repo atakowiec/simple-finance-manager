@@ -23,6 +23,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Service for managing groups. It provides methods for creating, updating and deleting groups.
+ */
 @Service
 @RequiredArgsConstructor
 public class GroupService {
@@ -33,21 +36,43 @@ public class GroupService {
     private final GroupInviteRepository groupInviteRepository;
     private final CategoryRepository categoryRepository;
 
+    /**
+     * Returns the group with the specified id or throws an exception if the group does not exist.
+     *
+     * @param groupId id of the group
+     * @return group with the specified id
+     */
     public Group getGroupByIdOrThrow(long groupId) {
         return groupRepository.findById(groupId)
                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono grupy o podanym identyfikatorze: " + groupId));
     }
 
+    /**
+     * Checks if the specified user is a member of the specified group. If not, throws an exception.
+     *
+     * @param user  user to check
+     * @param group group to check
+     * @throws HttpException if the user is not a member of the group
+     */
     public void checkMembershipOrThrow(User user, Group group) {
         if (group.getUsers().stream().noneMatch(u -> u.getId().equals(user.getId()))) {
             throw new HttpException(HttpStatus.FORBIDDEN, "Nie masz dostępu do tej grupy");
         }
     }
 
+    /**
+     * Returns all groups for the specified user.
+     *
+     * @param user user whose groups will be returned
+     * @return list of groups
+     */
     public List<Group> getAllGroupsForUser(User user) {
         return groupRepository.findByUsers_Id(user.getId());
     }
 
+    /**
+     * Saves the specified group to the database
+     */
     public Group createGroup(User user, GroupCreateDto groupCreateDto) {
         Group group = new Group();
         group.setName(groupCreateDto.getName());
@@ -60,6 +85,14 @@ public class GroupService {
         return group;
     }
 
+    /**
+     * Changes the color of the specified group.
+     *
+     * @param user    user who wants to change the color
+     * @param color   new color
+     * @param groupId id of the group
+     * @return updated group
+     */
     public Group changeColor(User user, String color, Long groupId) {
         Group group = getGroupByIdOrThrow(groupId);
         checkMembershipOrThrow(user, group);
@@ -71,6 +104,14 @@ public class GroupService {
         return group;
     }
 
+    /**
+     * Changes the name of the specified group.
+     *
+     * @param user    user who wants to change the name
+     * @param newName new name
+     * @param groupId id of the group
+     * @return updated group
+     */
     public Group changeName(User user, String newName, Long groupId) {
         Group group = getGroupByIdOrThrow(groupId);
         checkMembershipOrThrow(user, group);
@@ -82,6 +123,14 @@ public class GroupService {
         return group;
     }
 
+    /**
+     * Changes the expense limit of the specified group.
+     *
+     * @param user         user who wants to change the expense limit
+     * @param expenseLimit new expense limit
+     * @param groupId      id of the group
+     * @return updated group
+     */
     public Group changeExpenseLimit(User user, Double expenseLimit, Long groupId) {
         Group group = getGroupByIdOrThrow(groupId);
         checkMembershipOrThrow(user, group);
@@ -93,6 +142,14 @@ public class GroupService {
         return group;
     }
 
+    /**
+     * Deletes the specified member from the specified group.
+     *
+     * @param user     user who wants to delete the member
+     * @param groupId  id of the group
+     * @param memberId id of the member to delete
+     * @return updated group
+     */
     public Group deleteMember(User user, Long groupId, Long memberId) {
         Group group = getGroupByIdOrThrow(groupId);
         checkMembershipOrThrow(user, group);
@@ -100,11 +157,11 @@ public class GroupService {
         if (!Objects.equals(group.getOwner().getId(), user.getId()))
             throw new HttpException(HttpStatus.FORBIDDEN, "Musisz być właścicielem grupy aby to zrobić!");
 
-        if(Objects.equals(group.getOwner().getId(), memberId))
+        if (Objects.equals(group.getOwner().getId(), memberId))
             throw new HttpException(HttpStatus.FORBIDDEN, "Nie możesz usunąć właściciela grupy!");
 
         boolean anyRemoved = group.getUsers().removeIf(member -> Objects.equals(member.getId(), memberId));
-        if(!anyRemoved)
+        if (!anyRemoved)
             throw new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono użytkownika o podanym identyfikatorze: " + memberId);
 
         groupRepository.save(group);
@@ -112,6 +169,13 @@ public class GroupService {
         return group;
     }
 
+    /**
+     * Invites the specified user to the specified group.
+     *
+     * @param user            user who wants to invite the member
+     * @param groupId         id of the group
+     * @param importExportDto data transfer object with the list of expenses and incomes to import
+     */
     public void importTransactions(User user, Long groupId, ImportExportDto importExportDto) {
         Group group = getGroupByIdOrThrow(groupId);
         checkMembershipOrThrow(user, group);
@@ -147,6 +211,12 @@ public class GroupService {
         }
     }
 
+    /**
+     * Removes the specified group and all its data from the database.
+     *
+     * @param user    user who wants to remove the group
+     * @param groupId id of the group
+     */
     @Transactional
     public void removeGroup(User user, Long groupId) {
         Group group = getGroupByIdOrThrow(groupId);

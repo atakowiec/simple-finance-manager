@@ -16,6 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Service for managing incomes. It provides methods for adding, updating and deleting incomes.
+ */
 @Service
 @RequiredArgsConstructor
 public class IncomeService {
@@ -23,6 +26,13 @@ public class IncomeService {
     private final CategoryRepository categoryRepository;
     private final GroupService groupService;
 
+    /**
+     * Returns all incomes for the specified user in the specified group.
+     *
+     * @param user    user whose incomes will be returned
+     * @param groupId group for which the incomes will be returned
+     * @return list of incomes
+     */
     public List<Income> getAllIncomesForGroup(User user, long groupId) {
         Group group = groupService.getGroupByIdOrThrow(groupId);
         groupService.checkMembershipOrThrow(user, group);
@@ -30,10 +40,24 @@ public class IncomeService {
         return incomeRepository.findAllByGroup(group);
     }
 
+    /**
+     * Saves the specified income to the database.
+     *
+     * @param income income to be saved
+     * @return saved income
+     */
     public Income addIncome(Income income) {
         return incomeRepository.save(income);
     }
 
+    /**
+     * Updates the income with the specified id. The income must belong to the specified user.
+     *
+     * @param id            id of the income to be updated
+     * @param updatedIncome updated income data transfer object
+     * @param user          user who owns the income
+     * @return updated income
+     */
     public Income updateIncome(Long id, IncomeUpdateDto updatedIncome, User user) {
         return incomeRepository.findByIdAndUser(id, user)
                 .map(income -> {
@@ -56,6 +80,13 @@ public class IncomeService {
                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono dochodu z identyfikatorem: " + id));
     }
 
+    /**
+     * Deletes the income with the specified id. The income must belong to the specified user.
+     *
+     * @param id   id of the income to be deleted
+     * @param user user who owns the income
+     * @throws HttpException if the income with the specified id does not exist
+     */
     public void deleteIncome(Long id, User user) {
         if (incomeRepository.existsByIdAndUser(id, user)) {
             incomeRepository.deleteById(id);
@@ -64,6 +95,13 @@ public class IncomeService {
         }
     }
 
+    /**
+     * Returns the total income for the specified group and month. The income are grouped by day.
+     *
+     * @param user    user who requests the statistics
+     * @param groupId group for which the statistics will be returned
+     * @return total income for the specified group and month
+     */
     public Map<String, Double> getThisMonthStatsByDay(User user, Long groupId) {
         Group group = groupService.getGroupByIdOrThrow(groupId);
         groupService.checkMembershipOrThrow(user, group);

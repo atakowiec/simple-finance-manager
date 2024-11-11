@@ -9,7 +9,9 @@ import pl.pollub.backend.group.dto.GroupMemberDto;
 
 import java.time.LocalDateTime;
 
-
+/**
+ * Entity representing group invite. It holds information about active group invite.
+ */
 @Entity
 @Table(name = "group_invites")
 @Data

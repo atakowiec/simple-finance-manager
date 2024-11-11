@@ -6,6 +6,9 @@ import pl.pollub.backend.auth.user.User;
 
 import java.util.Objects;
 
+/**
+ * DTO for group member. It holds information about user that is a member of group.
+ */
 @Data
 @AllArgsConstructor
 public class GroupMemberDto {

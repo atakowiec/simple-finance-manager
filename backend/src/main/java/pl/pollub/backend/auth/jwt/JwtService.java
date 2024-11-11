@@ -9,6 +9,9 @@ import pl.pollub.backend.auth.user.User;
 
 import java.util.Date;
 
+/**
+ * Service for managing JWT tokens. It provides methods for creating, parsing and resolving JWT tokens.
+ */
 @Component
 public class JwtService {
     public static final String AUTHORIZATION_HEADER = "Authorization";
@@ -24,6 +27,12 @@ public class JwtService {
         this.jwtParser = Jwts.parser().setSigningKey(secret);
     }
 
+    /**
+     * Creates a JWT token for the specified user with its id and role in the claims.
+     *
+     * @param user user for which the token will be created
+     * @return JWT token
+     */
     public String createToken(User user) {
         Claims claims = Jwts.claims();
         claims.setSubject(String.valueOf(user.getId()));
@@ -38,10 +47,22 @@ public class JwtService {
                 .compact();
     }
 
+    /**
+     * Parses the specified JWT token and returns its claims.
+     *
+     * @param token JWT token to parse
+     * @return claims from the token
+     */
     public Claims parseJwtClaims(String token) {
         return jwtParser.parseClaimsJws(token).getBody();
     }
 
+    /**
+     * Resolves the claims from the specified request.
+     *
+     * @param req request from which the claims will be resolved
+     * @return claims from the request or null if the token is not present or invalid
+     */
     public Claims resolveClaims(HttpServletRequest req) {
         try {
             String token = resolveToken(req);
@@ -54,6 +75,12 @@ public class JwtService {
         }
     }
 
+    /**
+     * Resolves the JWT token from the specified request.
+     *
+     * @param request request from which the token will be resolved
+     * @return JWT token from the request or null if the token is not present
+     */
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
@@ -63,10 +90,22 @@ public class JwtService {
         return null;
     }
 
+    /**
+     * Adds the specified token to the response.
+     *
+     * @param response response to which the token will be added
+     * @param token    token to add
+     */
     public void addTokenToResponse(HttpServletResponse response, String token) {
         response.setHeader(AUTHORIZATION_HEADER, "Bearer " + token);
     }
 
+    /**
+     * Creates a JWT token for the specified user and adds it to the response.
+     *
+     * @param response response to which the token will be added
+     * @param user     user for which the token will be created
+     */
     public void addTokenToResponse(HttpServletResponse response, User user) {
         addTokenToResponse(response, createToken(user));
     }

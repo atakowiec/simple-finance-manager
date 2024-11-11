@@ -4,6 +4,9 @@ import lombok.Data;
 import pl.pollub.backend.categories.model.CategoryType;
 
 
+/**
+ * Data transfer object for creating category.
+ */
 @Data
 public class CategoryCreateDto {
     private long id;

@@ -11,6 +11,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import java.util.Collection;
 
+/**
+ * Controller advice for converting objects that implement DtoConvertible interface to DTOs.
+ */
 @ControllerAdvice
 public class DtoConversionAdvice implements ResponseBodyAdvice<Object> {
 

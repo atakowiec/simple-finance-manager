@@ -22,6 +22,9 @@ import pl.pollub.backend.incomes.dto.IncomeUpdateDto;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controller for income management.
+ */
 @RestController
 @RequestMapping("/incomes")
 @RequiredArgsConstructor

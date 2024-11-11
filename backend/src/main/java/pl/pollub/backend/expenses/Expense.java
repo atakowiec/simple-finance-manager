@@ -12,6 +12,9 @@ import pl.pollub.backend.group.model.Group;
 
 import java.time.LocalDate;
 
+/**
+ * Entity representing an expense.
+ */
 @Entity
 @Data
 @NoArgsConstructor

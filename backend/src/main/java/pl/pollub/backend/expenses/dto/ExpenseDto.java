@@ -7,6 +7,9 @@ import pl.pollub.backend.expenses.Expense;
 
 import java.time.LocalDate;
 
+/**
+ * DTO for expense.
+ */
 @Data
 @NoArgsConstructor
 public class ExpenseDto {

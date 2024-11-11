@@ -8,6 +8,9 @@ import pl.pollub.backend.group.model.GroupInvite;
 
 import java.util.List;
 
+/**
+ * JPA repository for group invites.
+ */
 @Service
 public interface GroupInviteRepository extends JpaRepository<GroupInvite, Long> {
 

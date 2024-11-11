@@ -7,6 +7,9 @@ import lombok.Data;
 
 import java.time.LocalDate;
 
+/**
+ * DTO for creating new expense.
+ */
 @Data
 public class ExpenseCreateDto {
     @NotBlank(message = "Nazwa wydatku jest wymagana")
