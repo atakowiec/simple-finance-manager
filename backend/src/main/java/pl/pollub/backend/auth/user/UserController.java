@@ -12,6 +12,9 @@ import pl.pollub.backend.auth.dto.UserEmailEditDto;
 import pl.pollub.backend.auth.dto.UserPasswordChangeDto;
 import pl.pollub.backend.auth.dto.UserUsernameEditDto;
 
+/**
+ * Controller for managing user by user.
+ */
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor

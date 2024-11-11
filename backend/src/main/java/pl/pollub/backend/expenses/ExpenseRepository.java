@@ -9,6 +9,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * JPA repository for expenses.
+ */
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     boolean existsByIdAndUser(Long id, User user);
 

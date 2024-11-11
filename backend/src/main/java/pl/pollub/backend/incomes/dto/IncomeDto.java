@@ -7,6 +7,9 @@ import pl.pollub.backend.incomes.Income;
 
 import java.time.LocalDate;
 
+/**
+ * DTO for income. It holds information about income id, name, amount, category, user, group and date.
+ */
 @Data
 @NoArgsConstructor
 public class IncomeDto {

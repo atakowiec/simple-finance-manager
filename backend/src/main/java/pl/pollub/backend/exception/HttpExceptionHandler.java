@@ -5,6 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+/**
+ * Exception handler for HttpException. It is used before the default exception handler.
+ */
 @RestControllerAdvice
 @Order(1)
 public class HttpExceptionHandler {

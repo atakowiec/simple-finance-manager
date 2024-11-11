@@ -12,6 +12,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import pl.pollub.backend.auth.jwt.JwtAuthenticationFilter;
 
+/**
+ * Configuration class for security.
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor

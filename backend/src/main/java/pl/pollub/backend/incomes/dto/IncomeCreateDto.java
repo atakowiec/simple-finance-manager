@@ -7,6 +7,9 @@ import lombok.Data;
 
 import java.time.LocalDate;
 
+/**
+ * DTO for creating new income. It holds information about income name, amount, category, group and date.
+ */
 @Data
 public class IncomeCreateDto {
     @NotBlank(message = "Nazwa dochodu jest wymagana")

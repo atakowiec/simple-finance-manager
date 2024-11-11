@@ -12,6 +12,9 @@ import pl.pollub.backend.incomes.dto.IncomeDto;
 
 import java.time.LocalDate;
 
+/**
+ * Entity representing income. It holds information about income.
+ */
 @Entity
 @Data
 @NoArgsConstructor

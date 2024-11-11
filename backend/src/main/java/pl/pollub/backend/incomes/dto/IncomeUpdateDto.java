@@ -6,6 +6,9 @@ import lombok.Data;
 
 import java.time.LocalDate;
 
+/**
+ * DTO for updating income. It holds information about income name, amount, category and date.
+ */
 @Data
 public class IncomeUpdateDto {
     @NotBlank

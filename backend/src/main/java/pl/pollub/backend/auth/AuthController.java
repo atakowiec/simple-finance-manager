@@ -20,6 +20,9 @@ import pl.pollub.backend.util.SimpleJsonBuilder;
 
 import java.util.Map;
 
+/**
+ * Controller for managing authentication.
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")

@@ -6,6 +6,9 @@ import lombok.Data;
 
 import java.time.LocalDate;
 
+/**
+ * DTO for updating expense.
+ */
 @Data
 public class ExpenseUpdateDto {
     @NotBlank

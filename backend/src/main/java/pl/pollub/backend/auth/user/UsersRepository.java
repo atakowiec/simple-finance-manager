@@ -8,6 +8,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Jpa repository for User model
+ */
 public interface UsersRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
 

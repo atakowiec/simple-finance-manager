@@ -17,6 +17,9 @@ import pl.pollub.backend.exception.HttpException;
 
 import java.util.List;
 
+/**
+ * Controller for managing categories.
+ */
 @RestController
 @RequestMapping("/categories")
 @RequiredArgsConstructor
