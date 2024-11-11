@@ -51,14 +51,6 @@ public class AdminController {
         return ResponseEntity.ok(message);
     }
 
-    @Operation(summary = "Zmiana limitu użytkownika")
-    @ApiResponse(responseCode = "200", description = "Zmieniono limit użytkownika")
-    @PutMapping("/{userId}/limit")
-    public ResponseEntity<String> updateLimit(@PathVariable Long userId, @RequestBody UserLimitDto limitDto) {
-        String message = adminService.updateUserLimit(userId, limitDto);
-        return ResponseEntity.ok(message);
-    }
-
     @Operation(summary = "Usuń użytkownika")
     @ApiResponse(responseCode = "200", description = "Usunięto użytkownika")
     @DeleteMapping("/{userId}")

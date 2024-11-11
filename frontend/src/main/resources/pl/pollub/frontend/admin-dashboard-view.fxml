@@ -31,7 +31,6 @@
                     <TableColumn fx:id="userEmailCol" prefWidth="174.4" text="Email" />
                     <TableColumn fx:id="userNameCol" prefWidth="173.6" text="Nazwa" />
                     <TableColumn fx:id="userRoleCol" prefWidth="127.2" text="Rola" />
-                    <TableColumn fx:id="userLimitCol" prefWidth="124.0" text="Limit Wydatków" />
                 </columns>
             </TableView>
             <HBox layoutX="10.0" layoutY="420.0" prefHeight="26.0" prefWidth="680.0" spacing="10.0">
@@ -45,7 +44,6 @@
                         </FXCollections>
                     </items>
                 </ComboBox>
-                <TextField fx:id="userLimitField" prefWidth="160.0" promptText="Limit Wydatków" HBox.hgrow="ALWAYS" />
             </HBox>
             <HBox layoutX="10.0" layoutY="460.0" spacing="10.0">
                 <Button onAction="#updateUser" styleClass="crud-button" text="Aktualizuj" />

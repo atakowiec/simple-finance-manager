@@ -19,6 +19,7 @@
 .sidenavItem {
     -fx-background-radius: 5px;
     -fx-padding: 5px;
+    -fx-cursor: hand;
 }
 
 .sidenavItem:hover {

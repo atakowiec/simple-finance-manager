@@ -2,7 +2,6 @@ package pl.pollub.backend.auth.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMin;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -32,10 +31,6 @@ public class User implements UserDetails {
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private Role role;
-
-    @Column(name = "monthly_limit")
-    @DecimalMin(value = "0.0", message = "Limit musi być większy lub równy 0.")
-    private Double monthlyLimit;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

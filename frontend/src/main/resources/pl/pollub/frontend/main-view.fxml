@@ -20,13 +20,14 @@
         <Region HBox.hgrow="ALWAYS" />
         <HBox alignment="CENTER" onMouseClicked="#onNotificationsClick" prefHeight="25.0" spacing="5" styleClass="navItem, notificationOption">
             <Label text="Powiadomienia" />
-            <StackPane id="notificationsIndicatorWrapper" visible="false">
+            <StackPane id="notificationsIndicatorWrapper" visible="false" managed="false">
                 <Circle stroke="#06a53b" fill="transparent" radius="9"/>
                 <Label id="notificationsIndicator">
 
                 </Label>
             </StackPane>
         </HBox>
+        <Label id="user" onMouseClicked="#onNavItemClick" prefHeight="25.0" styleClass="navItem" text="Profil" />
         <Label id="logout" onMouseClicked="#logout" prefHeight="25.0" styleClass="navItem" text="Wyloguj" />
     </HBox>
 

@@ -31,8 +31,6 @@ public class UserController {
     @FXML
     private VBox editPasswordPane;
     @FXML
-    private VBox editLimitsPane;
-    @FXML
     private TextField usernameField;
     @FXML
     private TextField emailField;
@@ -40,8 +38,6 @@ public class UserController {
     private PasswordField oldPasswordField;
     @FXML
     private PasswordField newPasswordField;
-    @FXML
-    private TextField limitField;
     @FXML
     private Label statusMessageLabel;
 
@@ -61,12 +57,6 @@ public class UserController {
     private void switchToPasswordEdit() {
         setVisiblePane(editPasswordPane);
         clearFields(oldPasswordField, newPasswordField);
-    }
-
-    @FXML
-    private void switchToLimitEdit() {
-        setVisiblePane(editLimitsPane);
-        clearFields(limitField);
     }
 
     @FXML
@@ -191,53 +181,10 @@ public class UserController {
         displayStatusMessage("Wystąpił błąd podczas zmiany hasła");
     }
 
-    @FXML
-    private void saveLimits() {
-        String limitText = limitField.getText().trim();
-
-        if (limitText.isEmpty()) {
-            displayStatusMessage("Limit nie może być pusty.");
-            return;
-        }
-
-        double spendingLimit;
-        try {
-            spendingLimit = Double.parseDouble(limitText);
-        } catch (NumberFormatException e) {
-            displayStatusMessage("Wprowadź poprawną wartość limitu.");
-            return;
-        }
-
-        if (spendingLimit <= 0) {
-            displayStatusMessage("Limit musi być większy od zera.");
-            return;
-        }
-
-        HttpResponse<String> response = userService.updateUserLimit(spendingLimit);
-
-        if (response.statusCode() == 200) {
-            displayStatusMessage("Limit wydatków został zaktualizowany.");
-            return;
-        }
-
-        if (response.statusCode() == 400) {
-            displayStatusMessage("Wprowadź poprawną wartość limitu większą od zera.");
-            return;
-        }
-
-        if (response.statusCode() == 404) {
-            displayStatusMessage("Użytkownik nie został znaleziony.");
-            return;
-        }
-
-        displayStatusMessage("Wystąpił błąd podczas aktualizacji limitu wydatków.");
-    }
-
     private void setVisiblePane(VBox pane) {
         editUsernamePane.setVisible(false);
         editEmailPane.setVisible(false);
         editPasswordPane.setVisible(false);
-        editLimitsPane.setVisible(false);
 
         pane.setVisible(true);
     }

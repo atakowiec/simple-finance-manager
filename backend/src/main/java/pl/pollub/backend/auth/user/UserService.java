@@ -5,10 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.pollub.backend.auth.AuthService;
-import pl.pollub.backend.auth.dto.UserUsernameEditDto;
 import pl.pollub.backend.auth.dto.UserEmailEditDto;
 import pl.pollub.backend.auth.dto.UserPasswordChangeDto;
-import pl.pollub.backend.auth.dto.UserLimitDto;
+import pl.pollub.backend.auth.dto.UserUsernameEditDto;
 import pl.pollub.backend.exception.HttpException;
 
 import java.util.Optional;
@@ -72,18 +71,6 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         return "Hasło zostało zaktualizowane.";
-    }
-
-    public String updateSpendingLimit(Long userId, UserLimitDto userEditDto) {
-        if (userEditDto.getSpendingLimit() == null || userEditDto.getSpendingLimit() <= 0) {
-            throw new HttpException(400, "Limit wydatków musi być większy niż zero.");
-        }
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new HttpException(404, "Użytkownik nie znaleziony"));
-        user.setMonthlyLimit(userEditDto.getSpendingLimit());
-        userRepository.save(user);
-        return "Limit wydatków został zaktualizowany.";
     }
 
     public Optional<User> findById(Long userId) {

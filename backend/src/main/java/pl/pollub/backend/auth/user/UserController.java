@@ -3,15 +3,14 @@ package pl.pollub.backend.auth.user;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import pl.pollub.backend.auth.dto.UserPasswordChangeDto;
-import pl.pollub.backend.auth.dto.UserLimitDto;
-import pl.pollub.backend.auth.dto.UserUsernameEditDto;
 import pl.pollub.backend.auth.dto.UserEmailEditDto;
-import jakarta.validation.Valid;
+import pl.pollub.backend.auth.dto.UserPasswordChangeDto;
+import pl.pollub.backend.auth.dto.UserUsernameEditDto;
 
 @RestController
 @RequestMapping("/user")
@@ -48,14 +47,4 @@ public class UserController {
 
         return userService.updateUserPassword(authenticatedUser.getId(), passwordChangeDto);
     }
-
-    @Operation(summary = "Zmień limit użytkownika")
-    @ApiResponse(responseCode = "200", description = "Zmieniono limit użytkownika")
-    @PutMapping("/edit/limit")
-    @ResponseStatus(HttpStatus.OK)
-    public String editUserLimit(@AuthenticationPrincipal User authenticatedUser,
-                                @Valid @RequestBody UserLimitDto userLimitDto) {
-        return userService.updateSpendingLimit(authenticatedUser.getId(), userLimitDto);
-    }
-
 }
