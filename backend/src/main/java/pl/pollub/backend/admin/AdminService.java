@@ -3,7 +3,6 @@ package pl.pollub.backend.admin;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.pollub.backend.auth.dto.UserEmailEditDto;
-import pl.pollub.backend.auth.dto.UserLimitDto;
 import pl.pollub.backend.auth.dto.UserRoleDto;
 import pl.pollub.backend.auth.dto.UserUsernameEditDto;
 import pl.pollub.backend.auth.user.Role;
@@ -31,23 +30,16 @@ public class AdminService {
 
     public List<UserDto> getAllUsers() {
         return usersRepository.findAll().stream()
-                .map(user -> new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getRole().name(), user.getMonthlyLimit()))
+                .map(user -> new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getRole().name()))
                 .collect(Collectors.toList());
     }
-
 
     public String updateUserUsername(Long userId, UserUsernameEditDto usernameEditDto) {
         return userService.updateUsername(userId, usernameEditDto);
     }
 
-
     public String updateUserEmail(Long userId, UserEmailEditDto emailEditDto) {
         return userService.updateEmail(userId, emailEditDto);
-    }
-
-
-    public String updateUserLimit(Long userId, UserLimitDto limitDto) {
-        return userService.updateSpendingLimit(userId, limitDto);
     }
 
     public String updateUserRole(Long userId, UserRoleDto roleDto) {

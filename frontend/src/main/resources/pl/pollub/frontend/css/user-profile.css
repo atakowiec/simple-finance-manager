@@ -1,25 +1,48 @@
-.nav-label {
-    -fx-font-size: 22px;
-    -fx-text-fill: #06a53b;
-    -fx-padding: 10px;
-    -fx-background-color: #2b3e50;;
+.nav {
+    -fx-background-color: #142738;
+    -fx-padding: 70px 20px 20px 20px;
 }
 
-.nav-label:hover {
-    -fx-background-color: #3b4e60;
+.nav-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
 }
+
+.nav-item {
+    -fx-background-radius: 5px;
+    -fx-padding: 5px;
+    -fx-cursor: hand;
+}
+
+.nav-item .label {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+}
+
+.nav-item:hover {
+    -fx-background-color: #173048;
+}
+
 .active {
     -fx-background-color: #3b4e60;
     -fx-text-fill: #FFFFFF;
 }
-.button {
+
+.user-icon {
+    -fx-pref-width: 120px;
+    -fx-pref-height: 120px;
+    -fx-background-radius: 50%;
     -fx-background-color: #2b3e50;
-    -fx-text-fill: #ffffff;
-    -fx-pref-width: 150px;
-    -fx-padding: 10px;
-    -fx-font-size: 14px;
-    -fx-border-color: #ffffff;
-    -fx-border-width: 0 0 1px 0;
-    -fx-border-style: solid;
+}
+
+.user-name {
+    -fx-font-size: 22px;
+    -fx-text-fill: white;
+    -fx-padding: 20px 0;
+    -fx-font-weight: bold;
+}
+
+.sidenavIconWrapper {
+    -fx-pref-width: 30px;
 }
 

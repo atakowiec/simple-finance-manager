@@ -40,13 +40,4 @@ public class UserService {
         String jsonPayload = JsonUtil.toJson(passwordData);
         return httpService.put("/user/edit/password", jsonPayload);
     }
-
-    public HttpResponse<String> updateUserLimit(Double spendingLimit) {
-        Map<String, Object> limitData = new HashMap<>();
-        limitData.put("spendingLimit", spendingLimit);
-
-        String jsonPayload = JsonUtil.toJson(limitData);
-        return httpService.put("/user/edit/limit", jsonPayload);
-    }
-
 }

@@ -49,13 +49,6 @@ public class AdminService {
 
                 user.setAdmin("ADMIN".equals(role));
 
-                Object monthlyLimitObj = userMap.get("monthlyLimit");
-                if (monthlyLimitObj != null) {
-                    user.setMonthlyLimit(((Number) monthlyLimitObj).doubleValue());
-                } else {
-                    user.setMonthlyLimit(null);
-                }
-
                 userList.add(user);
             }
             return userList;
@@ -76,12 +69,6 @@ public class AdminService {
         Map<String, String> profileData = new HashMap<>();
         profileData.put("username", username);
         return httpService.put("/api/admin/" + userId + "/username", profileData);
-    }
-
-    public HttpResponse<String> updateLimit(Long userId, Double limit) {
-        Map<String, Object> profileData = new HashMap<>();
-        profileData.put("spendingLimit", limit);
-        return httpService.put("/api/admin/" + userId + "/limit", profileData);
     }
 
     public HttpResponse<String> updateRole(Long userId, String role) {

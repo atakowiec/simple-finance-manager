@@ -55,15 +55,11 @@ public class AdminController {
     @FXML
     private TableColumn<User, String> userNameCol;
     @FXML
-    private TableColumn<User, Double> userLimitCol;
-    @FXML
     private TextField userEmailField;
     @FXML
     private TextField userNameField;
     @FXML
     private ComboBox<String> userRoleField;
-    @FXML
-    private TextField userLimitField;
     @FXML
     private Label statusMessageLabel;
     @FXML
@@ -114,8 +110,6 @@ public class AdminController {
             User user = cellData.getValue();
             return new SimpleStringProperty(user.getRole());
         });
-
-        userLimitCol.setCellValueFactory(new PropertyValueFactory<>("monthlyLimit"));
 
         userList = FXCollections.observableArrayList();
         usersTable.setItems(userList);
@@ -194,7 +188,6 @@ public class AdminController {
         userEmailField.setText(selectedUser.getEmail());
         userNameField.setText(selectedUser.getUsername());
         userRoleField.getSelectionModel().select(selectedUser.getRole());
-        userLimitField.setText(selectedUser.getMonthlyLimit() != null ? String.valueOf(selectedUser.getMonthlyLimit()) : "");
     }
 
 
@@ -209,7 +202,6 @@ public class AdminController {
                 String email = userEmailField.getText().trim();
                 String username = userNameField.getText().trim();
                 String role = userRoleField.getSelectionModel().getSelectedItem();
-                String limitText = userLimitField.getText().trim();
 
                 if (!email.isEmpty() && !email.equals(selectedUser.getEmail())) {
                     if (!isValidEmail(email)) {
@@ -267,29 +259,6 @@ public class AdminController {
                     }
                 }
 
-                if (!limitText.isEmpty() && !limitText.equals(String.valueOf(selectedUser.getMonthlyLimit()))) {
-                    try {
-                        double limit = Double.parseDouble(limitText);
-                        if (limit <= 0) {
-                            displayStatusMessage("Limit musi być większy od zera.");
-                            return;
-                        }
-
-                        response = adminService.updateLimit(selectedUser.getId(), limit);
-                        if (response.statusCode() == 400) {
-                            displayStatusMessage("Wprowadź poprawny limit wydatków.");
-                            return;
-                        }
-                        if (response.statusCode() != 200) {
-                            displayStatusMessage("Błąd podczas aktualizacji limitu wydatków.");
-                            return;
-                        }
-                    } catch (NumberFormatException e) {
-                        displayStatusMessage("Wprowadź poprawną liczbę dla limitu wydatków.");
-                        return;
-                    }
-                }
-
                 displayStatusMessage("Dane użytkownika zostały pomyślnie zaktualizowane.");
                 clearUserForm();
                 loadUsersFromDatabase();
@@ -335,7 +304,6 @@ public class AdminController {
         userEmailField.clear();
         userNameField.clear();
         userRoleField.getSelectionModel().clearSelection();
-        userLimitField.clear();
     }
 
 
