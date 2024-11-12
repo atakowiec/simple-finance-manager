@@ -19,3 +19,20 @@ services:
       - "6500:80"
     depends_on:
       - java_database
+  java_backend:
+    image: atakowiec/java-finance-manager:backend
+    container_name: java_backend
+    ports:
+      - "5000:5000"
+    depends_on:
+      - java_database
+    environment:
+      DATABASE_HOST: java_database
+      DATABASE_PORT: 3306
+      DATABASE_NAME: budget_planner_db
+      DATABASE_USER: user
+      DATABASE_PASSWORD: pass
+      MAIL_HOST: smtp.gmail.com
+      MAIL_PORT: 587
+      MAIL_USERNAME: username
+      MAIL_PASSWORD: password
