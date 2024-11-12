@@ -434,4 +434,38 @@ class GroupServiceTest {
         Mockito.verify(expenseRepository, Mockito.times(1)).deleteAllByGroup(loggedUserGroup);
         Mockito.verify(incomeRepository, Mockito.times(1)).deleteAllByGroup(loggedUserGroup);
     }
+
+    @Test
+    void leaveGroup_EverythingOk_LeavesGroup() {
+        groupService.leaveGroup(loggedUser, loggedUserGroup.getId());
+
+        Mockito.verify(groupRepository, Mockito.times(1)).save(loggedUserGroup);
+    }
+
+    @Test
+    void leaveGroup_UserNotInGroup_ThrowsHttp403Exception() {
+        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> groupService.leaveGroup(otherUser, loggedUserGroup.getId()));
+
+        Assertions.assertEquals(403, httpException.getHttpStatus().value());
+
+        Mockito.verify(groupRepository, Mockito.times(0)).save(loggedUserGroup);
+    }
+
+    @Test
+    void leaveGroup_GroupDoesNotExist_ThrowsHttp404Exception() {
+        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> groupService.leaveGroup(loggedUser, 4L));
+
+        Assertions.assertEquals(404, httpException.getHttpStatus().value());
+
+        Mockito.verify(groupRepository, Mockito.times(0)).save(loggedUserGroup);
+    }
+
+    @Test
+    void leaveGroup_UserIsOwner_ThrowsHttp403Exception() {
+        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> groupService.leaveGroup(ownerUser, loggedUserGroup.getId()));
+
+        Assertions.assertEquals(403, httpException.getHttpStatus().value());
+
+        Mockito.verify(groupRepository, Mockito.times(0)).save(loggedUserGroup);
+    }
 }

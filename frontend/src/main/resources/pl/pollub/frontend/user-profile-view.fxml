@@ -5,54 +5,50 @@
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.*?>
 
-<AnchorPane prefHeight="650.0" prefWidth="1100.0" stylesheets="@css/user-profile.css"
-            xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="pl.pollub.frontend.controller.UserController">
+<AnchorPane prefHeight="650.0" prefWidth="1100.0" stylesheets="@css/user-profile.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pollub.frontend.controller.UserController">
     <BorderPane prefHeight="650.0" prefWidth="1100.0">
         <left>
             <VBox alignment="TOP_CENTER" prefHeight="650.0" prefWidth="266.0" spacing="5.0" styleClass="nav">
                 <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                     <VBox.margin>
-                        <Insets/>
+                        <Insets />
                     </VBox.margin>
                     <HBox alignment="CENTER">
                         <VBox alignment="CENTER" styleClass="user-icon">
-                            <FontIcon iconColor="white" iconLiteral="fas-user" iconSize="80"/>
+                            <FontIcon iconColor="white" iconLiteral="fas-user" iconSize="80" />
                         </VBox>
                     </HBox>
-                    <Label text="sraken pierdaken" styleClass="user-name"/>
+                    <Label fx:id="userNameLabel" styleClass="user-name" />
                 </VBox>
 
                 <!-- Navigation Links -->
-                <HBox id="settings" alignment="CENTER_LEFT" onMouseClicked="#switchToUsernameEdit"
-                      styleClass="nav-item">
+                <HBox id="settings" alignment="CENTER_LEFT" onMouseClicked="#switchToUsernameEdit" styleClass="nav-item">
                     <VBox alignment="CENTER_LEFT" styleClass="sidenavIconWrapper">
-                        <FontIcon iconColor="white" iconLiteral="fas-edit" iconSize="24"/>
+                        <FontIcon iconColor="white" iconLiteral="fas-edit" iconSize="24" />
                     </VBox>
                     <Label text="Edytuj nazwę" HBox.hgrow="ALWAYS">
                         <HBox.margin>
-                            <Insets left="20.0"/>
+                            <Insets left="20.0" />
                         </HBox.margin>
                     </Label>
                 </HBox>
                 <HBox id="settings" alignment="CENTER_LEFT" onMouseClicked="#switchToEmailEdit" styleClass="nav-item">
                     <VBox alignment="CENTER_LEFT" styleClass="sidenavIconWrapper">
-                        <FontIcon iconColor="white" iconLiteral="fas-envelope" iconSize="24"/>
+                        <FontIcon iconColor="white" iconLiteral="fas-envelope" iconSize="24" />
                     </VBox>
                     <Label text="Edytuj email" HBox.hgrow="ALWAYS">
                         <HBox.margin>
-                            <Insets left="20.0"/>
+                            <Insets left="20.0" />
                         </HBox.margin>
                     </Label>
                 </HBox>
-                <HBox id="settings" alignment="CENTER_LEFT" onMouseClicked="#switchToPasswordEdit"
-                      styleClass="nav-item">
+                <HBox id="settings" alignment="CENTER_LEFT" onMouseClicked="#switchToPasswordEdit" styleClass="nav-item">
                     <VBox alignment="CENTER_LEFT" styleClass="sidenavIconWrapper">
-                        <FontIcon iconColor="white" iconLiteral="fas-lock" iconSize="24"/>
+                        <FontIcon iconColor="white" iconLiteral="fas-lock" iconSize="24" />
                     </VBox>
                     <Label text="Edytuj hasło" HBox.hgrow="ALWAYS">
                         <HBox.margin>
-                            <Insets left="20.0"/>
+                            <Insets left="20.0" />
                         </HBox.margin>
                     </Label>
                 </HBox>
@@ -61,32 +57,26 @@
 
         <center>
             <StackPane prefHeight="650.0" prefWidth="522.0">
-                <VBox fx:id="editUsernamePane" alignment="CENTER" prefHeight="200.0" prefWidth="200.0" spacing="10.0"
-                      style="-fx-padding: 20;" visible="true">
-                    <Label text="Edytuj nazwę użytkownika:"/>
-                    <TextField fx:id="usernameField" maxWidth="350.0" promptText="Wprowadź nową nazwę"/>
-                    <Button fx:id="saveUsernameButton" styleClass="primary-btn" onAction="#saveUsernameChanges"
-                            text="Zapisz"/>
+                <VBox fx:id="editUsernamePane" alignment="CENTER" prefHeight="200.0" prefWidth="200.0" spacing="10.0" style="-fx-padding: 20;">
+                    <Label text="Edytuj nazwę użytkownika:" />
+                    <TextField fx:id="usernameField" maxWidth="350.0" promptText="Wprowadź nową nazwę" />
+                    <Button onAction="#saveUsernameChanges" styleClass="primary-btn" text="Zapisz" />
                 </VBox>
 
-                <VBox fx:id="editEmailPane" alignment="CENTER" prefHeight="200.0" prefWidth="200.0" spacing="10.0"
-                      style="-fx-padding: 20;" visible="false">
-                    <Label text="Edytuj email:"/>
-                    <TextField fx:id="emailField" maxWidth="350.0" promptText="Wprowadź nowy email"/>
-                    <Button fx:id="saveEmailButton" styleClass="primary-btn" onAction="#saveEmailChanges"
-                            text="Zapisz"/>
+                <VBox fx:id="editEmailPane" alignment="CENTER" prefHeight="200.0" prefWidth="200.0" spacing="10.0" style="-fx-padding: 20;" visible="false">
+                    <Label text="Edytuj email:" />
+                    <TextField fx:id="emailField" maxWidth="350.0" promptText="Wprowadź nowy email" />
+                    <Button onAction="#saveEmailChanges" styleClass="primary-btn" text="Zapisz" />
                 </VBox>
 
-                <VBox fx:id="editPasswordPane" alignment="CENTER" prefHeight="200.0" prefWidth="200.0" spacing="10.0"
-                      style="-fx-padding: 20;" visible="false">
-                    <Label text="Edytuj hasło:"/>
-                    <PasswordField fx:id="oldPasswordField" maxWidth="350.0" promptText="Wprowadź stare hasło"/>
-                    <PasswordField fx:id="newPasswordField" maxWidth="350.0" promptText="Wprowadź nowe hasło"/>
-                    <Button fx:id="savePasswordButton" styleClass="primary-btn" onAction="#savePasswordChanges"
-                            text="Zapisz"/>
+                <VBox fx:id="editPasswordPane" alignment="CENTER" prefHeight="200.0" prefWidth="200.0" spacing="10.0" style="-fx-padding: 20;" visible="false">
+                    <Label text="Edytuj hasło:" />
+                    <PasswordField fx:id="oldPasswordField" maxWidth="350.0" promptText="Wprowadź stare hasło" />
+                    <PasswordField fx:id="newPasswordField" maxWidth="350.0" promptText="Wprowadź nowe hasło" />
+                    <Button styleClass="primary-btn" onAction="#savePasswordChanges" text="Zapisz" />
                 </VBox>
 
-                <Label fx:id="statusMessageLabel" text="" textFill="red"/>
+                <Label fx:id="statusMessageLabel" textFill="red" translateY="80.0" />
             </StackPane>
         </center>
     </BorderPane>

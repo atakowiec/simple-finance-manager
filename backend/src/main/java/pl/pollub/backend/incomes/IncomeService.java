@@ -88,11 +88,12 @@ public class IncomeService {
      * @throws HttpException if the income with the specified id does not exist
      */
     public void deleteIncome(Long id, User user) {
-        if (incomeRepository.existsByIdAndUser(id, user)) {
-            incomeRepository.deleteById(id);
-        } else {
-            throw new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono dochodu z identyfikatorem: " + id);
-        }
+        Income income = incomeRepository.findById(id)
+                .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono przychodu o podanym identyfikatorze: " + id));
+
+        groupService.checkMembershipOrThrow(user, income.getGroup());
+
+        incomeRepository.deleteById(id);
     }
 
     /**

@@ -2,6 +2,7 @@ package pl.pollub.frontend.controller.group;
 
 import com.google.gson.JsonObject;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -11,6 +12,7 @@ import pl.pollub.frontend.event.EventEmitter;
 import pl.pollub.frontend.event.EventType;
 import pl.pollub.frontend.injector.Inject;
 import pl.pollub.frontend.model.group.Group;
+import pl.pollub.frontend.service.AuthService;
 import pl.pollub.frontend.service.ColorsService;
 import pl.pollub.frontend.service.HttpService;
 import pl.pollub.frontend.service.ModalService;
@@ -28,6 +30,8 @@ public class SettingsController extends AbstractGroupController {
     private EventEmitter eventEmitter;
     @Inject
     private ModalService modalService;
+    @Inject
+    private AuthService authService;
 
     @FXML
     private TextField groupNameField;
@@ -41,6 +45,10 @@ public class SettingsController extends AbstractGroupController {
     private Label colorError;
     @FXML
     private Label expenseLimitError;
+    @FXML
+    public Button deleteGroupButton;
+    @FXML
+    public Button leaveGroupButton;
 
     @PostInitialize
     public void postInitialize() {
@@ -55,6 +63,12 @@ public class SettingsController extends AbstractGroupController {
         boolean expenseLimitSet = group.getExpenseLimit() != null && group.getExpenseLimit() > 0;
 
         expenseLimitField.setText(expenseLimitSet ? String.valueOf(group.getExpenseLimit()) : "");
+
+        deleteGroupButton.setVisible(authService.getUser().getId() == group.getOwner().getId());
+        deleteGroupButton.setManaged(authService.getUser().getId() == group.getOwner().getId());
+
+        leaveGroupButton.setVisible(authService.getUser().getId() != group.getOwner().getId());
+        leaveGroupButton.setManaged(authService.getUser().getId() != group.getOwner().getId());
     }
 
     public void saveName() {
@@ -128,5 +142,9 @@ public class SettingsController extends AbstractGroupController {
 
     public void handleDeleteGroup() {
         modalService.showModal("modal/remove-group-view.fxml", Map.of("groupId", groupId));
+    }
+
+    public void handleLeave() {
+        modalService.showModal("modal/leave-group-view.fxml", Map.of("groupId", groupId));
     }
 }

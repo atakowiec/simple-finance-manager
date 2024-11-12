@@ -47,12 +47,14 @@ class ExpenseServiceTest {
     private Expense notExistingExpense;
     private Expense existingExpense;
 
+    private Group group;
+
     @BeforeEach
     void setUp() {
         user = new User();
         user.setId(1L);
 
-        Group group = new Group();
+        group = new Group();
         group.setId(groupId);
         group.setUsers(List.of(user));
 
@@ -153,9 +155,9 @@ class ExpenseServiceTest {
     void deleteExpense_EverythingCorrect_DeletesExpense() {
         Expense expense = new Expense();
         expense.setUser(user);
-        expense.setGroup(new Group());
+        expense.setGroup(group);
 
-        Mockito.when(expenseRepository.existsByIdAndUser(Mockito.anyLong(), Mockito.any())).thenReturn(true);
+        Mockito.when(expenseRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(expense));
 
         expenseService.deleteExpense(1L, user);
 
@@ -164,7 +166,7 @@ class ExpenseServiceTest {
 
     @Test
     void deleteExpense_ExpanseDoesNotExist_ThrowHttp404Exception() {
-        Mockito.when(expenseRepository.existsByIdAndUser(Mockito.anyLong(), Mockito.any())).thenReturn(false);
+        Mockito.when(expenseRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
         HttpException httpException = Assertions.assertThrows(HttpException.class, () -> expenseService.deleteExpense(notExistingExpense.getId(), user));
 

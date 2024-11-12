@@ -46,13 +46,14 @@ class IncomesServiceTest {
 
     private Income notExistingIncome;
     private Income existingIncome;
+    private Group group;
 
     @BeforeEach
     void setUp() {
         user = new User();
         user.setId(1L);
 
-        Group group = new Group();
+        group = new Group();
         group.setId(groupId);
         group.setUsers(List.of(user));
 
@@ -153,9 +154,9 @@ class IncomesServiceTest {
     void deleteIncome_EverythingCorrect_DeletesIncome() {
         Income income = new Income();
         income.setUser(user);
-        income.setGroup(new Group());
+        income.setGroup(group);
 
-        Mockito.when(incomeRepository.existsByIdAndUser(Mockito.anyLong(), Mockito.any())).thenReturn(true);
+        Mockito.when(incomeRepository.findById(Mockito.any())).thenReturn(Optional.of(income));
 
         incomeService.deleteIncome(1L, user);
 
@@ -164,7 +165,7 @@ class IncomesServiceTest {
 
     @Test
     void deleteIncome_ExpanseDoesNotExist_ThrowHttp404Exception() {
-        Mockito.when(incomeRepository.existsByIdAndUser(Mockito.anyLong(), Mockito.any())).thenReturn(false);
+        Mockito.when(incomeRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
         HttpException httpException = Assertions.assertThrows(HttpException.class, () -> incomeService.deleteIncome(notExistingIncome.getId(), user));
 

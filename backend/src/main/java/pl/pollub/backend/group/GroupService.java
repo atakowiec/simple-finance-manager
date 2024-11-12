@@ -230,4 +230,16 @@ public class GroupService {
         incomeRepository.deleteAllByGroup(group);
         groupRepository.delete(group);
     }
+
+    public void leaveGroup(User user, Long groupId) {
+        Group group = getGroupByIdOrThrow(groupId);
+        checkMembershipOrThrow(user, group);
+
+        if (Objects.equals(group.getOwner().getId(), user.getId()))
+            throw new HttpException(HttpStatus.FORBIDDEN, "Nie możesz opuścić grupy, której jesteś właścicielem!");
+
+        group.getUsers().removeIf(user::equals);
+
+        groupRepository.save(group);
+    }
 }

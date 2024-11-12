@@ -71,7 +71,7 @@ public class TransactionsController extends AbstractGroupController {
         LocalDate startDate = LocalDate.now().withDayOfMonth(1);
 
         return transactions.stream()
-                .filter(t -> t.getLocalDate().isAfter(startDate))
+                .filter(t -> t.getLocalDate().isEqual(startDate) || t.getLocalDate().isAfter(startDate))
                 .mapToDouble(Transaction::getAmount)
                 .sum();
     }
