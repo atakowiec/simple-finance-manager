@@ -11,6 +11,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import pl.pollub.backend.auth.jwt.JwtAuthenticationFilter;
+import pl.pollub.backend.auth.user.Role;
 
 /**
  * Configuration class for security.
@@ -35,11 +36,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers(SWAGGER_WHITELIST).permitAll();
-                    auth.requestMatchers("/ws/**").authenticated();
                     auth.requestMatchers("/auth/verify").authenticated();
                     auth.requestMatchers("/auth/**").permitAll();
                     auth.requestMatchers("/expenses/**", "/incomes/**").authenticated();
                     auth.requestMatchers("/groups/**").authenticated();
+                    auth.requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name());
                     auth.anyRequest().permitAll();
                 })
                 .sessionManagement((configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)))
