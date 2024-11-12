@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 
-<BorderPane prefHeight="650" prefWidth="1100" style="-fx-background-color: #eef8f8;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pollub.frontend.controller.LoginController">
+<BorderPane prefHeight="650" prefWidth="1100" style="-fx-background-color: #eef8f8;" xmlns="http://javafx.com/javafx/17.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pollub.frontend.controller.LoginController">
     <left>
         <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <ImageView fitHeight="672.0" fitWidth="619.0" layoutY="-20.0" pickOnBounds="true" smooth="false">

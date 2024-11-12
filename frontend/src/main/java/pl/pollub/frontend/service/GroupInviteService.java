@@ -34,6 +34,8 @@ public class GroupInviteService {
     private DependencyInjector dependencyInjector;
     @Inject
     private PollingService pollingService;
+    @Inject
+    private GroupsService groupsService;
 
     private VBox notificationOverlay;
     private VBox notificationContainer;
@@ -150,6 +152,8 @@ public class GroupInviteService {
 
     public void onInviteAccept(GroupInvite groupInvite) {
         deleteInvite(groupInvite);
+
+        groupsService.updateGroups();
 
         screenService.switchTo("group", Map.of("groupId", groupInvite.getGroup().getId()));
         hideNotifications();

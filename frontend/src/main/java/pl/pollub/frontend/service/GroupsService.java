@@ -146,4 +146,15 @@ public class GroupsService {
         updateGroups();
         screenService.switchTo("home");
     }
+
+    public void leaveGroup(Long groupId) {
+        HttpResponse<String> response = httpService.post("/groups/" + groupId + "/leave", null);
+
+        if (response.statusCode() != 200) {
+            return;
+        }
+
+        updateGroups();
+        screenService.switchTo("home");
+    }
 }

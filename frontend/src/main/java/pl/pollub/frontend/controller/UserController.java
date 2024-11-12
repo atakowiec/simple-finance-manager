@@ -10,8 +10,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import pl.pollub.frontend.annotation.NavBar;
+import pl.pollub.frontend.annotation.PostInitialize;
 import pl.pollub.frontend.annotation.View;
 import pl.pollub.frontend.injector.Inject;
+import pl.pollub.frontend.service.AuthService;
 import pl.pollub.frontend.service.UserService;
 import pl.pollub.frontend.util.JsonUtil;
 
@@ -23,7 +25,11 @@ public class UserController {
 
     @Inject
     private UserService userService;
+    @Inject
+    private AuthService authService;
 
+    @FXML
+    public Label userNameLabel;
     @FXML
     private VBox editUsernamePane;
     @FXML
@@ -40,6 +46,11 @@ public class UserController {
     private PasswordField newPasswordField;
     @FXML
     private Label statusMessageLabel;
+
+    @PostInitialize
+    private void postInitialize() {
+        userNameLabel.setText(authService.getUser().getUsername());
+    }
 
     @FXML
     private void switchToUsernameEdit() {
@@ -77,6 +88,7 @@ public class UserController {
 
         if (response.statusCode() == 200) {
             displayStatusMessage("Nazwa użytkownika została zaktualizowana.");
+            userNameLabel.setText(username);
             return;
         }
 

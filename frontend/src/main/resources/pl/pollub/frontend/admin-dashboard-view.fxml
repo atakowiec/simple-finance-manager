@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="650.0" prefWidth="1100.0" stylesheets="@css/admin-dashboard.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pollub.frontend.controller.AdminController">
+<AnchorPane prefHeight="650.0" prefWidth="1100.0" stylesheets="@css/admin-dashboard.css" xmlns="http://javafx.com/javafx/17.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pollub.frontend.controller.AdminController">
     <AnchorPane prefHeight="636.0" prefWidth="1125.0">
         <VBox layoutX="51.0" layoutY="253.0" prefWidth="150.0">
             <Button onAction="#showUsersPane" styleClass="sidebar-button" text="Użytkownicy">

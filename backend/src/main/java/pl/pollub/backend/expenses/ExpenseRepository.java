@@ -13,8 +13,6 @@ import java.util.Optional;
  * JPA repository for expenses.
  */
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
-    boolean existsByIdAndUser(Long id, User user);
-
     Optional<Expense> findByIdAndUser(Long id, User user);
 
     List<Expense> findAllByGroup(Group group);

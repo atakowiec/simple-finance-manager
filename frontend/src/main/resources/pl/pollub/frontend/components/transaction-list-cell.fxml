@@ -9,36 +9,36 @@
 <?import javafx.scene.layout.VBox?>
 
 <?import org.kordamp.ikonli.javafx.FontIcon?>
-<HBox prefHeight="70.0" prefWidth="318.0" stylesheets="@../css/home.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pollub.frontend.controller.group.transaction.TransactionCellController">
-   <padding>
-      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-   </padding>
-   <VBox alignment="CENTER">
-      <ImageView fx:id="categoryIcon" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
-         <VBox.margin>
-            <Insets right="10.0" />
-         </VBox.margin>
-      </ImageView>
-   </VBox>
-   <VBox>
-      <Label fx:id="nameLabel" styleClass="name" text="Label" />
-      <Region VBox.vgrow="ALWAYS" />
-      <Label fx:id="dateLabel" styleClass="date" text="Label" />
-   </VBox>
-   <Region HBox.hgrow="ALWAYS" />
-   <VBox alignment="CENTER_RIGHT">
-      <Label fx:id="amountLabel" styleClass="value" text="Label" />
-   </VBox>
-   <VBox alignment="CENTER_RIGHT">
-      <children>
-         <Button fx:id="deleteButton" mnemonicParsing="false" styleClass="danger-btn">
+<HBox prefHeight="70.0" prefWidth="318.0" stylesheets="@../css/home.css" xmlns="http://javafx.com/javafx/17.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="pl.pollub.frontend.controller.group.transaction.TransactionCellController">
+    <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+    </padding>
+    <VBox alignment="CENTER">
+        <ImageView fx:id="categoryIcon" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+            <VBox.margin>
+                <Insets right="10.0"/>
+            </VBox.margin>
+        </ImageView>
+    </VBox>
+    <VBox>
+        <Label fx:id="nameLabel" styleClass="name" text="Label"/>
+        <Region VBox.vgrow="ALWAYS"/>
+        <Label fx:id="dateLabel" styleClass="date" text="Label"/>
+    </VBox>
+    <Region HBox.hgrow="ALWAYS"/>
+    <VBox alignment="CENTER_RIGHT">
+        <Label fx:id="amountLabel" styleClass="value" text="Label"/>
+    </VBox>
+    <VBox alignment="CENTER_RIGHT">
+        <HBox.margin>
+            <Insets left="10.0"/>
+        </HBox.margin>
+        <Button fx:id="deleteButton" mnemonicParsing="false" styleClass="danger-btn">
             <graphic>
-               <FontIcon iconLiteral="far-trash-alt" iconSize="12" iconColor="#fff"/>
+                <FontIcon iconLiteral="far-trash-alt" iconSize="12" iconColor="#fff"/>
             </graphic>
-         </Button>
-      </children>
-      <HBox.margin>
-         <Insets left="10.0" />
-      </HBox.margin>
-   </VBox>
+        </Button>
+    </VBox>
 </HBox>

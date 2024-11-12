@@ -127,4 +127,11 @@ public class GroupController {
     public void removeGroup(@AuthenticationPrincipal User user, @PathVariable Long groupId) {
         groupService.removeGroup(user, groupId);
     }
+
+    @Operation(summary = "Opuść grupę")
+    @ApiResponse(responseCode = "200", description = "Opuszczono grupę")
+    @PostMapping("/{groupId}/leave")
+    public void leaveGroup(@AuthenticationPrincipal User user, @PathVariable Long groupId) {
+        groupService.leaveGroup(user, groupId);
+    }
 }

@@ -42,7 +42,8 @@
             <VBox.margin>
                 <Insets top="50.0"/>
             </VBox.margin>
-            <Button onAction="#handleDeleteGroup" mnemonicParsing="false" styleClass="danger-btn" text="Usuń grupę"/>
+            <Button fx:id="deleteGroupButton" onAction="#handleDeleteGroup" mnemonicParsing="false" styleClass="danger-btn" text="Usuń grupę"/>
+            <Button fx:id="leaveGroupButton" onAction="#handleLeave" mnemonicParsing="false" styleClass="danger-btn" text="Opuść grupe"/>
         </HBox>
     </VBox>
 </HBox>

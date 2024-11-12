@@ -13,8 +13,6 @@ import java.util.Optional;
  * JPA repository for incomes.
  */
 public interface IncomeRepository extends JpaRepository<Income, Long> {
-    boolean existsByIdAndUser(Long id, User user);
-
     Optional<Income> findByIdAndUser(Long id, User user);
 
     List<Income> findAllByGroup(Group group);

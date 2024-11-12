@@ -87,11 +87,12 @@ public class ExpenseService {
      * @param user user who owns the expense
      */
     public void deleteExpense(Long id, User user) {
-        if (expenseRepository.existsByIdAndUser(id, user)) {
-            expenseRepository.deleteById(id);
-        } else {
-            throw new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono wydatku o podanym identyfikatorze: " + id);
-        }
+        Expense expense = expenseRepository.findById(id)
+                .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono wydatku o podanym identyfikatorze: " + id));
+
+        groupService.checkMembershipOrThrow(user, expense.getGroup());
+
+        expenseRepository.deleteById(id);
     }
 
     /**
