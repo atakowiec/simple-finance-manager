@@ -76,4 +76,6 @@ public interface AuthService extends UserDetailsService {
      * @return the json response containing the token and user data.
      */
     String handleRegister(RegisterDto registerDto, HttpServletResponse res);
+
+    void save(User user);
 }
