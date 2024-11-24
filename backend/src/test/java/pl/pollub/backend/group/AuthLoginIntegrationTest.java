@@ -6,17 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import pl.pollub.backend.auth.dto.LoginDto;
-import pl.pollub.backend.auth.dto.RegisterDto;
 import pl.pollub.backend.auth.user.Role;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.auth.AuthService;
-import pl.pollub.backend.exception.HttpException;
 
 import java.util.Map;
 
