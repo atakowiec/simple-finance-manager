@@ -1,4 +1,4 @@
-package pl.pollub.backend.group;
+package pl.pollub.backend.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +12,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import pl.pollub.backend.auth.dto.LoginDto;
 import pl.pollub.backend.auth.user.Role;
 import pl.pollub.backend.auth.user.User;
-import pl.pollub.backend.auth.AuthService;
 
 import java.util.Map;
 
