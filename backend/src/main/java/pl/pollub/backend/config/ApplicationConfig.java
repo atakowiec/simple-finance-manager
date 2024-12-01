@@ -26,7 +26,7 @@ public class ApplicationConfig {
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
-        return authService.getBCryptPasswordEncoder();
+        return new BCryptPasswordEncoder();
     }
 
     @Bean

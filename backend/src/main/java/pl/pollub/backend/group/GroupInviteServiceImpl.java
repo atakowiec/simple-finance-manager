@@ -9,8 +9,11 @@ import pl.pollub.backend.auth.user.UserService;
 import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.dto.InviteTargetDto;
 import pl.pollub.backend.group.enums.MembershipStatus;
+import pl.pollub.backend.group.interfaces.GroupInviteService;
+import pl.pollub.backend.group.interfaces.GroupService;
 import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.group.model.GroupInvite;
+import pl.pollub.backend.group.repository.GroupInviteRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,19 +24,12 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-public class GroupInviteService {
+public class GroupInviteServiceImpl implements GroupInviteService {
     private final GroupInviteRepository inviteRepository;
     private final GroupService groupService;
     private final UserService userService;
 
-    /**
-     * Invite user to group.
-     *
-     * @param user    inviter
-     * @param groupId group id that user is invited to
-     * @param userId  invitee id
-     * @return new membership status
-     */
+    @Override
     public MembershipStatus inviteUser(User user, Long groupId, Long userId) {
         Group group = groupService.getGroupByIdOrThrow(groupId);
         groupService.checkMembershipOrThrow(user, group);
@@ -61,14 +57,7 @@ public class GroupInviteService {
         return MembershipStatus.INVITED;
     }
 
-    /**
-     * Delete invitation.
-     *
-     * @param user    user that wants to delete invitation
-     * @param groupId group id that invitation is related to
-     * @param userId  user id that invitation is related to
-     * @return new membership status
-     */
+    @Override
     public MembershipStatus deleteInvitation(User user, Long groupId, Long userId) {
         Group group = groupService.getGroupByIdOrThrow(groupId);
         groupService.checkMembershipOrThrow(user, group);
@@ -88,13 +77,7 @@ public class GroupInviteService {
         return MembershipStatus.NONE;
     }
 
-    /**
-     * Deny invitation.
-     *
-     * @param user     user that wants to deny invitation
-     * @param inviteId invitation id
-     * @return new membership status
-     */
+    @Override
     public MembershipStatus denyInvitation(User user, Long inviteId) {
         GroupInvite groupInvite = inviteRepository.findById(inviteId)
                 .orElseThrow(() -> new HttpException(404, "Nie znaleniono zaprosznia"));
@@ -107,12 +90,7 @@ public class GroupInviteService {
         return MembershipStatus.NONE;
     }
 
-    /**
-     * Accept invitation.
-     * @param user user that wants to accept invitation
-     * @param inviteId invitation id
-     * @return new membership status
-     */
+    @Override
     public MembershipStatus acceptInvitation(User user, Long inviteId) {
         GroupInvite groupInvite = inviteRepository.findById(inviteId)
                 .orElseThrow(() -> new HttpException(404, "Nie znaleniono zaprosznia"));
@@ -128,18 +106,12 @@ public class GroupInviteService {
 
         group.getUsers().add(user);
 
-        groupService.getGroupRepository().save(group);
+        groupService.save(group);
 
         return MembershipStatus.IN_GROUP;
     }
 
-    /**
-     * Find users to invite to group with all needed information about their membership status.
-     * @param user user that wants to invite
-     * @param groupId group id that user wants to invite to
-     * @param query query to search for users
-     * @return list of users with their membership status
-     */
+    @Override
     public List<InviteTargetDto> findInviteTargets(User user, Long groupId, String query) {
         Group group = groupService.getGroupByIdOrThrow(groupId);
         groupService.checkMembershipOrThrow(user, group);
@@ -170,11 +142,7 @@ public class GroupInviteService {
         return result;
     }
 
-    /**
-     * Get all active invitations for user.
-     * @param user user that wants to get own invitations
-     * @return list of active invitations
-     */
+    @Override
     public List<GroupInvite> getActiveInvitations(User user) {
         return inviteRepository.findAllByInvitee(user);
     }

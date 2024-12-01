@@ -1,4 +1,5 @@
-package pl.pollub.backend.expenses;
+package pl.pollub.backend.transaction.model;
+
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,19 +8,19 @@ import lombok.NoArgsConstructor;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.categories.model.TransactionCategory;
 import pl.pollub.backend.conversion.DtoConvertible;
-import pl.pollub.backend.expenses.dto.ExpenseDto;
 import pl.pollub.backend.group.model.Group;
+import pl.pollub.backend.transaction.dto.TransactionDto;
 
 import java.time.LocalDate;
 
 /**
- * Entity representing an expense.
+ * Base class for all transactions.
  */
-@Entity
+@MappedSuperclass
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Expense implements DtoConvertible<ExpenseDto> {
+public class Transaction implements DtoConvertible<TransactionDto> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -41,7 +42,7 @@ public class Expense implements DtoConvertible<ExpenseDto> {
     private LocalDate date;
 
     @Override
-    public ExpenseDto toDto() {
-        return new ExpenseDto(this);
+    public TransactionDto toDto() {
+        return new TransactionDto(this);
     }
 }

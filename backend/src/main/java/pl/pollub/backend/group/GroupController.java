@@ -13,6 +13,8 @@ import pl.pollub.backend.group.dto.GroupCreateDto;
 import pl.pollub.backend.group.dto.ImportExportDto;
 import pl.pollub.backend.group.dto.InviteTargetDto;
 import pl.pollub.backend.group.enums.MembershipStatus;
+import pl.pollub.backend.group.interfaces.GroupInviteService;
+import pl.pollub.backend.group.interfaces.GroupService;
 import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.group.model.GroupInvite;
 

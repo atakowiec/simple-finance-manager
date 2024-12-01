@@ -12,11 +12,15 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.categories.CategoryRepository;
+import pl.pollub.backend.categories.CategoryService;
 import pl.pollub.backend.categories.model.TransactionCategory;
 import pl.pollub.backend.exception.HttpException;
-import pl.pollub.backend.group.GroupService;
+import pl.pollub.backend.group.GroupServiceImpl;
 import pl.pollub.backend.group.model.Group;
-import pl.pollub.backend.incomes.dto.IncomeUpdateDto;
+import pl.pollub.backend.transaction.dto.TransactionUpdateDto;
+import pl.pollub.backend.transaction.model.Income;
+import pl.pollub.backend.transaction.repository.IncomeRepository;
+import pl.pollub.backend.transaction.service.IncomeServiceImpl;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,13 +34,16 @@ class IncomesServiceTest {
     private IncomeRepository incomeRepository;
 
     @Mock
-    private GroupService groupService;
+    private GroupServiceImpl groupService;
 
     @Mock
     private CategoryRepository categoryRepository;
 
+    @Mock
+    private CategoryService categoryService; // mockito needs to know what to inject
+
     @InjectMocks
-    private IncomeService incomeService;
+    private IncomeServiceImpl incomeService;
 
     private User user;
     private final long groupId = 1L;
@@ -85,7 +92,7 @@ class IncomesServiceTest {
 
     @Test
     void getAllIncomesForGroup_EverythingIsOkay_ReturnExpectedIncomes() {
-        List<Income> incomes = incomeService.getAllIncomesForGroup(user, groupId);
+        List<Income> incomes = incomeService.getAllTransactionsForGroup(user, groupId);
 
         Assertions.assertNotNull(incomes);
         Assertions.assertEquals(expectedIncomes, incomes);
@@ -96,14 +103,14 @@ class IncomesServiceTest {
         User userNotInGroup = new User();
         userNotInGroup.setId(2L);
 
-        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> incomeService.getAllIncomesForGroup(userNotInGroup, groupId));
+        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> incomeService.getAllTransactionsForGroup(userNotInGroup, groupId));
 
         Assertions.assertEquals(403, httpException.getHttpStatus().value());
     }
 
     @Test
     void getAllIncomesForGroup_GroupNotFound_ThrowHttp404Exception() {
-        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> incomeService.getAllIncomesForGroup(user, notExistingGroupId));
+        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> incomeService.getAllTransactionsForGroup(user, notExistingGroupId));
 
         Assertions.assertEquals(404, httpException.getHttpStatus().value());
     }
@@ -116,7 +123,7 @@ class IncomesServiceTest {
 
         Mockito.when(incomeRepository.save(Mockito.any())).thenReturn(income);
 
-        Income savedIncome = incomeService.addIncome(income);
+        Income savedIncome = incomeService.save(income);
 
         Assertions.assertNotNull(savedIncome);
         Assertions.assertEquals(income, savedIncome);
@@ -125,7 +132,7 @@ class IncomesServiceTest {
 
     @Test
     void updateIncome_EverythingCorrect_updatesExpese() {
-        IncomeUpdateDto updatedIncome = new IncomeUpdateDto();
+        TransactionUpdateDto updatedIncome = new TransactionUpdateDto();
         updatedIncome.setDate(LocalDate.parse("2021-01-01"));
         updatedIncome.setName("New name");
         updatedIncome.setAmount(100.0);
@@ -133,7 +140,7 @@ class IncomesServiceTest {
 
         Mockito.when(incomeRepository.save(Mockito.any())).thenReturn(existingIncome);
 
-        Income updated = incomeService.updateIncome(1L, updatedIncome, user);
+        Income updated = incomeService.updateTransaction(1L, updatedIncome, user);
 
         Assertions.assertNotNull(updated);
         Assertions.assertEquals(updatedIncome.getName(), updated.getName());
@@ -142,10 +149,10 @@ class IncomesServiceTest {
 
     @Test
     void updateIncome_IncomeDoesNotExist_ThrowHttp404Exception() {
-        IncomeUpdateDto updatedIncome = new IncomeUpdateDto();
+        TransactionUpdateDto updatedIncome = new TransactionUpdateDto();
         updatedIncome.setName("New name");
 
-        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> incomeService.updateIncome(notExistingIncome.getId(), updatedIncome, user));
+        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> incomeService.updateTransaction(notExistingIncome.getId(), updatedIncome, user));
 
         Assertions.assertEquals(404, httpException.getHttpStatus().value());
     }
@@ -158,7 +165,7 @@ class IncomesServiceTest {
 
         Mockito.when(incomeRepository.findById(Mockito.any())).thenReturn(Optional.of(income));
 
-        incomeService.deleteIncome(1L, user);
+        incomeService.deleteTransaction(1L, user);
 
         Mockito.verify(incomeRepository, Mockito.times(1)).deleteById(Mockito.anyLong());
     }
@@ -167,7 +174,7 @@ class IncomesServiceTest {
     void deleteIncome_ExpanseDoesNotExist_ThrowHttp404Exception() {
         Mockito.when(incomeRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
-        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> incomeService.deleteIncome(notExistingIncome.getId(), user));
+        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> incomeService.deleteTransaction(notExistingIncome.getId(), user));
 
         Assertions.assertEquals(404, httpException.getHttpStatus().value());
     }

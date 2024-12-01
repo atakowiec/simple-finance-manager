@@ -1,4 +1,4 @@
-package pl.pollub.backend.group;
+package pl.pollub.backend.group.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import pl.pollub.backend.group.model.Group;

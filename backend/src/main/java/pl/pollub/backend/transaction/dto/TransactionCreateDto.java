@@ -1,4 +1,4 @@
-package pl.pollub.backend.expenses.dto;
+package pl.pollub.backend.transaction.dto;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -8,18 +8,18 @@ import lombok.Data;
 import java.time.LocalDate;
 
 /**
- * DTO for creating new expense.
+ * DTO for creating new income. It holds information about income name, amount, category, group and date.
  */
 @Data
-public class ExpenseCreateDto {
-    @NotBlank(message = "Nazwa wydatku jest wymagana")
+public class TransactionCreateDto {
+    @NotBlank(message = "Nazwa jest wymagana")
     private String name;
 
-    @NotNull(message = "Kwota wydatku jest wymagana")
+    @NotNull(message = "Kwota jest wymagana")
     @DecimalMin(value = "0.01", message = "Kwota musi być większa niż 0")
     private Double amount;
 
-    @NotNull(message = "Kategoria wydatku jest wymagana")
+    @NotNull(message = "Kategoria jest wymagana")
     private Long categoryId;
 
     @NotNull(message = "Grupa jest wymagana")
