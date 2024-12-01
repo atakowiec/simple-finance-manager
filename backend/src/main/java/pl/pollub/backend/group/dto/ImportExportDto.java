@@ -1,8 +1,7 @@
 package pl.pollub.backend.group.dto;
 
 import lombok.Data;
-import pl.pollub.backend.expenses.dto.ExpenseDto;
-import pl.pollub.backend.incomes.dto.IncomeDto;
+import pl.pollub.backend.transaction.dto.TransactionDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,6 +14,6 @@ public class ImportExportDto {
     private LocalDateTime createdAt;
     private String exportedBy;
 
-    private List<IncomeDto> incomes;
-    private List<ExpenseDto> expenses;
+    private List<TransactionDto> incomes;
+    private List<TransactionDto> expenses;
 }

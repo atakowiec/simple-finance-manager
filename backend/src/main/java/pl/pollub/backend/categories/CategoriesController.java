@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.pollub.backend.admin.AdminService;
 import pl.pollub.backend.categories.dto.CategoryCreateDto;
 import pl.pollub.backend.categories.dto.CategoryUpdateDto;
 import pl.pollub.backend.categories.model.TransactionCategory;
@@ -27,7 +26,7 @@ import java.util.List;
 public class CategoriesController {
 
     private final CategoryRepository categoryRepository;
-    private final AdminService adminService;
+    private final CategoryService categoryService;
 
     @Operation(summary = "Pobierz wszystkie kategorie")
     @ApiResponse(responseCode = "200", description = "Lista kategorii")
@@ -40,7 +39,7 @@ public class CategoriesController {
     @ApiResponse(responseCode = "200", description = "Dodano kategorię")
     @PostMapping
     public ResponseEntity<String> addCategory(@RequestBody CategoryCreateDto categoryDto) {
-        String message = adminService.addCategory(categoryDto);
+        String message = categoryService.addCategory(categoryDto);
         return ResponseEntity.ok(message);
     }
 
@@ -48,7 +47,7 @@ public class CategoriesController {
     @ApiResponse(responseCode = "200", description = "Zaktualizowano kategorię")
     @PutMapping("/{id}")
     public ResponseEntity<String> updateCategory(@PathVariable Long id, @RequestBody CategoryUpdateDto categoryUpdateDto) {
-        String message = adminService.updateCategory(id, categoryUpdateDto);
+        String message = categoryService.updateCategory(id, categoryUpdateDto);
         return ResponseEntity.ok(message);
     }
 
@@ -56,7 +55,7 @@ public class CategoriesController {
     @ApiResponse(responseCode = "200", description = "Usunięto kategorię")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
-        String message = adminService.deleteCategory(id);
+        String message = categoryService.deleteCategory(id);
         return ResponseEntity.ok(message);
     }
 

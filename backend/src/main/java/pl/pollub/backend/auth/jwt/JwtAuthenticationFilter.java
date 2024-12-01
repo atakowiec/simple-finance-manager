@@ -31,9 +31,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public void doFilterInternal(@NonNull HttpServletRequest request,
                                  @NonNull HttpServletResponse response,
                                  @NonNull FilterChain filterChain) throws ServletException, IOException {
-        Claims tokenClaims = jwtService.resolveClaims(request);
-
-        if (tokenClaims == null) {
+        // why do I have to do this?
+        Claims tokenClaims;
+        try {
+            tokenClaims = jwtService.resolveClaims(request);
+        } catch (Exception e) {
             filterChain.doFilter(request, response);
             return;
         }

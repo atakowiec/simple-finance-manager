@@ -21,7 +21,8 @@ public class AdminService {
 
     @SuppressWarnings("unchecked")
     public List<User> getAllUsers() {
-        HttpResponse<String> response = httpService.get("/api/admin/users");
+        // todo pagination someday
+        HttpResponse<String> response = httpService.get("/admin/users");
         if (response.statusCode() != 200) {
             throw new RuntimeException("Błąd pobierania użytkowników: " + response.statusCode());
         }
@@ -62,23 +63,23 @@ public class AdminService {
     public HttpResponse<String> updateEmail(Long userId, String email) {
         Map<String, String> profileData = new HashMap<>();
         profileData.put("email", email);
-        return httpService.put("/api/admin/" + userId + "/email", profileData);
+        return httpService.put("/admin/" + userId + "/email", profileData);
     }
 
     public HttpResponse<String> updateUsername(Long userId, String username) {
         Map<String, String> profileData = new HashMap<>();
         profileData.put("username", username);
-        return httpService.put("/api/admin/" + userId + "/username", profileData);
+        return httpService.put("/admin/" + userId + "/username", profileData);
     }
 
     public HttpResponse<String> updateRole(Long userId, String role) {
         Map<String, String> profileData = new HashMap<>();
         profileData.put("role", role);
-        return httpService.put("/api/admin/" + userId + "/role", profileData);
+        return httpService.put("/admin/" + userId + "/role", profileData);
     }
 
     public HttpResponse<String> deleteUser(Long userId) {
-        return httpService.delete("/api/admin/" + userId);
+        return httpService.delete("/admin/" + userId);
     }
 
     public List<TransactionCategory> getExpenseCategories() {

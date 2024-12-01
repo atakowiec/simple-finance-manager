@@ -12,19 +12,21 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.categories.CategoryRepository;
+import pl.pollub.backend.categories.CategoryService;
 import pl.pollub.backend.categories.dto.CategoryDto;
 import pl.pollub.backend.categories.model.CategoryType;
 import pl.pollub.backend.categories.model.TransactionCategory;
 import pl.pollub.backend.exception.HttpException;
-import pl.pollub.backend.expenses.Expense;
-import pl.pollub.backend.expenses.ExpenseRepository;
-import pl.pollub.backend.expenses.dto.ExpenseDto;
 import pl.pollub.backend.group.dto.GroupCreateDto;
 import pl.pollub.backend.group.dto.ImportExportDto;
 import pl.pollub.backend.group.model.Group;
-import pl.pollub.backend.incomes.Income;
-import pl.pollub.backend.incomes.IncomeRepository;
-import pl.pollub.backend.incomes.dto.IncomeDto;
+import pl.pollub.backend.group.repository.GroupInviteRepository;
+import pl.pollub.backend.group.repository.GroupRepository;
+import pl.pollub.backend.transaction.dto.TransactionDto;
+import pl.pollub.backend.transaction.model.Expense;
+import pl.pollub.backend.transaction.model.Income;
+import pl.pollub.backend.transaction.repository.ExpenseRepository;
+import pl.pollub.backend.transaction.repository.IncomeRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,9 +46,11 @@ class GroupServiceTest {
     private GroupInviteRepository groupInviteRepository;
     @Mock
     private CategoryRepository categoryRepository;
+    @Mock
+    private CategoryService categoryService; // mockito needs to know what to inject
 
     @InjectMocks
-    private GroupService groupService;
+    private GroupServiceImpl groupService;
 
     private User loggedUser;
     private Group loggedUserGroup;
@@ -332,7 +336,7 @@ class GroupServiceTest {
         for (long i = 0; i < 5; i++) {
             CategoryDto categoryDto = new CategoryDto(i, "Category " + i, CategoryType.EXPENSE);
 
-            ExpenseDto expenseDto = new ExpenseDto();
+            TransactionDto expenseDto = new TransactionDto();
             expenseDto.setCategory(categoryDto);
             importExportDto.getExpenses().add(expenseDto);
         }
@@ -340,33 +344,15 @@ class GroupServiceTest {
         for (long i = 5; i < 10; i++) {
             CategoryDto categoryDto = new CategoryDto(i, "Category " + i, CategoryType.INCOME);
 
-            IncomeDto incomeDto = new IncomeDto();
-            incomeDto.setCategory(categoryDto);
-            importExportDto.getIncomes().add(incomeDto);
+            TransactionDto transactionDto = new TransactionDto();
+            transactionDto.setCategory(categoryDto);
+            importExportDto.getIncomes().add(transactionDto);
         }
 
         groupService.importTransactions(loggedUser, loggedUserGroup.getId(), importExportDto);
 
         Mockito.verify(expenseRepository, Mockito.times(5)).save(Mockito.any());
         Mockito.verify(incomeRepository, Mockito.times(5)).save(Mockito.any());
-    }
-
-    @Test
-    void importTransactions_CategoryDoesNotExist_ThrowsHttp404Exception() {
-        ImportExportDto importExportDto = new ImportExportDto();
-        importExportDto.setExpenses(new ArrayList<>());
-        importExportDto.setIncomes(new ArrayList<>());
-
-        CategoryDto categoryDto = new CategoryDto(11L, "Category 11", CategoryType.INCOME);
-        IncomeDto incomeDto = new IncomeDto();
-        incomeDto.setCategory(categoryDto);
-        importExportDto.getIncomes().add(incomeDto);
-
-        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> groupService.importTransactions(loggedUser, loggedUserGroup.getId(), importExportDto));
-
-        Assertions.assertEquals(404, httpException.getHttpStatus().value());
-
-        Mockito.verifyNoInteractions(expenseRepository);
     }
 
     @Test

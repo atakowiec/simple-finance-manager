@@ -12,11 +12,15 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.categories.CategoryRepository;
+import pl.pollub.backend.categories.CategoryService;
 import pl.pollub.backend.categories.model.TransactionCategory;
 import pl.pollub.backend.exception.HttpException;
-import pl.pollub.backend.expenses.dto.ExpenseUpdateDto;
-import pl.pollub.backend.group.GroupService;
+import pl.pollub.backend.group.GroupServiceImpl;
 import pl.pollub.backend.group.model.Group;
+import pl.pollub.backend.transaction.dto.TransactionUpdateDto;
+import pl.pollub.backend.transaction.model.Expense;
+import pl.pollub.backend.transaction.repository.ExpenseRepository;
+import pl.pollub.backend.transaction.service.ExpenseServiceImpl;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,13 +34,16 @@ class ExpenseServiceTest {
     private ExpenseRepository expenseRepository;
 
     @Mock
-    private GroupService groupService;
+    private GroupServiceImpl groupService;
+
+    @Mock
+    private CategoryService categoryService; // mockito needs to know what to inject
 
     @Mock
     private CategoryRepository categoryRepository;
 
     @InjectMocks
-    private ExpenseService expenseService;
+    private ExpenseServiceImpl expenseService;
 
     private User user;
     private final long groupId = 1L;
@@ -86,7 +93,7 @@ class ExpenseServiceTest {
 
     @Test
     void getAllExpensesForGroup_EverythingIsOkay_ReturnExpectedExpenses() {
-        List<Expense> expenses = expenseService.getAllExpensesForGroup(user, groupId);
+        List<Expense> expenses = expenseService.getAllTransactionsForGroup(user, groupId);
 
         Assertions.assertNotNull(expenses);
         Assertions.assertEquals(expectedExpenses, expenses);
@@ -97,14 +104,14 @@ class ExpenseServiceTest {
         User userNotInGroup = new User();
         userNotInGroup.setId(2L);
 
-        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> expenseService.getAllExpensesForGroup(userNotInGroup, groupId));
+        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> expenseService.getAllTransactionsForGroup(userNotInGroup, groupId));
 
         Assertions.assertEquals(403, httpException.getHttpStatus().value());
     }
 
     @Test
     void getAllExpensesForGroup_GroupNotFound_ThrowHttp404Exception() {
-        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> expenseService.getAllExpensesForGroup(user, notExistingGroupId));
+        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> expenseService.getAllTransactionsForGroup(user, notExistingGroupId));
 
         Assertions.assertEquals(404, httpException.getHttpStatus().value());
     }
@@ -117,7 +124,7 @@ class ExpenseServiceTest {
 
         Mockito.when(expenseRepository.save(Mockito.any())).thenReturn(expense);
 
-        Expense savedExpense = expenseService.addExpense(expense);
+        Expense savedExpense = expenseService.save(expense);
 
         Assertions.assertNotNull(savedExpense);
         Assertions.assertEquals(expense, savedExpense);
@@ -126,7 +133,7 @@ class ExpenseServiceTest {
 
     @Test
     void updateExpense_EverythingCorrect_updatesExpese() {
-        ExpenseUpdateDto updatedExpense = new ExpenseUpdateDto();
+        TransactionUpdateDto updatedExpense = new TransactionUpdateDto();
         updatedExpense.setDate(LocalDate.parse("2021-01-01"));
         updatedExpense.setName("New name");
         updatedExpense.setAmount(100.0);
@@ -134,7 +141,7 @@ class ExpenseServiceTest {
 
         Mockito.when(expenseRepository.save(Mockito.any())).thenReturn(existingExpense);
 
-        Expense updated = expenseService.updateExpense(1L, updatedExpense, user);
+        Expense updated = expenseService.updateTransaction(1L, updatedExpense, user);
 
         Assertions.assertNotNull(updated);
         Assertions.assertEquals(updatedExpense.getName(), updated.getName());
@@ -143,10 +150,10 @@ class ExpenseServiceTest {
 
     @Test
     void updateExpense_ExpenseDoesNotExist_ThrowHttp404Exception() {
-        ExpenseUpdateDto updatedExpense = new ExpenseUpdateDto();
+        TransactionUpdateDto updatedExpense = new TransactionUpdateDto();
         updatedExpense.setName("New name");
 
-        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> expenseService.updateExpense(notExistingExpense.getId(), updatedExpense, user));
+        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> expenseService.updateTransaction(notExistingExpense.getId(), updatedExpense, user));
 
         Assertions.assertEquals(404, httpException.getHttpStatus().value());
     }
@@ -159,7 +166,7 @@ class ExpenseServiceTest {
 
         Mockito.when(expenseRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(expense));
 
-        expenseService.deleteExpense(1L, user);
+        expenseService.deleteTransaction(1L, user);
 
         Mockito.verify(expenseRepository, Mockito.times(1)).deleteById(Mockito.anyLong());
     }
@@ -168,7 +175,7 @@ class ExpenseServiceTest {
     void deleteExpense_ExpanseDoesNotExist_ThrowHttp404Exception() {
         Mockito.when(expenseRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
-        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> expenseService.deleteExpense(notExistingExpense.getId(), user));
+        HttpException httpException = Assertions.assertThrows(HttpException.class, () -> expenseService.deleteTransaction(notExistingExpense.getId(), user));
 
         Assertions.assertEquals(404, httpException.getHttpStatus().value());
     }
