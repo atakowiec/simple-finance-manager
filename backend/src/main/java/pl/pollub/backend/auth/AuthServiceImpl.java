@@ -133,4 +133,9 @@ public class AuthServiceImpl implements AuthService {
                 .add("token", token)
                 .toJson();
     }
+
+    @Override
+    public void save(User user) {
+        usersRepository.save(user);
+    }
 }

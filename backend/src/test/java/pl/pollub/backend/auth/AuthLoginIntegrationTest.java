@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import pl.pollub.backend.auth.dto.LoginDto;
 import pl.pollub.backend.auth.user.Role;
 import pl.pollub.backend.auth.user.User;
+import pl.pollub.backend.auth.user.UsersRepository;
 
 import java.util.Map;
 
@@ -24,38 +25,34 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 public class AuthLoginIntegrationTest {
-
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private AuthService authService;
+    @Autowired
+    private UsersRepository usersRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
-        // Usuwamy istniejących użytkowników przed każdym testem
-        authService.getUsersRepository().deleteAll();
+        usersRepository.deleteAll();
 
-        // Tworzymy użytkownika testowego
         User user = new User();
         user.setUsername("testuser");
         user.setEmail("testuser@example.com");
         user.setPassword(authService.hashPassword("testpassword"));
         user.setRole(Role.USER);
-        authService.getUsersRepository().save(user);
+        authService.save(user);
     }
 
     @Test
     void shouldLoginSuccessfully() throws Exception {
-        // Przygotowanie danych logowania
         LoginDto loginDto = new LoginDto();
         loginDto.setIdentifier("testuser");
         loginDto.setPassword("testpassword");
 
-        // Wykonanie żądania logowania
         String response = mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginDto)))
@@ -65,27 +62,22 @@ public class AuthLoginIntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        // Parsowanie odpowiedzi
         Map<String, Object> responseMap = objectMapper.readValue(response, Map.class);
 
-        // Sprawdzenie zawartości odpowiedzi
         String token = (String) responseMap.get("token");
         assertThat(token).isNotEmpty();
         assertThat(responseMap.get("username")).isEqualTo("testuser");
         assertThat(responseMap.get("role")).isEqualTo("USER");
 
-        // Printowanie tokenu
         System.out.println("Wygenerowany token JWT: " + token);
     }
 
     @Test
     void shouldFailLoginWithIncorrectPassword() throws Exception {
-        // Przygotowanie danych logowania z niepoprawnym hasłem
         LoginDto loginDto = new LoginDto();
         loginDto.setIdentifier("testuser");
         loginDto.setPassword("wrongpassword");
 
-        // Wykonanie żądania logowania z niepoprawnym hasłem
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginDto)))
@@ -94,12 +86,10 @@ public class AuthLoginIntegrationTest {
 
     @Test
     void shouldFailLoginWithNonExistingUser() throws Exception {
-        // Przygotowanie danych logowania dla nieistniejącego użytkownika
         LoginDto loginDto = new LoginDto();
         loginDto.setIdentifier("nonexistinguser");
         loginDto.setPassword("testpassword");
 
-        // Wykonanie żądania logowania dla nieistniejącego użytkownika
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginDto)))

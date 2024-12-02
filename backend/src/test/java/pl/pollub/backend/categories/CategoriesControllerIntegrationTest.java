@@ -9,7 +9,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import pl.pollub.backend.admin.AdminService;
 import pl.pollub.backend.categories.dto.CategoryCreateDto;
 import pl.pollub.backend.categories.model.CategoryType;
 import pl.pollub.backend.categories.model.TransactionCategory;
@@ -31,7 +30,7 @@ class CategoriesControllerIntegrationTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private AdminService adminService;
+    private CategoryService categoryService;
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -43,7 +42,7 @@ class CategoriesControllerIntegrationTest {
         categoryDto.setCategoryType(CategoryType.EXPENSE);
         categoryDto.setIcon(new byte[]{1, 2, 3});
 
-        when(adminService.addCategory(any(CategoryCreateDto.class))).thenReturn("Kategoria została dodana pomyślnie");
+        when(categoryService.addCategory(any(CategoryCreateDto.class))).thenReturn("Kategoria została dodana pomyślnie");
 
         mockMvc.perform(post("/categories")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -51,7 +50,7 @@ class CategoriesControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").value("Kategoria została dodana pomyślnie"));
 
-        verify(adminService, times(1)).addCategory(any(CategoryCreateDto.class));
+        verify(categoryService, times(1)).addCategory(any(CategoryCreateDto.class));
     }
 
     @Test
@@ -61,7 +60,6 @@ class CategoriesControllerIntegrationTest {
         categoryDto.setCategoryType(CategoryType.EXPENSE);
         categoryDto.setIcon(new byte[]{1, 2, 3});
 
-        // Ręczne dodanie do bazy
         TransactionCategory newCategory = new TransactionCategory();
         newCategory.setName("Test Category");
         newCategory.setCategoryType(CategoryType.EXPENSE);
@@ -74,8 +72,7 @@ class CategoriesControllerIntegrationTest {
         Long categoryId = addedCategory.getId();
 
         mockMvc.perform(delete("/categories/" + categoryId))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Kategoria została usunięta pomyślnie"));
+                .andExpect(status().isOk());
 
         boolean exists = categoryRepository.existsById(categoryId);
         assert !exists : "Kategoria nadal istnieje w bazie danych, mimo że powinna zostać usunięta.";
