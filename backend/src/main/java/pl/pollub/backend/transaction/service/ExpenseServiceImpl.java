@@ -2,13 +2,19 @@ package pl.pollub.backend.transaction.service;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.categories.CategoryService;
 import pl.pollub.backend.categories.model.TransactionCategory;
+import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.interfaces.GroupService;
 import pl.pollub.backend.group.model.Group;
-import pl.pollub.backend.notifications.MailService;
+import pl.pollub.backend.mail.MailService;
+import pl.pollub.backend.mail.interfaces.Mail;
+import pl.pollub.backend.mail.mails.CloseToLimitMail;
+import pl.pollub.backend.mail.mails.LimitExceededMail;
 import pl.pollub.backend.transaction.dto.TransactionCreateDto;
 import pl.pollub.backend.transaction.model.Expense;
 import pl.pollub.backend.transaction.repository.ExpenseRepository;
@@ -39,6 +45,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     @Override
+    @Transactional
     public Expense createTransaction(TransactionCreateDto createDto, User user) {
         TransactionCategory category = getCategoryService().getCategoryByIdOrThrow(createDto.getCategoryId());
 
@@ -53,9 +60,45 @@ public class ExpenseServiceImpl implements ExpenseService {
         expense.setDate(createDto.getDate());
         expense.setGroup(group);
 
-        if (createDto.getDate().isAfter(LocalDate.now().withDayOfMonth(1)))
-            mailService.trySendLimitWarningMail(user, group);
+        expense = save(expense);
 
-        return save(expense);
+        if (createDto.getDate().isAfter(LocalDate.now().withDayOfMonth(1)))
+            this.trySendLimitWarningMail(user, group);
+
+        return expense;
+    }
+
+    @Override
+    public void trySendLimitWarningMail(User user, Group group) {
+        if (group.getExpenseLimit() <= 0)
+            return;
+
+        LocalDate now = LocalDate.now();
+        LocalDate startOfTheMonth = now.withDayOfMonth(1);
+        Double totalExpenses = expenseRepository.getTotalByGroupAndMinDate(group, startOfTheMonth);
+
+        if (totalExpenses == null) {
+            totalExpenses = 0.0;
+        }
+
+        double remainingPart = 1 - (totalExpenses / group.getExpenseLimit());
+
+        if (remainingPart > 0.1) {
+            return;
+        }
+
+        Mail<?> mail;
+
+        if (remainingPart < 0) {
+            mail = LimitExceededMail.createFor(user, group, totalExpenses);
+        } else {
+            mail = CloseToLimitMail.createFor(user, group, totalExpenses);
+        }
+
+        try {
+            this.mailService.sendMail(mail);
+        } catch (Exception e) {
+            throw new HttpException(HttpStatus.INTERNAL_SERVER_ERROR, "Błąd podczas wysyłania e-maila");
+        }
     }
 }

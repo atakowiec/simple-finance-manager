@@ -81,21 +81,13 @@ class GroupServiceTest {
         otherUserGroup.setUsers(new ArrayList<>(List.of(ownerUser, otherUser)));
         otherUserGroup.setOwner(ownerUser);
 
-        Mockito.doNothing().when(groupInviteRepository).deleteAllByGroup(loggedUserGroup);
-
         Mockito.when(groupRepository.findById(loggedUserGroup.getId())).thenReturn(Optional.of(loggedUserGroup));
         Mockito.when(groupRepository.findById(otherUserGroup.getId())).thenReturn(Optional.of(otherUserGroup));
+    }
 
-        // mock 5 transaction categories
+    private void mockTransactionRepositories() {
         Mockito.when(expenseRepository.save(Mockito.any())).thenReturn(new Expense());
         Mockito.when(incomeRepository.save(Mockito.any())).thenReturn(new Income());
-        for (int i = 0; i < 10; i++) {
-            TransactionCategory transactionCategory = new TransactionCategory();
-            transactionCategory.setId((long) i);
-            transactionCategory.setCategoryType(i >= 5 ? CategoryType.EXPENSE : CategoryType.INCOME);
-            transactionCategory.setName("Category " + i);
-            Mockito.when(categoryRepository.findById((long) i)).thenReturn(Optional.of(transactionCategory));
-        }
     }
 
     @Test
@@ -328,6 +320,18 @@ class GroupServiceTest {
 
     @Test
     void importTransactions_TransactionsInPayload_SavesExpenses() {
+        mockTransactionRepositories();
+
+        List<TransactionCategory> categories = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            TransactionCategory transactionCategory = new TransactionCategory();
+            transactionCategory.setId((long) i);
+            transactionCategory.setCategoryType(i >= 5 ? CategoryType.EXPENSE : CategoryType.INCOME);
+            transactionCategory.setName("Category " + i);
+            categories.add(transactionCategory);
+        }
+
+        Mockito.when(categoryService.getAllCategories()).thenReturn(categories);
 
         ImportExportDto importExportDto = new ImportExportDto();
         importExportDto.setExpenses(new ArrayList<>());

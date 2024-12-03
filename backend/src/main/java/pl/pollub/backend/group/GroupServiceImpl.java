@@ -23,7 +23,9 @@ import pl.pollub.backend.transaction.repository.IncomeRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Service for managing groups. It provides methods for creating, updating and deleting groups.
@@ -130,8 +132,14 @@ public class GroupServiceImpl implements GroupService {
         Group group = getGroupByIdOrThrow(groupId);
         checkMembershipOrThrow(user, group);
 
+        Map<Long, TransactionCategory> categories = categoryService.getAllCategories().stream()
+                .collect(Collectors.toMap(TransactionCategory::getId, v -> v));
+
         for (TransactionDto expense : importExportDto.getExpenses()) {
-            TransactionCategory category = categoryService.getCategoryByIdOrThrow(expense.getCategory().getId());
+            TransactionCategory category = categories.get(expense.getCategory().getId());
+
+            if(category == null)
+                throw new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono kategorii o podanym identyfikatorze: " + expense.getCategory().getId());
 
             Expense newExpense = new Expense();
             newExpense.setName(expense.getName());
@@ -145,7 +153,10 @@ public class GroupServiceImpl implements GroupService {
         }
 
         for (TransactionDto income : importExportDto.getIncomes()) {
-            TransactionCategory category = categoryService.getCategoryByIdOrThrow(income.getCategory().getId());
+            TransactionCategory category = categories.get(income.getCategory().getId());
+
+            if(category == null)
+                throw new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono kategorii o podanym identyfikatorze: " + income.getCategory().getId());
 
             Income newIncome = new Income();
             newIncome.setName(income.getName());
