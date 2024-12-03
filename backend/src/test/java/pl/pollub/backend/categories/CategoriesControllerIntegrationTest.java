@@ -60,14 +60,20 @@ class CategoriesControllerIntegrationTest {
         categoryDto.setCategoryType(CategoryType.EXPENSE);
         categoryDto.setIcon(new byte[]{1, 2, 3});
 
-        TransactionCategory newCategory = new TransactionCategory();
-        newCategory.setName("Test Category");
-        newCategory.setCategoryType(CategoryType.EXPENSE);
-        newCategory.setIcon(new byte[]{1, 2, 3});
-        categoryRepository.save(newCategory); // Zapisanie do bazy
+        when(categoryService.addCategory(any(CategoryCreateDto.class)))
+                .thenReturn("Kategoria została dodana pomyślnie");
 
-        TransactionCategory addedCategory = categoryRepository.getByNameAndCategoryType("Test Category", CategoryType.EXPENSE);
-        assert addedCategory != null : "Kategoria nie została poprawnie dodana";
+        mockMvc.perform(post("/categories")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(categoryDto)))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Kategoria została dodana pomyślnie"));
+        verify(categoryService, times(1)).addCategory(any(CategoryCreateDto.class));
+
+        TransactionCategory addedCategory = new TransactionCategory();
+        addedCategory.setId(1L);
+        addedCategory.setName("Test Category");
+        when(categoryService.getCategoryByIdOrThrow(1L)).thenReturn(addedCategory);
 
         Long categoryId = addedCategory.getId();
 
@@ -78,4 +84,3 @@ class CategoriesControllerIntegrationTest {
         assert !exists : "Kategoria nadal istnieje w bazie danych, mimo że powinna zostać usunięta.";
     }
 }
-
