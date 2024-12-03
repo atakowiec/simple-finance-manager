@@ -4,6 +4,8 @@ import pl.pollub.backend.categories.dto.CategoryCreateDto;
 import pl.pollub.backend.categories.dto.CategoryUpdateDto;
 import pl.pollub.backend.categories.model.TransactionCategory;
 
+import java.util.List;
+
 public interface CategoryService {
     TransactionCategory getCategoryByIdOrThrow(Long id);
 
@@ -12,4 +14,6 @@ public interface CategoryService {
     String updateCategory(Long id, CategoryUpdateDto categoryUpdateDto);
 
     String deleteCategory(Long id);
+
+    List<TransactionCategory> getAllCategories();
 }

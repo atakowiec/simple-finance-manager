@@ -7,6 +7,8 @@ import pl.pollub.backend.categories.dto.CategoryUpdateDto;
 import pl.pollub.backend.categories.model.TransactionCategory;
 import pl.pollub.backend.exception.HttpException;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
@@ -58,5 +60,10 @@ public class CategoryServiceImpl implements CategoryService {
 
         categoryRepository.delete(category);
         return "Kategoria została usunięta.";
+    }
+
+    @Override
+    public List<TransactionCategory> getAllCategories() {
+        return categoryRepository.findAll();
     }
 }
