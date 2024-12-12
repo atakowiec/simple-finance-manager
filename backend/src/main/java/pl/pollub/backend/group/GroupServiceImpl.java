@@ -138,7 +138,7 @@ public class GroupServiceImpl implements GroupService {
         for (TransactionDto expense : importExportDto.getExpenses()) {
             TransactionCategory category = categories.get(expense.getCategory().getId());
 
-            if(category == null)
+            if (category == null)
                 throw new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono kategorii o podanym identyfikatorze: " + expense.getCategory().getId());
 
             Expense newExpense = new Expense();
@@ -155,7 +155,7 @@ public class GroupServiceImpl implements GroupService {
         for (TransactionDto income : importExportDto.getIncomes()) {
             TransactionCategory category = categories.get(income.getCategory().getId());
 
-            if(category == null)
+            if (category == null)
                 throw new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono kategorii o podanym identyfikatorze: " + income.getCategory().getId());
 
             Income newIncome = new Income();
