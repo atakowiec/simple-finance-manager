@@ -87,7 +87,7 @@ public class ExpenseServiceImpl implements ExpenseService {
             return;
         }
 
-        Mail<?> mail;
+        Mail mail;
 
         if (remainingPart < 0) {
             mail = LimitExceededMail.createFor(user, group, totalExpenses);

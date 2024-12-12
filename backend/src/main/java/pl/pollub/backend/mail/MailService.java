@@ -13,5 +13,5 @@ public interface MailService {
      * @param mailToSend the mail object to send
      * @throws MessagingException if an error occurs while sending the e-mail
      */
-    void sendMail(Mail<?> mailToSend) throws MessagingException;
+    void sendMail(Mail mailToSend) throws MessagingException;
 }

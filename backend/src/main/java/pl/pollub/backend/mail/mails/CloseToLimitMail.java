@@ -4,7 +4,7 @@ import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.mail.interfaces.FullHtmlMail;
 
-public class CloseToLimitMail implements FullHtmlMail<CloseToLimitMail> {
+public class CloseToLimitMail implements FullHtmlMail {
     private final User user;
     private final Group group;
     private final Double totalExpenses;
