@@ -60,5 +60,14 @@ public abstract class TransactionController<T extends Transaction> {
     public Map<String, Double> getThisMonthCategoryStats(@AuthenticationPrincipal User user, @PathVariable Long groupId) {
         return getTransactionService().getThisMonthCategoryStats(user, groupId);
     }
+
+    // start L1 prototyp
+    @Operation(summary = "Klonuj transakcje danego typu")
+    @ApiResponse(responseCode = "201", description = "Sklonowano transakcje")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/{id}/clone")
+    public T cloneTransaction(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        return getTransactionService().cloneTransaction(id, user);
+    }
 }
 

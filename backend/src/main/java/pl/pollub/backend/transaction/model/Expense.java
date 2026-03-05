@@ -9,5 +9,12 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 public class Expense extends Transaction {
-
+    @Override
+    public Expense clone() {
+        try {
+            return (Expense) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException("Cloning failed", e);
+        }
+    }
 }

@@ -20,7 +20,7 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Transaction implements DtoConvertible<TransactionDto> {
+public abstract class Transaction implements DtoConvertible<TransactionDto>, Cloneable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -44,5 +44,12 @@ public class Transaction implements DtoConvertible<TransactionDto> {
     @Override
     public TransactionDto toDto() {
         return new TransactionDto(this);
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        Transaction cloned = (Transaction) super.clone();
+        cloned.setId(null);
+        return cloned;
     }
 }

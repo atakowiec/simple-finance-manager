@@ -163,4 +163,28 @@ public interface TransactionService<T extends Transaction> {
 
         return save(transaction);
     }
+
+    /**
+     * Clones an existing transaction and saves it as a new entry.
+     *
+     * @param id   id of the transaction to be cloned
+     * @param user user who owns the transaction
+     * @return cloned transaction
+     */
+    default T cloneTransaction(Long id, User user) {
+        T original = getTransactionByIdAndUserOrThrow(id, user);
+
+        // Use the Prototype pattern to create a copy
+        try {
+            @SuppressWarnings("unchecked")
+            T cloned = (T) original.clone();
+
+            // Optionally modify the date to today or keep it
+            cloned.setDate(LocalDate.now());
+
+            return save(cloned);
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException("Cloning failed", e);
+        }
+    }
 }
