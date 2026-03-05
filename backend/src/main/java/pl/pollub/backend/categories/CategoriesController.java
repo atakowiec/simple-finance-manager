@@ -27,6 +27,7 @@ public class CategoriesController {
 
     private final CategoryRepository categoryRepository;
     private final CategoryService categoryService;
+    private final IconFlyweightFactory iconFlyweightFactory;
 
     @Operation(summary = "Pobierz wszystkie kategorie")
     @ApiResponse(responseCode = "200", description = "Lista kategorii")
@@ -65,10 +66,16 @@ public class CategoriesController {
     public ResponseEntity<byte[]> getIcon(@PathVariable Long id) {
         TransactionCategory category = categoryRepository.findById(id).orElseThrow(() -> new HttpException(404, "Category not found"));
 
+        // obtain canonical/shared byte[] instance from flyweight
+        byte[] icon = iconFlyweightFactory.getOrAdd(category.getIcon());
+        if (icon == null) {
+            throw new HttpException(404, "Icon not found");
+        }
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
-        headers.setContentLength(category.getIcon().length);
+        headers.setContentLength(icon.length);
 
-        return new ResponseEntity<>(category.getIcon(), headers, HttpStatus.OK);
+        return new ResponseEntity<>(icon, headers, HttpStatus.OK);
     }
 }

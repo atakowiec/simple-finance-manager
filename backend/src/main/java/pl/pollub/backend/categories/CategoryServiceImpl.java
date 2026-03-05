@@ -13,6 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
+    private final IconFlyweightFactory iconFlyweightFactory;
 
     @Override
     public TransactionCategory getCategoryByIdOrThrow(Long id) {
@@ -28,7 +29,8 @@ public class CategoryServiceImpl implements CategoryService {
 
         TransactionCategory transactionCategory = new TransactionCategory();
         transactionCategory.setName(categoryDto.getName());
-        transactionCategory.setIcon(categoryDto.getIcon());
+        // use flyweight to store shared icon instance
+        transactionCategory.setIcon(iconFlyweightFactory.getOrAdd(categoryDto.getIcon()));
         transactionCategory.setCategoryType(categoryDto.getCategoryType());
 
         if (categoryDto.getParentId() != null) {
@@ -54,7 +56,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setName(categoryUpdateDto.getName());
 
         if (categoryUpdateDto.getIcon() != null)
-            category.setIcon(categoryUpdateDto.getIcon());
+            category.setIcon(iconFlyweightFactory.getOrAdd(categoryUpdateDto.getIcon()));
 
         if (categoryUpdateDto.getParentId() != null) {
             if (categoryUpdateDto.getParentId().equals(id)) {
