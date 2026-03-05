@@ -92,6 +92,15 @@ public interface GroupService {
     void importTransactions(User user, Long groupId, ImportExportDto importExportDto);
 
     /**
+     * Exports all transactions for the specified group.
+     *
+     * @param user    user who wants to export the transactions
+     * @param groupId id of the group
+     * @return data transfer object with the list of expenses and incomes
+     */
+    ImportExportDto exportTransactions(User user, Long groupId);
+
+    /**
      * Removes the specified group and all its data from the database.
      *
      * @param user    user who wants to remove the group

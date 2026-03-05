@@ -22,6 +22,7 @@ import pl.pollub.backend.transaction.repository.ExpenseRepository;
 import pl.pollub.backend.transaction.repository.IncomeRepository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -168,6 +169,23 @@ public class GroupServiceImpl implements GroupService {
 
             incomeRepository.save(newIncome);
         }
+    }
+
+    @Override
+    public ImportExportDto exportTransactions(User user, Long groupId) {
+        Group group = getGroupByIdOrThrow(groupId);
+        checkMembershipOrThrow(user, group);
+
+        List<Expense> expenses = expenseRepository.findAllByGroup(group);
+        List<Income> incomes = incomeRepository.findAllByGroup(group);
+
+        ImportExportDto exportDto = new ImportExportDto();
+        exportDto.setCreatedAt(LocalDateTime.now());
+        exportDto.setExportedBy(user.getUsername());
+        exportDto.setExpenses(expenses.stream().map(TransactionDto::new).collect(Collectors.toList()));
+        exportDto.setIncomes(incomes.stream().map(TransactionDto::new).collect(Collectors.toList()));
+
+        return exportDto;
     }
 
     @Override

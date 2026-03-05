@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.pollub.backend.auth.user.User;
@@ -13,6 +15,7 @@ import pl.pollub.backend.group.dto.GroupCreateDto;
 import pl.pollub.backend.group.dto.ImportExportDto;
 import pl.pollub.backend.group.dto.InviteTargetDto;
 import pl.pollub.backend.group.enums.MembershipStatus;
+import pl.pollub.backend.group.export.*;
 import pl.pollub.backend.group.interfaces.GroupInviteService;
 import pl.pollub.backend.group.interfaces.GroupService;
 import pl.pollub.backend.group.model.Group;
@@ -121,6 +124,38 @@ public class GroupController {
     @PostMapping("/{groupId}/import")
     public void handleImport(@AuthenticationPrincipal User user, @PathVariable Long groupId, @RequestBody ImportExportDto importExportDto) {
         groupService.importTransactions(user, groupId, importExportDto);
+    }
+
+    @Operation(summary = "Eksportuj transakcje z grupy")
+    @ApiResponse(responseCode = "200", description = "Wyeksportowano transakcje")
+    @GetMapping("/{groupId}/export")
+    public ResponseEntity<byte[]> handleExport(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long groupId,
+            @RequestParam(defaultValue = "json") String format
+    ) {
+        ImportExportDto exportDto = groupService.exportTransactions(user, groupId);
+        
+        DataExporter exporter = new BaseDataExporter();
+        String contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+        String filename = "export";
+
+        if ("csv".equalsIgnoreCase(format)) {
+            exporter = new CsvFormatterDecorator(exporter);
+            contentType = "text/csv";
+            filename += ".csv";
+        } else if ("json".equalsIgnoreCase(format)) {
+            exporter = new JsonFormatterDecorator(exporter);
+            contentType = MediaType.APPLICATION_JSON_VALUE;
+            filename += ".json";
+        }
+
+        byte[] data = exporter.export(exportDto);
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=" + filename)
+                .contentType(MediaType.parseMediaType(contentType))
+                .body(data);
     }
 
     @Operation(summary = "Usuń grupę")
