@@ -11,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import pl.pollub.backend.auth.user.User;
-import pl.pollub.backend.categories.CategoryRepository;
 import pl.pollub.backend.categories.CategoryService;
 import pl.pollub.backend.categories.dto.CategoryDto;
 import pl.pollub.backend.categories.model.CategoryType;
@@ -39,13 +38,11 @@ class GroupServiceTest {
     @Mock
     private GroupRepository groupRepository;
     @Mock
+    private GroupInviteRepository groupInviteRepository;
+    @Mock
     private ExpenseRepository expenseRepository;
     @Mock
     private IncomeRepository incomeRepository;
-    @Mock
-    private GroupInviteRepository groupInviteRepository;
-    @Mock
-    private CategoryRepository categoryRepository;
     @Mock
     private CategoryService categoryService; // mockito needs to know what to inject
 
@@ -338,7 +335,7 @@ class GroupServiceTest {
         importExportDto.setIncomes(new ArrayList<>());
 
         for (long i = 0; i < 5; i++) {
-            CategoryDto categoryDto = new CategoryDto(i, "Category " + i, CategoryType.EXPENSE);
+            CategoryDto categoryDto = new CategoryDto(i, "Category " + i, CategoryType.EXPENSE, new ArrayList<>());
 
             TransactionDto expenseDto = new TransactionDto();
             expenseDto.setCategory(categoryDto);
@@ -346,7 +343,7 @@ class GroupServiceTest {
         }
 
         for (long i = 5; i < 10; i++) {
-            CategoryDto categoryDto = new CategoryDto(i, "Category " + i, CategoryType.INCOME);
+            CategoryDto categoryDto = new CategoryDto(i, "Category " + i, CategoryType.INCOME, new ArrayList<>());
 
             TransactionDto transactionDto = new TransactionDto();
             transactionDto.setCategory(categoryDto);

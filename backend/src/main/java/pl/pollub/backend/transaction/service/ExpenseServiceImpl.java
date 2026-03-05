@@ -12,6 +12,7 @@ import pl.pollub.backend.group.interfaces.GroupService;
 import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.mail.MailService;
 import pl.pollub.backend.mail.interfaces.Mail;
+import pl.pollub.backend.mail.interfaces.MailSenderImplementation;
 import pl.pollub.backend.mail.mails.CloseToLimitMail;
 import pl.pollub.backend.mail.mails.LimitExceededMail;
 import pl.pollub.backend.transaction.dto.TransactionCreateDto;
@@ -35,6 +36,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     private final GroupService groupService;
     private final CategoryService categoryService;
     private final MailService mailService;
+    private final MailSenderImplementation mailSenderImplementation;
     private final ExpenseFactory expenseFactory;
 
     @Override
@@ -88,12 +90,14 @@ public class ExpenseServiceImpl implements ExpenseService {
         // start L1 builder
         if (remainingPart < 0) {
             mail = LimitExceededMail.builder()
+                    .sender(mailSenderImplementation)
                     .user(user)
                     .group(group)
                     .totalExpenses(totalExpenses)
                     .build();
         } else {
             mail = CloseToLimitMail.builder()
+                    .sender(mailSenderImplementation)
                     .user(user)
                     .group(group)
                     .totalExpenses(totalExpenses)

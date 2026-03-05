@@ -1,10 +1,16 @@
 package pl.pollub.backend.mail.interfaces;
 
 import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
 
-public interface Mail {
-    void applyTo(MimeMessage mimeMessage) throws MessagingException;
+/**
+ * Abstraction in the Bridge design pattern.
+ */
+@RequiredArgsConstructor
+public abstract class Mail {
+    protected final MailSenderImplementation sender;
 
-    String getTo();
+    public abstract void send() throws MessagingException;
+
+    public abstract String getTo();
 }

@@ -1,24 +1,37 @@
 package pl.pollub.backend.mail.mails;
 
+import jakarta.mail.MessagingException;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.mail.interfaces.FullHtmlMail;
+import pl.pollub.backend.mail.interfaces.Mail;
+import pl.pollub.backend.mail.interfaces.MailSenderImplementation;
 
-public class CloseToLimitMail implements FullHtmlMail {
+/**
+ * Refined Abstraction in the Bridge design pattern.
+ */
+public class CloseToLimitMail extends Mail implements FullHtmlMail {
     private final User user;
     private final Group group;
     private final Double totalExpenses;
 
     private CloseToLimitMail(Builder builder) {
+        super(builder.sender);
         this.user = builder.user;
         this.group = builder.group;
         this.totalExpenses = builder.totalExpenses;
     }
 
     public static class Builder {
+        private MailSenderImplementation sender;
         private User user;
         private Group group;
         private Double totalExpenses;
+
+        public Builder sender(MailSenderImplementation sender) {
+            this.sender = sender;
+            return this;
+        }
 
         public Builder user(User user) {
             this.user = user;
@@ -43,6 +56,11 @@ public class CloseToLimitMail implements FullHtmlMail {
     // start L1 builder
     public static Builder builder() {
         return new Builder();
+    }
+
+    @Override
+    public void send() throws MessagingException {
+        sender.send(getTo(), getSubject(), getHtml(), true);
     }
 
     @Override

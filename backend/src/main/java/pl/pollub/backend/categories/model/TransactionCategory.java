@@ -39,6 +39,13 @@ public class TransactionCategory implements DtoConvertible<CategoryDto> {
     @Column(name = "icon", columnDefinition = "LONGBLOB")
     private byte[] icon;
 
+    public TransactionCategory(Long id, String name, CategoryType categoryType, byte[] icon) {
+        this.id = id;
+        this.name = name;
+        this.categoryType = categoryType;
+        this.icon = icon;
+    }
+
     @Override
     public CategoryDto toDto() {
         List<CategoryDto> childrenDto = children != null ? children.stream()
