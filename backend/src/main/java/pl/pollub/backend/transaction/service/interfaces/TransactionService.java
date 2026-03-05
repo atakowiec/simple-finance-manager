@@ -10,6 +10,7 @@ import pl.pollub.backend.group.interfaces.GroupService;
 import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.transaction.dto.TransactionCreateDto;
 import pl.pollub.backend.transaction.dto.TransactionUpdateDto;
+import pl.pollub.backend.transaction.factory.TransactionFactory;
 import pl.pollub.backend.transaction.model.Transaction;
 import pl.pollub.backend.transaction.repository.TransactionRepository;
 
@@ -24,6 +25,7 @@ public interface TransactionService<T extends Transaction> {
     CategoryService getCategoryService();
 
     TransactionRepository<T> getTransactionRepository();
+    TransactionFactory<T> getTransactionFactory();
 
     default T getTransactionByIdAndUserOrThrow(Long id, User user) {
         return getTransactionRepository().findByIdAndUser(id, user)
@@ -143,5 +145,22 @@ public interface TransactionService<T extends Transaction> {
         return stats;
     }
 
-    T createTransaction(@Valid TransactionCreateDto createDto, User user);
+    /**
+     * Creates a new transation for the specified user.
+     *
+     * @param createDto transation data transfer object
+     * @param user      user who creates the transation
+     * @return created transation
+     */
+    default T createTransaction(@Valid TransactionCreateDto createDto, User user) {
+        TransactionCategory category = getCategoryService().getCategoryByIdOrThrow(createDto.getCategoryId());
+
+        Group group = getGroupService().getGroupByIdOrThrow(createDto.getGroupId());
+        getGroupService().checkMembershipOrThrow(user, group);
+
+        // start L1 Factory method
+        T transaction = getTransactionFactory().create(createDto, user, category, group);
+
+        return save(transaction);
+    }
 }
