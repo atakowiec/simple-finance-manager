@@ -47,7 +47,9 @@ class GroupServiceTest {
     private CategoryService categoryService; // mockito needs to know what to inject
 
     @InjectMocks
-    private GroupServiceImpl groupService;
+    private GroupServiceImpl groupServiceImpl;
+
+    private GroupServiceProxy groupService;
 
     private User loggedUser;
     private Group loggedUserGroup;
@@ -77,6 +79,8 @@ class GroupServiceTest {
         otherUserGroup.setId(2L);
         otherUserGroup.setUsers(new ArrayList<>(List.of(ownerUser, otherUser)));
         otherUserGroup.setOwner(ownerUser);
+
+        groupService = new GroupServiceProxy(groupServiceImpl);
 
         Mockito.when(groupRepository.findById(loggedUserGroup.getId())).thenReturn(Optional.of(loggedUserGroup));
         Mockito.when(groupRepository.findById(otherUserGroup.getId())).thenReturn(Optional.of(otherUserGroup));

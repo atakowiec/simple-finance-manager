@@ -75,43 +75,30 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group changeColor(User user, String color, Long groupId) {
         Group group = getGroupByIdOrThrow(groupId);
-        checkMembershipOrThrow(user, group);
-
         group.setColor(color);
-
         groupRepository.save(group);
-
         return group;
     }
 
     @Override
     public Group changeName(User user, String newName, Long groupId) {
         Group group = getGroupByIdOrThrow(groupId);
-        checkMembershipOrThrow(user, group);
-
         group.setName(newName);
-
         groupRepository.save(group);
-
         return group;
     }
 
     @Override
     public Group changeExpenseLimit(User user, Double expenseLimit, Long groupId) {
         Group group = getGroupByIdOrThrow(groupId);
-        checkMembershipOrThrow(user, group);
-
         group.setExpenseLimit(expenseLimit);
-
         groupRepository.save(group);
-
         return group;
     }
 
     @Override
     public Group deleteMember(User user, Long groupId, Long memberId) {
         Group group = getGroupByIdOrThrow(groupId);
-        checkMembershipOrThrow(user, group);
 
         if (!Objects.equals(group.getOwner().getId(), user.getId()))
             throw new HttpException(HttpStatus.FORBIDDEN, "Musisz być właścicielem grupy aby to zrobić!");
@@ -131,7 +118,6 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void importTransactions(User user, Long groupId, ImportExportDto importExportDto) {
         Group group = getGroupByIdOrThrow(groupId);
-        checkMembershipOrThrow(user, group);
 
         Map<Long, TransactionCategory> categories = categoryService.getAllCategories().stream()
                 .collect(Collectors.toMap(TransactionCategory::getId, v -> v));
@@ -174,7 +160,6 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public ImportExportDto exportTransactions(User user, Long groupId) {
         Group group = getGroupByIdOrThrow(groupId);
-        checkMembershipOrThrow(user, group);
 
         List<Expense> expenses = expenseRepository.findAllByGroup(group);
         List<Income> incomes = incomeRepository.findAllByGroup(group);
@@ -192,7 +177,6 @@ public class GroupServiceImpl implements GroupService {
     @Transactional
     public void removeGroup(User user, Long groupId) {
         Group group = getGroupByIdOrThrow(groupId);
-        checkMembershipOrThrow(user, group);
 
         if (!Objects.equals(group.getOwner().getId(), user.getId()))
             throw new HttpException(HttpStatus.FORBIDDEN, "Musisz być właścicielem grupy aby to zrobić!");
@@ -206,7 +190,6 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void leaveGroup(User user, Long groupId) {
         Group group = getGroupByIdOrThrow(groupId);
-        checkMembershipOrThrow(user, group);
 
         if (Objects.equals(group.getOwner().getId(), user.getId()))
             throw new HttpException(HttpStatus.FORBIDDEN, "Nie możesz opuścić grupy, której jesteś właścicielem!");
