@@ -135,14 +135,35 @@ public interface TransactionService<T extends Transaction> {
         getGroupService().checkMembershipOrThrow(user, group);
 
         LocalDate now = LocalDate.now();
-        List<Object[]> result = getTransactionRepository().sumAllByGroupAndMinDate(group, LocalDate.of(now.getYear(), now.getMonthValue(), 1));
-        Map<String, Double> stats = new HashMap<>();
+        LocalDate minDate = LocalDate.of(now.getYear(), now.getMonthValue(), 1);
+        List<Object[]> result = getTransactionRepository().sumAllByGroupAndMinDate(group, minDate);
+        Map<Long, Double> rawStats = new HashMap<>();
 
         for (Object[] row : result) {
-            stats.compute(row[0].toString(), (k, v) -> v == null ? (Double) row[1] : v + (Double) row[1]);
+            rawStats.put((Long) row[0], (Double) row[1]);
+        }
+
+        Map<String, Double> stats = new HashMap<>();
+        List<TransactionCategory> allCategories = getCategoryService().getAllCategories(); // This now returns only root categories
+
+        for (TransactionCategory root : allCategories) {
+            Double total = calculateRecursiveTotal(root, rawStats);
+            if (total > 0) {
+                stats.put(root.getName(), total);
+            }
         }
 
         return stats;
+    }
+
+    private Double calculateRecursiveTotal(TransactionCategory category, Map<Long, Double> rawStats) {
+        Double total = rawStats.getOrDefault(category.getId(), 0.0);
+        if (category.getChildren() != null) {
+            for (TransactionCategory child : category.getChildren()) {
+                total += calculateRecursiveTotal(child, rawStats);
+            }
+        }
+        return total;
     }
 
     /**

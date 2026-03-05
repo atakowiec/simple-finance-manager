@@ -12,8 +12,14 @@ public class CategoryCellController {
     @FXML
     private Label nameLabel;
 
+    @FXML
+    private javafx.scene.layout.HBox container;
+
     public void setCategory(TransactionCategory category) {
         nameLabel.setText(category.getName());
         categoryIcon.setImage(category.getImageIcon());
+        if (container != null) {
+            container.setPadding(new javafx.geometry.Insets(0, 0, 0, category.getDepth() * 20));
+        }
     }
 }

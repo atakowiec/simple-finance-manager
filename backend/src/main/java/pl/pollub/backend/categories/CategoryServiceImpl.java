@@ -30,6 +30,12 @@ public class CategoryServiceImpl implements CategoryService {
         transactionCategory.setName(categoryDto.getName());
         transactionCategory.setIcon(categoryDto.getIcon());
         transactionCategory.setCategoryType(categoryDto.getCategoryType());
+
+        if (categoryDto.getParentId() != null) {
+            TransactionCategory parent = getCategoryByIdOrThrow(categoryDto.getParentId());
+            transactionCategory.setParent(parent);
+        }
+
         categoryRepository.save(transactionCategory);
 
         return "Kategoria została dodana pomyślnie.";
@@ -50,6 +56,16 @@ public class CategoryServiceImpl implements CategoryService {
         if (categoryUpdateDto.getIcon() != null)
             category.setIcon(categoryUpdateDto.getIcon());
 
+        if (categoryUpdateDto.getParentId() != null) {
+            if (categoryUpdateDto.getParentId().equals(id)) {
+                throw new HttpException(400, "Kategoria nie może być swoim własnym rodzicem.");
+            }
+            TransactionCategory parent = getCategoryByIdOrThrow(categoryUpdateDto.getParentId());
+            category.setParent(parent);
+        } else {
+            category.setParent(null);
+        }
+
         categoryRepository.save(category);
         return "Kategoria została zaktualizowana.";
     }
@@ -58,12 +74,17 @@ public class CategoryServiceImpl implements CategoryService {
     public String deleteCategory(Long id) {
         TransactionCategory category = getCategoryByIdOrThrow(id);
 
+        // Optional: Check if it has children and decide what to do. 
+        // With CascadeType.ALL, children will be deleted too.
+        
         categoryRepository.delete(category);
         return "Kategoria została usunięta.";
     }
 
     @Override
     public List<TransactionCategory> getAllCategories() {
-        return categoryRepository.findAll();
+        return categoryRepository.findAll().stream()
+                .filter(category -> category.getParent() == null)
+                .toList();
     }
 }

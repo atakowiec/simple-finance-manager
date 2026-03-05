@@ -3,6 +3,8 @@ package pl.pollub.backend.categories.dto;
 import lombok.Value;
 import pl.pollub.backend.categories.model.CategoryType;
 
+import java.util.List;
+
 /**
  * Data transfer object for category.
  */
@@ -11,4 +13,5 @@ public class CategoryDto {
     Long id;
     String name;
     CategoryType categoryType;
+    List<CategoryDto> children;
 }

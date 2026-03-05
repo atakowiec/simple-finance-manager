@@ -12,4 +12,5 @@ public class CategoryUpdateDto {
     private String name;
     private CategoryType categoryType;
     private byte[] icon;
+    private Long parentId;
 }

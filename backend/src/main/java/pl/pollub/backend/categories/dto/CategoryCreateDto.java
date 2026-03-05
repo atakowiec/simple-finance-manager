@@ -13,4 +13,5 @@ public class CategoryCreateDto {
     private String name;
     private byte[] icon;
     private CategoryType categoryType;
+    private Long parentId;
 }

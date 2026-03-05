@@ -35,13 +35,23 @@ public class CategoryService {
         for (TransactionCategory category : categories) {
             switch (category.getCategoryType()) {
                 case EXPENSE:
-                    expenseCategories.add(category);
+                    addCategoryAndChildren(category, expenseCategories, 0);
                     break;
                 case INCOME:
-                    incomeCategories.add(category);
+                    addCategoryAndChildren(category, incomeCategories, 0);
                     break;
                 default:
                     throw new RuntimeException("Unknown category type: " + category.getCategoryType());
+            }
+        }
+    }
+
+    private void addCategoryAndChildren(TransactionCategory category, List<TransactionCategory> targetList, int depth) {
+        category.setDepth(depth);
+        targetList.add(category);
+        if (category.getChildren() != null) {
+            for (TransactionCategory child : category.getChildren()) {
+                addCategoryAndChildren(child, targetList, depth + 1);
             }
         }
     }
