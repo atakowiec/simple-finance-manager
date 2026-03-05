@@ -85,10 +85,19 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         Mail mail;
 
+        // start L1 builder
         if (remainingPart < 0) {
-            mail = LimitExceededMail.createFor(user, group, totalExpenses);
+            mail = LimitExceededMail.builder()
+                    .user(user)
+                    .group(group)
+                    .totalExpenses(totalExpenses)
+                    .build();
         } else {
-            mail = CloseToLimitMail.createFor(user, group, totalExpenses);
+            mail = CloseToLimitMail.builder()
+                    .user(user)
+                    .group(group)
+                    .totalExpenses(totalExpenses)
+                    .build();
         }
 
         try {

@@ -9,10 +9,40 @@ public class LimitExceededMail implements FullHtmlMail {
     private final Group group;
     private final Double totalExpenses;
 
-    private LimitExceededMail(User user, Group group, Double totalExpenses) {
-        this.user = user;
-        this.group = group;
-        this.totalExpenses = totalExpenses;
+    private LimitExceededMail(Builder builder) {
+        this.user = builder.user;
+        this.group = builder.group;
+        this.totalExpenses = builder.totalExpenses;
+    }
+
+    public static class Builder {
+        private User user;
+        private Group group;
+        private Double totalExpenses;
+
+        public Builder user(User user) {
+            this.user = user;
+            return this;
+        }
+
+        public Builder group(Group group) {
+            this.group = group;
+            return this;
+        }
+
+        public Builder totalExpenses(Double totalExpenses) {
+            this.totalExpenses = totalExpenses;
+            return this;
+        }
+
+        public LimitExceededMail build() {
+            return new LimitExceededMail(this);
+        }
+    }
+
+    // start L1 builder
+    public static Builder builder() {
+        return new Builder();
     }
 
     @Override
@@ -31,9 +61,5 @@ public class LimitExceededMail implements FullHtmlMail {
     @Override
     public String getTo() {
         return user.getEmail();
-    }
-
-    public static LimitExceededMail createFor(User user, Group group, Double totalExpenses) {
-        return new LimitExceededMail(user, group, totalExpenses);
     }
 }
