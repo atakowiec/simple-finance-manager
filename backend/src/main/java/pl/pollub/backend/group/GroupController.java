@@ -33,6 +33,7 @@ import java.util.List;
 public class GroupController {
     private final GroupService groupService;
     private final GroupInviteService groupInviteService;
+    private final GroupExportFacade groupExportFacade;
 
     @Operation(summary = "Pobierz wszystkie grupy dla zalogoanego użytkownika")
     @ApiResponse(responseCode = "200", description = "Lista grup zalogowanego użytkownika")
@@ -134,28 +135,12 @@ public class GroupController {
             @PathVariable Long groupId,
             @RequestParam(defaultValue = "json") String format
     ) {
-        ImportExportDto exportDto = groupService.exportTransactions(user, groupId);
-        
-        DataExporter exporter = new BaseDataExporter();
-        String contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
-        String filename = "export";
-
-        if ("csv".equalsIgnoreCase(format)) {
-            exporter = new CsvFormatterDecorator(exporter);
-            contentType = "text/csv";
-            filename += ".csv";
-        } else if ("json".equalsIgnoreCase(format)) {
-            exporter = new JsonFormatterDecorator(exporter);
-            contentType = MediaType.APPLICATION_JSON_VALUE;
-            filename += ".json";
-        }
-
-        byte[] data = exporter.export(exportDto);
+        GroupExportResponse response = groupExportFacade.exportGroupData(user, groupId, format);
 
         return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=" + filename)
-                .contentType(MediaType.parseMediaType(contentType))
-                .body(data);
+                .header("Content-Disposition", "attachment; filename=" + response.getFilename())
+                .contentType(MediaType.parseMediaType(response.getContentType()))
+                .body(response.getData());
     }
 
     @Operation(summary = "Usuń grupę")
