@@ -31,6 +31,13 @@ public class HttpService {
         return sendRequest(request.build());
     }
 
+    public HttpResponse<byte[]> getBytes(String url) {
+        HttpRequest.Builder request = getHttpRequestBuilder(url)
+                .GET();
+
+        return sendRequestBytes(request.build());
+    }
+
     public HttpResponse<String> put(String url, Object body) {
         HttpRequest.Builder request = getHttpRequestBuilder(url)
                 .PUT(HttpRequest.BodyPublishers.ofString(JsonUtil.toJson(body)));
@@ -60,6 +67,21 @@ public class HttpService {
 
             if (response.statusCode() >= 400)
                 System.out.println("Error: " + response.body());
+
+            return response;
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private HttpResponse<byte[]> sendRequestBytes(HttpRequest request) {
+        HttpClient client = HttpClient.newHttpClient();
+        try {
+            HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+
+            if (response.statusCode() >= 400) {
+                System.out.println("Error: request failed with status " + response.statusCode());
+            }
 
             return response;
         } catch (IOException | InterruptedException e) {

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.pollub.backend.auth.user.User;
+import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.dto.GroupCreateDto;
 import pl.pollub.backend.group.dto.ImportExportDto;
 import pl.pollub.backend.group.dto.InviteTargetDto;
@@ -22,6 +23,8 @@ import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.group.model.GroupInvite;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 /**
  * Controller for group management.
@@ -31,6 +34,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Grupy", description = "Zarządzanie grupami")
 public class GroupController {
+    private static final Set<String> SUPPORTED_EXPORT_FORMATS = Set.of("json", "csv");
+
     private final GroupService groupService;
     private final GroupInviteService groupInviteService;
     private final GroupExportFacade groupExportFacade;
@@ -135,7 +140,12 @@ public class GroupController {
             @PathVariable Long groupId,
             @RequestParam(defaultValue = "json") String format
     ) {
-        GroupExportResponse response = groupExportFacade.exportGroupData(user, groupId, format);
+        String normalizedFormat = format.toLowerCase(Locale.ROOT);
+        if (!SUPPORTED_EXPORT_FORMATS.contains(normalizedFormat)) {
+            throw new HttpException(HttpStatus.BAD_REQUEST, "Nieobsługiwany format eksportu: " + format);
+        }
+
+        GroupExportResponse response = groupExportFacade.exportGroupData(user, groupId, normalizedFormat);
 
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=" + response.getFilename())

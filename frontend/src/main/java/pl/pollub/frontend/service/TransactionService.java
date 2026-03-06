@@ -94,4 +94,8 @@ public class TransactionService {
     public HttpResponse<String> importTransactions(Long groupId, ImportExportDto dto) {
         return httpService.post("/groups/" + groupId + "/import", JsonUtil.GSON.toJson(dto));
     }
+
+    public HttpResponse<byte[]> exportTransactions(Long groupId, String format) {
+        return httpService.getBytes("/groups/" + groupId + "/export?format=" + format);
+    }
 }
