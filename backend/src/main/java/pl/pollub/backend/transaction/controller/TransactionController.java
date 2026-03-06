@@ -3,6 +3,7 @@ package pl.pollub.backend.transaction.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -10,12 +11,16 @@ import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.transaction.dto.TransactionCreateDto;
 import pl.pollub.backend.transaction.dto.TransactionUpdateDto;
 import pl.pollub.backend.transaction.model.Transaction;
+import pl.pollub.backend.transaction.query.TransactionQueryInterpreter;
 import pl.pollub.backend.transaction.service.interfaces.TransactionService;
 
 import java.util.List;
 import java.util.Map;
 
 public abstract class TransactionController<T extends Transaction> {
+    @Autowired
+    private TransactionQueryInterpreter queryInterpreter;
+
     public abstract TransactionService<T> getTransactionService();
 
     @Operation(summary = "Pobierz wszystkie transakcje danego typu dla grupy")
@@ -23,6 +28,17 @@ public abstract class TransactionController<T extends Transaction> {
     @GetMapping("/{groupId}")
     public List<T> getTransactionsByGroupId(@PathVariable Long groupId, @AuthenticationPrincipal User user) {
         return getTransactionService().getAllTransactionsForGroup(user, groupId);
+    }
+
+    @Operation(summary = "Wyszukaj transakcje za pomocą Transaction Query Language")
+    @ApiResponse(responseCode = "200", description = "Przefiltrowane transakcje")
+    @GetMapping("/{groupId}/query")
+    public List<T> queryTransactions(
+            @PathVariable Long groupId,
+            @RequestParam String query,
+            @AuthenticationPrincipal User user) {
+        List<T> allTransactions = getTransactionService().getAllTransactionsForGroup(user, groupId);
+        return queryInterpreter.filter(allTransactions, query);
     }
 
     @Operation(summary = "Stwórz nową transakcje danego typu")

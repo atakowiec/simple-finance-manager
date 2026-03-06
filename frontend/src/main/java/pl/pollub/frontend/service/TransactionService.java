@@ -98,4 +98,22 @@ public class TransactionService {
     public HttpResponse<byte[]> exportTransactions(Long groupId, String format) {
         return httpService.getBytes("/groups/" + groupId + "/export?format=" + format);
     }
+
+    public List<Expense> queryExpenses(long groupId, String query) {
+        HttpResponse<String> response = httpService.get("/expenses/" + groupId + "/query?query=" + encodeQuery(query));
+        Type type = new TypeToken<List<Expense>>() {
+        }.getType();
+        return JsonUtil.GSON.fromJson(response.body(), type);
+    }
+
+    public List<Income> queryIncomes(long groupId, String query) {
+        HttpResponse<String> response = httpService.get("/incomes/" + groupId + "/query?query=" + encodeQuery(query));
+        Type type = new TypeToken<List<Income>>() {
+        }.getType();
+        return JsonUtil.GSON.fromJson(response.body(), type);
+    }
+
+    private String encodeQuery(String query) {
+        return java.net.URLEncoder.encode(query, java.nio.charset.StandardCharsets.UTF_8);
+    }
 }

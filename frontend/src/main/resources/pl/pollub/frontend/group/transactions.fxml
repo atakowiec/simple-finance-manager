@@ -14,6 +14,19 @@
         <Label styleClass="contentTitle">
             Transakcje
         </Label>
+        <VBox spacing="5.0">
+            <VBox.margin>
+                <Insets bottom="10.0"/>
+            </VBox.margin>
+            <Label text="Wyszukaj transakcje (TQL - Transaction Query Language):" style="-fx-font-size: 12px;"/>
+            <HBox spacing="5.0">
+                <TextField fx:id="queryField" promptText="np. amount > 100 AND category = 'Food'" prefWidth="350" HBox.hgrow="ALWAYS"/>
+                <Button text="Szukaj" onAction="#executeQuery" styleClass="primary-btn"/>
+                <Button text="Wyczyść" onAction="#clearQuery" styleClass="primary-outline-btn"/>
+            </HBox>
+            <Label fx:id="queryHelpLabel" text="Przykłady: amount > 100 | category = 'Food' | name contains 'coffee' | date after 2026-01-01"
+                   style="-fx-font-size: 10px; -fx-text-fill: gray;" wrapText="true"/>
+        </VBox>
         <HBox prefHeight="0.0" prefWidth="0.0">
             <VBox.margin>
                 <Insets bottom="10.0"/>
