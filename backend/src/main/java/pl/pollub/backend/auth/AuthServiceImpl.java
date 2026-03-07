@@ -127,7 +127,8 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    private User createUser(RegisterDto registerDto) {
+    @Override
+    public User createUser(RegisterDto registerDto) {
         String hashedPassword = hashPassword(registerDto.getPassword());
 
         User user = new User();

@@ -78,4 +78,6 @@ public interface AuthService extends UserDetailsService {
     String handleRegister(RegisterDto registerDto, HttpServletResponse res);
 
     void save(User user);
+
+    User createUser(RegisterDto registerDto);
 }
