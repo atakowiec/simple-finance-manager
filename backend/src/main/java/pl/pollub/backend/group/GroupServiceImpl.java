@@ -14,6 +14,7 @@ import pl.pollub.backend.group.dto.ImportExportDto;
 import pl.pollub.backend.group.interfaces.GroupService;
 import pl.pollub.backend.group.memento.GroupCaretaker;
 import pl.pollub.backend.group.memento.GroupMemento;
+import pl.pollub.backend.group.membership.UserMembership;
 import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.group.repository.GroupInviteRepository;
 import pl.pollub.backend.group.repository.GroupRepository;
@@ -217,7 +218,9 @@ public class GroupServiceImpl implements GroupService {
         if (Objects.equals(group.getOwner().getId(), user.getId()))
             throw new HttpException(HttpStatus.FORBIDDEN, "Nie możesz opuścić grupy, której jesteś właścicielem!");
 
-        group.getUsers().removeIf(user::equals);
+        // Use State Pattern: Let the state object validate the membership transition
+        UserMembership membership = UserMembership.create(user, group, null);
+        membership.leaveGroup();
 
         groupRepository.save(group);
     }

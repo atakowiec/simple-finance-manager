@@ -13,6 +13,7 @@ import pl.pollub.backend.group.interfaces.GroupInviteService;
 import pl.pollub.backend.group.interfaces.GroupService;
 import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.group.model.GroupInvite;
+import pl.pollub.backend.group.membership.UserMembership;
 import pl.pollub.backend.group.repository.GroupInviteRepository;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,8 @@ import java.util.List;
 
 /**
  * Service for group invites management.
+ * Uses the State Design Pattern (via UserMembership) to manage state transitions
+ * and prevent invalid membership operations.
  */
 @Service
 @RequiredArgsConstructor
@@ -39,22 +42,24 @@ public class GroupInviteServiceImpl implements GroupInviteService {
         if (target == null)
             throw new HttpException(404, "Nie znaleziono podanego użytkownika");
 
-        if (group.getUsers().stream().anyMatch(other -> other.getId().equals(target.getId())))
-            throw new HttpException(409, "Ten użytkownik jest juz w tej grupie");
+        // Check if invitation already exists
+        GroupInvite existingInvite = inviteRepository.findGroupInviteByInviteeAndGroup(target, group);
 
-        GroupInvite invite = inviteRepository.findGroupInviteByInviteeAndGroup(target, group);
-
-        if (invite != null)
-            throw new HttpException(409, "Ten użytkownik ma już zaproszenie do grupy");
-
-        invite = new GroupInvite();
+        // Create invitation object
+        GroupInvite invite = new GroupInvite();
         invite.setGroup(group);
         invite.setInviter(user);
         invite.setInvitee(target);
         invite.setCreatedAt(LocalDateTime.now());
+
+        // Use State Pattern: Let the state object validate the operation
+        UserMembership membership = UserMembership.create(target, group, existingInvite);
+        membership.inviteUser(user, invite);
+
+        // Save the invitation
         inviteRepository.save(invite);
 
-        return MembershipStatus.INVITED;
+        return membership.getStatus();
     }
 
     @Override
@@ -72,43 +77,54 @@ public class GroupInviteServiceImpl implements GroupInviteService {
         if (invite == null)
             throw new HttpException(404, "Ten użytkownik nie ma zaproszenia do grupy");
 
+        // Use State Pattern: Let the state object validate the operation
+        UserMembership membership = UserMembership.create(target, group, invite);
+        membership.denyInvitation(invite);
+
         inviteRepository.delete(invite);
 
-        return MembershipStatus.NONE;
+        return membership.getStatus();
     }
 
     @Override
     public MembershipStatus denyInvitation(User user, Long inviteId) {
         GroupInvite groupInvite = inviteRepository.findById(inviteId)
-                .orElseThrow(() -> new HttpException(404, "Nie znaleniono zaprosznia"));
-
-        if (!groupInvite.getInvitee().equals(user))
-            throw new HttpException(HttpStatus.UNAUTHORIZED, "To zaproszenie nie dotyczy ciebie!");
-
-        inviteRepository.delete(groupInvite);
-
-        return MembershipStatus.NONE;
-    }
-
-    @Override
-    public MembershipStatus acceptInvitation(User user, Long inviteId) {
-        GroupInvite groupInvite = inviteRepository.findById(inviteId)
-                .orElseThrow(() -> new HttpException(404, "Nie znaleniono zaprosznia"));
+                .orElseThrow(() -> new HttpException(404, "Nie znaleziono zaproszenia"));
 
         if (!groupInvite.getInvitee().equals(user))
             throw new HttpException(HttpStatus.UNAUTHORIZED, "To zaproszenie nie dotyczy ciebie!");
 
         Group group = groupService.getGroupByIdOrThrow(groupInvite.getGroup().getId());
-        if (group.getUsers().stream().anyMatch(otherUser -> otherUser.equals(user)))
-            throw new HttpException(409, "Już jesteś w tej grupie!");
 
+        // Use State Pattern: Let the state object validate the operation
+        UserMembership membership = UserMembership.create(user, group, groupInvite);
+        membership.denyInvitation(groupInvite);
+
+        // Delete invitation
         inviteRepository.delete(groupInvite);
 
-        group.getUsers().add(user);
+        return membership.getStatus();
+    }
 
+    @Override
+    public MembershipStatus acceptInvitation(User user, Long inviteId) {
+        GroupInvite groupInvite = inviteRepository.findById(inviteId)
+                .orElseThrow(() -> new HttpException(404, "Nie znaleziono zaproszenia"));
+
+        if (!groupInvite.getInvitee().equals(user))
+            throw new HttpException(HttpStatus.UNAUTHORIZED, "To zaproszenie nie dotyczy ciebie!");
+
+        Group group = groupService.getGroupByIdOrThrow(groupInvite.getGroup().getId());
+
+        // Use State Pattern: Let the state object validate the operation
+        UserMembership membership = UserMembership.create(user, group, groupInvite);
+        membership.acceptInvitation(groupInvite);
+
+        // Delete invitation and save group
+        inviteRepository.delete(groupInvite);
         groupService.save(group);
 
-        return MembershipStatus.IN_GROUP;
+        return membership.getStatus();
     }
 
     @Override
