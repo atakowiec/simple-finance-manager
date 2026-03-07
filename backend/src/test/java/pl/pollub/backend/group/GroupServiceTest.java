@@ -18,6 +18,7 @@ import pl.pollub.backend.categories.model.TransactionCategory;
 import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.dto.GroupCreateDto;
 import pl.pollub.backend.group.dto.ImportExportDto;
+import pl.pollub.backend.group.memento.GroupCaretaker;
 import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.group.repository.GroupInviteRepository;
 import pl.pollub.backend.group.repository.GroupRepository;
@@ -45,6 +46,8 @@ class GroupServiceTest {
     private IncomeRepository incomeRepository;
     @Mock
     private CategoryService categoryService; // mockito needs to know what to inject
+    @Mock
+    private GroupCaretaker groupCaretaker;
 
     @InjectMocks
     private GroupServiceImpl groupServiceImpl;

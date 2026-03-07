@@ -166,4 +166,18 @@ public class GroupController {
     public void leaveGroup(@AuthenticationPrincipal User user, @PathVariable Long groupId) {
         groupService.leaveGroup(user, groupId);
     }
+
+    @Operation(summary = "Cofnij ostatnią zmianę w grupie")
+    @ApiResponse(responseCode = "200", description = "Cofnięto ostatnią zmianę")
+    @PostMapping("/{groupId}/undo")
+    public Group undoGroupChange(@AuthenticationPrincipal User user, @PathVariable Long groupId) {
+        return groupService.undoGroupChange(user, groupId);
+    }
+
+    @Operation(summary = "Sprawdź czy można cofnąć zmiany")
+    @ApiResponse(responseCode = "200", description = "Status możliwości cofnięcia")
+    @GetMapping("/{groupId}/can-undo")
+    public boolean canUndo(@PathVariable Long groupId) {
+        return groupService.canUndo(groupId);
+    }
 }

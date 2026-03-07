@@ -157,4 +157,18 @@ public class GroupsService {
         updateGroups();
         screenService.switchTo("home");
     }
+
+    public HttpResponse<String> undoGroupChange(Long groupId) {
+        return httpService.post("/groups/" + groupId + "/undo", null);
+    }
+
+    public boolean canUndo(Long groupId) {
+        HttpResponse<String> response = httpService.get("/groups/" + groupId + "/can-undo");
+
+        if (response.statusCode() == 200) {
+            return Boolean.parseBoolean(response.body());
+        }
+
+        return false;
+    }
 }

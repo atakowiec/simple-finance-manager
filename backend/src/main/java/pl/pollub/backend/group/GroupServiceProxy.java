@@ -101,4 +101,14 @@ public class GroupServiceProxy implements GroupService {
     public void save(Group group) {
         groupService.save(group);
     }
+
+    @Override
+    public Group undoGroupChange(User user, Long groupId) {
+        return groupService.undoGroupChange(user, groupId);
+    }
+
+    @Override
+    public boolean canUndo(Long groupId) {
+        return groupService.canUndo(groupId);
+    }
 }

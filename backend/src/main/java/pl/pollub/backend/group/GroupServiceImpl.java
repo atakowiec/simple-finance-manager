@@ -12,6 +12,8 @@ import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.dto.GroupCreateDto;
 import pl.pollub.backend.group.dto.ImportExportDto;
 import pl.pollub.backend.group.interfaces.GroupService;
+import pl.pollub.backend.group.memento.GroupCaretaker;
+import pl.pollub.backend.group.memento.GroupMemento;
 import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.group.repository.GroupInviteRepository;
 import pl.pollub.backend.group.repository.GroupRepository;
@@ -40,6 +42,7 @@ public class GroupServiceImpl implements GroupService {
     private final IncomeRepository incomeRepository;
     private final GroupInviteRepository groupInviteRepository;
     private final CategoryService categoryService;
+    private final GroupCaretaker groupCaretaker;
 
     @Override
     public Group getGroupByIdOrThrow(long groupId) {
@@ -75,6 +78,8 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group changeColor(User user, String color, Long groupId) {
         Group group = getGroupByIdOrThrow(groupId);
+        // Save current state before making changes (Memento pattern)
+        saveGroupState(group);
         group.setColor(color);
         groupRepository.save(group);
         return group;
@@ -83,6 +88,8 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group changeName(User user, String newName, Long groupId) {
         Group group = getGroupByIdOrThrow(groupId);
+        // Save current state before making changes (Memento pattern)
+        saveGroupState(group);
         group.setName(newName);
         groupRepository.save(group);
         return group;
@@ -91,6 +98,8 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group changeExpenseLimit(User user, Double expenseLimit, Long groupId) {
         Group group = getGroupByIdOrThrow(groupId);
+        // Save current state before making changes (Memento pattern)
+        saveGroupState(group);
         group.setExpenseLimit(expenseLimit);
         groupRepository.save(group);
         return group;
@@ -202,5 +211,45 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void save(Group group) {
         groupRepository.save(group);
+    }
+
+    @Override
+    public Group undoGroupChange(User user, Long groupId) {
+        Group group = getGroupByIdOrThrow(groupId);
+        checkMembershipOrThrow(user, group);
+
+        GroupMemento memento = groupCaretaker.getLastMemento(groupId);
+
+        if (memento == null) {
+            throw new HttpException(HttpStatus.BAD_REQUEST, "Brak historii zmian do cofnięcia");
+        }
+
+        // Restore the state from memento
+        group.setName(memento.getName());
+        group.setColor(memento.getColor());
+        group.setExpenseLimit(memento.getExpenseLimit());
+
+        groupRepository.save(group);
+        return group;
+    }
+
+    @Override
+    public boolean canUndo(Long groupId) {
+        return groupCaretaker.hasHistory(groupId);
+    }
+
+    /**
+     * Helper method to save the current state of a group before making changes.
+     * Part of the Memento pattern implementation.
+     *
+     * @param group the group whose state should be saved
+     */
+    private void saveGroupState(Group group) {
+        GroupMemento memento = GroupMemento.create(
+                group.getName(),
+                group.getColor(),
+                group.getExpenseLimit()
+        );
+        groupCaretaker.saveMemento(group.getId(), memento);
     }
 }

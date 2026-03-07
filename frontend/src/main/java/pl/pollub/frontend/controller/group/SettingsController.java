@@ -49,6 +49,10 @@ public class SettingsController extends AbstractGroupController {
     public Button deleteGroupButton;
     @FXML
     public Button leaveGroupButton;
+    @FXML
+    public Button undoButton;
+    @FXML
+    private Label undoStatus;
 
     @PostInitialize
     public void postInitialize() {
@@ -69,6 +73,14 @@ public class SettingsController extends AbstractGroupController {
 
         leaveGroupButton.setVisible(authService.getUser().getId() != group.getOwner().getId());
         leaveGroupButton.setManaged(authService.getUser().getId() != group.getOwner().getId());
+
+        // Check if undo is available
+        updateUndoButtonState();
+    }
+
+    private void updateUndoButtonState() {
+        boolean canUndo = groupsService.canUndo(getGroup().getId());
+        undoButton.setDisable(!canUndo);
     }
 
     public void saveName() {
@@ -89,6 +101,7 @@ public class SettingsController extends AbstractGroupController {
         getGroup().setName(jsonResponse.get("name").getAsString());
         nameError.setText("Zapisano!");
         eventEmitter.emit(EventType.GROUPS_UPDATE);
+        updateUndoButtonState();
     }
 
     public void saveColor() {
@@ -108,6 +121,7 @@ public class SettingsController extends AbstractGroupController {
 
         getGroup().setColor(jsonResponse.get("color").getAsString());
         colorError.setText("Zapisano!");
+        updateUndoButtonState();
     }
 
     public void saveExpenseLimit() {
@@ -135,6 +149,7 @@ public class SettingsController extends AbstractGroupController {
 
             getGroup().setExpenseLimit(jsonResponse.get("expenseLimit").getAsDouble());
             expenseLimitError.setText("Zapisano!");
+            updateUndoButtonState();
         } catch (NumberFormatException ignored) {
             expenseLimitError.setText("Limit musi być liczbą!");
         }
@@ -146,5 +161,33 @@ public class SettingsController extends AbstractGroupController {
 
     public void handleLeave() {
         modalService.showModal("modal/leave-group-view.fxml", Map.of("groupId", groupId));
+    }
+
+    public void handleUndo() {
+        HttpResponse<String> response = groupsService.undoGroupChange(getGroup().getId());
+
+        if (response.statusCode() != 200) {
+            undoStatus.setText("Wystąpił błąd podczas cofania zmian!");
+            return;
+        }
+
+        JsonObject jsonResponse = JsonUtil.fromJson(response.body()).getAsJsonObject();
+
+        // Update the UI with restored values
+        getGroup().setName(jsonResponse.get("name").getAsString());
+        getGroup().setColor(jsonResponse.get("color").getAsString());
+        getGroup().setExpenseLimit(jsonResponse.get("expenseLimit").getAsDouble());
+
+        groupNameField.setText(getGroup().getName());
+        colorPicker.setButtonCell(new ColorListCell(getGroup().getColor()));
+
+        boolean expenseLimitSet = getGroup().getExpenseLimit() != null && getGroup().getExpenseLimit() > 0;
+        expenseLimitField.setText(expenseLimitSet ? String.valueOf(getGroup().getExpenseLimit()) : "");
+
+        undoStatus.setText("Cofnięto ostatnią zmianę!");
+        eventEmitter.emit(EventType.GROUPS_UPDATE);
+
+        // Update undo button state
+        updateUndoButtonState();
     }
 }

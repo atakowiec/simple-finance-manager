@@ -112,4 +112,22 @@ public interface GroupService {
     void leaveGroup(User user, Long groupId);
 
     void save(Group group);
+
+    /**
+     * Undoes the last change made to the specified group.
+     * Uses the Memento pattern to restore the previous state.
+     *
+     * @param user    user who wants to undo the change
+     * @param groupId id of the group
+     * @return updated group with restored state, or null if no history exists
+     */
+    Group undoGroupChange(User user, Long groupId);
+
+    /**
+     * Checks if there is any history available for undo operation.
+     *
+     * @param groupId id of the group
+     * @return true if undo is available, false otherwise
+     */
+    boolean canUndo(Long groupId);
 }
