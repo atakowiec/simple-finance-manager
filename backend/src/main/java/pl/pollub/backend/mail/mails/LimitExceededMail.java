@@ -7,6 +7,7 @@ import pl.pollub.backend.mail.adapter.UserContactAdapter;
 import pl.pollub.backend.mail.interfaces.Contact;
 import pl.pollub.backend.mail.interfaces.FullHtmlMail;
 import pl.pollub.backend.mail.interfaces.Mail;
+import pl.pollub.backend.mail.interfaces.MailRequest;
 import pl.pollub.backend.mail.interfaces.MailSenderImplementation;
 
 /**
@@ -62,7 +63,7 @@ public class LimitExceededMail extends Mail implements FullHtmlMail {
 
     @Override
     public void send() throws MessagingException {
-        sender.send(getTo(), getSubject(), getHtml(), true);
+        sender.send(new MailRequest(getTo(), getSubject(), getHtml(), true));
     }
 
     @Override

@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import pl.pollub.backend.auth.user.User;
+import pl.pollub.backend.config.constants.SecurityConstants;
 
 import java.util.Date;
 
@@ -14,8 +15,6 @@ import java.util.Date;
  */
 @Component
 public class JwtServiceImpl implements JwtService {
-    public static final String AUTHORIZATION_HEADER = "Authorization";
-
     private final String secret;
     private final long expiration;
     private final JwtParser jwtParser;
@@ -54,9 +53,9 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
+        String bearerToken = request.getHeader(SecurityConstants.AUTHORIZATION_HEADER);
+        if (bearerToken != null && bearerToken.startsWith(SecurityConstants.BEARER_SCHEME + " ")) {
+            return bearerToken.substring(SecurityConstants.BEARER_PREFIX_LENGTH);
         }
 
         throw new JwtException("Token not found");
@@ -64,7 +63,7 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public void addTokenToResponse(HttpServletResponse response, String token) {
-        response.setHeader(AUTHORIZATION_HEADER, "Bearer " + token);
+        response.setHeader(SecurityConstants.AUTHORIZATION_HEADER, SecurityConstants.BEARER_SCHEME + " " + token);
     }
 
     @Override

@@ -90,8 +90,14 @@ class CategoriesControllerIntegrationTest {
     @Test
     void saveAndGetCategories_shouldReturnSavedCategories() throws Exception {
         List<TransactionCategory> categories = Arrays.asList(
-                new TransactionCategory(1L, "Food", CategoryType.INCOME, new byte[]{1}),
-                new TransactionCategory(2L, "Transport", CategoryType.EXPENSE, new byte[]{2})
+                new TransactionCategory(
+                        new TransactionCategory.BasicData(1L, "Food", CategoryType.INCOME),
+                        new byte[]{1}
+                ),
+                new TransactionCategory(
+                        new TransactionCategory.BasicData(2L, "Transport", CategoryType.EXPENSE),
+                        new byte[]{2}
+                )
         );
 
         List<CategoryDto> categoryDtos = categories.stream().map(TransactionCategory::toDto).toList();

@@ -3,7 +3,6 @@ package pl.pollub.backend.categories.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import pl.pollub.backend.categories.dto.CategoryDto;
 import pl.pollub.backend.conversion.DtoConvertible;
 
@@ -16,7 +15,6 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class TransactionCategory implements DtoConvertible<CategoryDto> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,10 +37,12 @@ public class TransactionCategory implements DtoConvertible<CategoryDto> {
     @Column(name = "icon", columnDefinition = "LONGBLOB")
     private byte[] icon;
 
-    public TransactionCategory(Long id, String name, CategoryType categoryType, byte[] icon) {
-        this.id = id;
-        this.name = name;
-        this.categoryType = categoryType;
+    public record BasicData(Long id, String name, CategoryType categoryType) {}
+
+    public TransactionCategory(BasicData basicData, byte[] icon) {
+        this.id = basicData.id();
+        this.name = basicData.name();
+        this.categoryType = basicData.categoryType();
         this.icon = icon;
     }
 

@@ -3,6 +3,7 @@ package pl.pollub.backend.group.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import pl.pollub.backend.auth.user.User;
+import pl.pollub.backend.config.constants.ExpenseLimitConstants;
 import pl.pollub.backend.conversion.DtoConvertible;
 import pl.pollub.backend.group.dto.GroupDto;
 import pl.pollub.backend.group.dto.GroupMemberDto;
@@ -36,7 +37,7 @@ public class Group implements DtoConvertible<GroupDto> {
     private User owner;
 
     @Column(name = "expense_limit")
-    private double expenseLimit = -1;
+    private double expenseLimit = ExpenseLimitConstants.NO_EXPENSE_LIMIT;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

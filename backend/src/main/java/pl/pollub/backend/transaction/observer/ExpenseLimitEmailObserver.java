@@ -3,6 +3,7 @@ package pl.pollub.backend.transaction.observer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import pl.pollub.backend.config.constants.ExpenseLimitConstants;
 import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.mail.MailService;
@@ -35,11 +36,11 @@ public class ExpenseLimitEmailObserver implements ExpenseLimitObserver {
         Double totalExpenses = calculateTotalExpenses(group);
         double remainingPart = calculateRemainingPart(totalExpenses, group.getExpenseLimit());
 
-        if (remainingPart > 0.1) {
+        if (remainingPart > ExpenseLimitConstants.EXPENSE_WARNING_THRESHOLD) {
             return;
         }
 
-        Mail mail = selectMailType(event, group, totalExpenses, remainingPart);
+        Mail mail = selectMailType(event, totalExpenses, remainingPart);
         sendMailWithErrorHandling(mail);
     }
 
@@ -50,22 +51,22 @@ public class ExpenseLimitEmailObserver implements ExpenseLimitObserver {
     }
 
     private double calculateRemainingPart(Double totalExpenses, Double expenseLimit) {
-        return 1 - (totalExpenses / expenseLimit);
+        return 1.0 - (totalExpenses / expenseLimit);
     }
 
-    private Mail selectMailType(ExpenseLimitEvent event, Group group, Double totalExpenses, double remainingPart) {
+    private Mail selectMailType(ExpenseLimitEvent event, Double totalExpenses, double remainingPart) {
         if (remainingPart < 0) {
             return LimitExceededMail.builder()
                     .sender(mailSenderImplementation)
                     .user(event.user())
-                    .group(group)
+                    .group(event.group())
                     .totalExpenses(totalExpenses)
                     .build();
         } else {
             return CloseToLimitMail.builder()
                     .sender(mailSenderImplementation)
                     .user(event.user())
-                    .group(group)
+                    .group(event.group())
                     .totalExpenses(totalExpenses)
                     .build();
         }
@@ -79,4 +80,3 @@ public class ExpenseLimitEmailObserver implements ExpenseLimitObserver {
         }
     }
 }
-

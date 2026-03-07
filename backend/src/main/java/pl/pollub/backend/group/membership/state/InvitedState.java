@@ -1,5 +1,6 @@
 package pl.pollub.backend.group.membership.state;
 
+import org.springframework.http.HttpStatus;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.enums.MembershipStatus;
@@ -26,7 +27,7 @@ public class InvitedState implements MemberState {
     @Override
     public MemberState invite(User invitee, Group group, GroupInvite invite) {
         // Invalid: already invited
-        throw new HttpException(409, "User is already invited to this group");
+        throw new HttpException(HttpStatus.CONFLICT.value(), "User is already invited to this group");
     }
 
     @Override
@@ -44,7 +45,7 @@ public class InvitedState implements MemberState {
     @Override
     public MemberState leave(User user, Group group) {
         // Invalid: not yet a member
-        throw new HttpException(409, "User is not a member of this group - cannot leave");
+        throw new HttpException(HttpStatus.CONFLICT.value(), "User is not a member of this group - cannot leave");
     }
 
     @Override

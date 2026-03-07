@@ -11,6 +11,7 @@ import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.transaction.dto.TransactionCreateDto;
 import pl.pollub.backend.transaction.dto.TransactionUpdateDto;
 import pl.pollub.backend.transaction.factory.TransactionFactory;
+import pl.pollub.backend.transaction.factory.TransactionFactoryContext;
 import pl.pollub.backend.transaction.model.Transaction;
 import pl.pollub.backend.transaction.repository.TransactionRepository;
 
@@ -177,7 +178,7 @@ public interface TransactionService<T extends Transaction> {
         getGroupService().checkMembershipOrThrow(user, group);
 
         // start L1 Factory method
-        T transaction = getTransactionFactory().create(createDto, user, category, group);
+        T transaction = getTransactionFactory().create(createDto, new TransactionFactoryContext(user, category, group));
 
         return save(transaction);
     }

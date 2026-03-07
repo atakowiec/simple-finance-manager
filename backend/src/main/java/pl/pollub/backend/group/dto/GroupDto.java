@@ -1,6 +1,7 @@
 package pl.pollub.backend.group.dto;
 
 import lombok.Data;
+import pl.pollub.backend.config.constants.ExpenseLimitConstants;
 
 import java.util.List;
 
@@ -15,5 +16,5 @@ public class GroupDto {
     private String createdAt;
     private GroupMemberDto owner;
     private List<GroupMemberDto> users;
-    private double expenseLimit = -1;
+    private double expenseLimit = ExpenseLimitConstants.NO_EXPENSE_LIMIT;
 }

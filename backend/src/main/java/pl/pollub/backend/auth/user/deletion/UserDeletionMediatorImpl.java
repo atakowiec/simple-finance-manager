@@ -1,6 +1,7 @@
 package pl.pollub.backend.auth.user.deletion;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pollub.backend.auth.user.User;
@@ -55,7 +56,7 @@ public class UserDeletionMediatorImpl implements UserDeletionMediator {
 
     private void validateDeletion(User user) {
         if (ANONYMIZED_USERNAME.equals(user.getUsername())) {
-            throw new HttpException(400, "Nie można usunąć użytkownika systemowego do anonimizacji.");
+            throw new HttpException(HttpStatus.BAD_REQUEST, "Nie można usunąć użytkownika systemowego do anonimizacji.");
         }
     }
 

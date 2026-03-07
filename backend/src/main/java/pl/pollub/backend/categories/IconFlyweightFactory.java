@@ -1,6 +1,8 @@
 package pl.pollub.backend.categories;
 
 import org.springframework.stereotype.Component;
+import pl.pollub.backend.config.constants.FormatConstants;
+import pl.pollub.backend.config.constants.SecurityConstants;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -24,11 +26,11 @@ public class IconFlyweightFactory {
 
     private String sha256Hex(byte[] data) {
         try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            MessageDigest md = MessageDigest.getInstance(SecurityConstants.SHA256_ALGORITHM);
             byte[] digest = md.digest(data);
             StringBuilder sb = new StringBuilder(digest.length * 2);
             for (byte b : digest) {
-                sb.append(String.format("%02x", b));
+                sb.append(String.format(FormatConstants.HEX_BYTE_FORMAT, b));
             }
             return sb.toString();
         } catch (NoSuchAlgorithmException e) {

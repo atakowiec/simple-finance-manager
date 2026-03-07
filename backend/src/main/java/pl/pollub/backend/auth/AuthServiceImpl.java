@@ -140,7 +140,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private String createRegisterResponse(User user, HttpServletResponse res) {
-        res.setStatus(201);
+        res.setStatus(HttpStatus.CREATED.value());
         String token = jwtService.createToken(user);
         jwtService.addTokenToResponse(res, token);
         log.info("User registered: {}", user.getUsername());

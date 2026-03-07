@@ -34,8 +34,14 @@ class TransactionQueryInterpreterTest {
         User user = new User();
         Group group = new Group();
 
-        TransactionCategory foodCategory = new TransactionCategory(1L, "Food", CategoryType.EXPENSE, null);
-        TransactionCategory transportCategory = new TransactionCategory(2L, "Transport", CategoryType.EXPENSE, null);
+        TransactionCategory foodCategory = new TransactionCategory(
+                new TransactionCategory.BasicData(1L, "Food", CategoryType.EXPENSE),
+                null
+        );
+        TransactionCategory transportCategory = new TransactionCategory(
+                new TransactionCategory.BasicData(2L, "Transport", CategoryType.EXPENSE),
+                null
+        );
 
         Expense expense1 = new Expense();
         expense1.setId(1L);

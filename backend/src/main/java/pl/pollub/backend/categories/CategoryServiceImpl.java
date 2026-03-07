@@ -1,6 +1,7 @@
 package pl.pollub.backend.categories;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import pl.pollub.backend.categories.dto.CategoryCreateDto;
 import pl.pollub.backend.categories.dto.CategoryUpdateDto;
@@ -18,13 +19,13 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public TransactionCategory getCategoryByIdOrThrow(Long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new HttpException(404, "Kategoria nie znaleziona."));
+                .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND.value(), "Kategoria nie znaleziona."));
     }
 
     @Override
     public String addCategory(CategoryCreateDto categoryDto) {
         if (categoryRepository.existsByNameAndCategoryType(categoryDto.getName(), categoryDto.getCategoryType())) {
-            throw new HttpException(409, "Kategoria o tej nazwie już istnieje.");
+            throw new HttpException(HttpStatus.CONFLICT.value(), "Kategoria o tej nazwie już istnieje.");
         }
 
         TransactionCategory transactionCategory = new TransactionCategory();
@@ -49,7 +50,7 @@ public class CategoryServiceImpl implements CategoryService {
         TransactionCategory foundCategory = categoryRepository.getByNameAndCategoryType(categoryUpdateDto.getName(), categoryUpdateDto.getCategoryType());
 
         if (foundCategory != null && !foundCategory.getId().equals(id))
-            throw new HttpException(409, "Kategoria o tej nazwie już istnieje.");
+            throw new HttpException(HttpStatus.CONFLICT.value(), "Kategoria o tej nazwie już istnieje.");
 
         category.setName(categoryUpdateDto.getName());
 
@@ -58,7 +59,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         if (categoryUpdateDto.getParentId() != null) {
             if (categoryUpdateDto.getParentId().equals(id))
-                throw new HttpException(400, "Kategoria nie może być swoim własnym rodzicem.");
+                throw new HttpException(HttpStatus.BAD_REQUEST.value(), "Kategoria nie może być swoim własnym rodzicem.");
 
             TransactionCategory parent = getCategoryByIdOrThrow(categoryUpdateDto.getParentId());
             category.setParent(parent);

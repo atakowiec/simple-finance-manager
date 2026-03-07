@@ -19,7 +19,6 @@ public class GroupInviteCleanupHandler implements UserDeletionHandler {
     public void handle(User user, UserDeletionContext context) {
         groupInviteRepository.deleteAllByInvitee(user);
         groupInviteRepository.deleteAllByInviter(user);
-        // Note: Could track count if repositories returned int, but void for now
         context.setInvitesDeleted(context.getInvitesDeleted() + 1);
     }
 }

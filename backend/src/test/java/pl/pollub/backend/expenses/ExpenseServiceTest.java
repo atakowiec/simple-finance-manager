@@ -209,7 +209,10 @@ class ExpenseServiceTest {
         createdExpense.setCategory(category);
 
         Mockito.when(categoryService.getCategoryByIdOrThrow(1L)).thenReturn(category);
-        Mockito.when(expenseFactory.create(Mockito.any(), Mockito.eq(user), Mockito.eq(category), Mockito.eq(group))).thenReturn(createdExpense);
+        Mockito.when(expenseFactory.create(
+                Mockito.any(),
+                Mockito.argThat(context -> context.user() == user && context.category() == category && context.group() == group)
+        )).thenReturn(createdExpense);
 
         Expense result = expenseService.createTransaction(createDto, user);
 
@@ -235,7 +238,10 @@ class ExpenseServiceTest {
         createdExpense.setCategory(category);
 
         Mockito.when(categoryService.getCategoryByIdOrThrow(1L)).thenReturn(category);
-        Mockito.when(expenseFactory.create(Mockito.any(), Mockito.eq(user), Mockito.eq(category), Mockito.eq(group))).thenReturn(createdExpense);
+        Mockito.when(expenseFactory.create(
+                Mockito.any(),
+                Mockito.argThat(context -> context.user() == user && context.category() == category && context.group() == group)
+        )).thenReturn(createdExpense);
 
         expenseService.createTransaction(createDto, user);
 

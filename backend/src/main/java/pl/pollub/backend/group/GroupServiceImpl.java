@@ -48,6 +48,8 @@ public class GroupServiceImpl implements GroupService {
     private final GroupCaretaker groupCaretaker;
     private final ExpenseLimitSubject expenseLimitSubject;
 
+    private record ImportContext(User user, Group group, Map<Long, TransactionCategory> categories) {}
+
     @Override
     public Group getGroupByIdOrThrow(long groupId) {
         return groupRepository.findById(groupId)
@@ -132,10 +134,10 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void importTransactions(User user, Long groupId, ImportExportDto importExportDto) {
         Group group = getGroupByIdOrThrow(groupId);
-        Map<Long, TransactionCategory> categories = loadCategories();
+        ImportContext importContext = new ImportContext(user, group, loadCategories());
 
-        boolean hasCurrentMonthImportedExpense = importExpensesFromDto(user, group, importExportDto.getExpenses(), categories);
-        importIncomesFromDto(user, group, importExportDto.getIncomes(), categories);
+        boolean hasCurrentMonthImportedExpense = importExpensesFromDto(importContext, importExportDto.getExpenses());
+        importIncomesFromDto(importContext, importExportDto.getIncomes());
 
         notifyIfNeeded(user, group, hasCurrentMonthImportedExpense);
     }
@@ -145,13 +147,13 @@ public class GroupServiceImpl implements GroupService {
                 .collect(Collectors.toMap(TransactionCategory::getId, v -> v));
     }
 
-    private boolean importExpensesFromDto(User user, Group group, List<TransactionDto> expenses, Map<Long, TransactionCategory> categories) {
+    private boolean importExpensesFromDto(ImportContext importContext, List<TransactionDto> expenses) {
         LocalDate startOfTheMonth = LocalDate.now().withDayOfMonth(1);
         boolean hasCurrentMonthImportedExpense = false;
 
         for (TransactionDto expense : expenses) {
-            TransactionCategory category = validateCategory(expense.getCategory().getId(), categories);
-            Expense newExpense = createExpenseEntity(user, group, expense, category);
+            TransactionCategory category = validateCategory(expense.getCategory().getId(), importContext.categories());
+            Expense newExpense = createExpenseEntity(importContext, expense, category);
 
             if (expense.getDate() != null && !expense.getDate().isBefore(startOfTheMonth)) {
                 hasCurrentMonthImportedExpense = true;
@@ -163,10 +165,10 @@ public class GroupServiceImpl implements GroupService {
         return hasCurrentMonthImportedExpense;
     }
 
-    private void importIncomesFromDto(User user, Group group, List<TransactionDto> incomes, Map<Long, TransactionCategory> categories) {
+    private void importIncomesFromDto(ImportContext importContext, List<TransactionDto> incomes) {
         for (TransactionDto income : incomes) {
-            TransactionCategory category = validateCategory(income.getCategory().getId(), categories);
-            Income newIncome = createIncomeEntity(user, group, income, category);
+            TransactionCategory category = validateCategory(income.getCategory().getId(), importContext.categories());
+            Income newIncome = createIncomeEntity(importContext, income, category);
             incomeRepository.save(newIncome);
         }
     }
@@ -178,25 +180,25 @@ public class GroupServiceImpl implements GroupService {
         return category;
     }
 
-    private Expense createExpenseEntity(User user, Group group, TransactionDto expense, TransactionCategory category) {
+    private Expense createExpenseEntity(ImportContext importContext, TransactionDto expense, TransactionCategory category) {
         Expense newExpense = new Expense();
         newExpense.setName(expense.getName());
         newExpense.setAmount(expense.getAmount());
         newExpense.setCategory(category);
         newExpense.setDate(expense.getDate());
-        newExpense.setGroup(group);
-        newExpense.setUser(user);
+        newExpense.setGroup(importContext.group());
+        newExpense.setUser(importContext.user());
         return newExpense;
     }
 
-    private Income createIncomeEntity(User user, Group group, TransactionDto income, TransactionCategory category) {
+    private Income createIncomeEntity(ImportContext importContext, TransactionDto income, TransactionCategory category) {
         Income newIncome = new Income();
         newIncome.setName(income.getName());
         newIncome.setAmount(income.getAmount());
         newIncome.setCategory(category);
         newIncome.setDate(income.getDate());
-        newIncome.setGroup(group);
-        newIncome.setUser(user);
+        newIncome.setGroup(importContext.group());
+        newIncome.setUser(importContext.user());
         return newIncome;
     }
 

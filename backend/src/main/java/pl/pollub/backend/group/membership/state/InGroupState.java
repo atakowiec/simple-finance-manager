@@ -1,5 +1,6 @@
 package pl.pollub.backend.group.membership.state;
 
+import org.springframework.http.HttpStatus;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.enums.MembershipStatus;
@@ -28,19 +29,19 @@ public class InGroupState implements MemberState {
     @Override
     public MemberState invite(User invitee, Group group, GroupInvite invite) {
         // Invalid: already a member
-        throw new HttpException(409, "User is already a member of this group");
+        throw new HttpException(HttpStatus.CONFLICT.value(), "User is already a member of this group");
     }
 
     @Override
     public MemberState accept(User user, GroupInvite invite) {
         // Invalid: already a member
-        throw new HttpException(409, "User is already a member of this group - cannot accept");
+        throw new HttpException(HttpStatus.CONFLICT.value(), "User is already a member of this group - cannot accept");
     }
 
     @Override
     public MemberState deny(User user, GroupInvite invite) {
         // Invalid: already a member
-        throw new HttpException(409, "User is already a member of this group - cannot deny");
+        throw new HttpException(HttpStatus.CONFLICT.value(), "User is already a member of this group - cannot deny");
     }
 
     @Override

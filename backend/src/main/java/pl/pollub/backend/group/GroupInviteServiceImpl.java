@@ -53,7 +53,7 @@ public class GroupInviteServiceImpl implements GroupInviteService {
     private User getUserOrThrow(Long userId) {
         User target = userService.getUserById(userId);
         if (target == null)
-            throw new HttpException(404, "Nie znaleziono podanego użytkownika");
+            throw new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono podanego użytkownika");
         return target;
     }
 
@@ -85,7 +85,7 @@ public class GroupInviteServiceImpl implements GroupInviteService {
     private GroupInvite getInviteOrThrow(User target, Group group) {
         GroupInvite invite = inviteRepository.findGroupInviteByInviteeAndGroup(target, group);
         if (invite == null)
-            throw new HttpException(404, "Ten użytkownik nie ma zaproszenia do grupy");
+            throw new HttpException(HttpStatus.NOT_FOUND, "Ten użytkownik nie ma zaproszenia do grupy");
         return invite;
     }
 
@@ -106,7 +106,7 @@ public class GroupInviteServiceImpl implements GroupInviteService {
 
     private GroupInvite getInviteByIdOrThrow(Long inviteId) {
         return inviteRepository.findById(inviteId)
-                .orElseThrow(() -> new HttpException(404, "Nie znaleziono zaproszenia"));
+                .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono zaproszenia"));
     }
 
     private void validateInviteOwnership(User user, GroupInvite groupInvite) {

@@ -1,6 +1,7 @@
 package pl.pollub.backend.exception;
 
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -14,6 +15,6 @@ public class ServerExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleHttpException(Exception ex) {
         ex.printStackTrace();
-        return new HttpException(500, "Internal server error").toResponseEntity();
+        return new HttpException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error").toResponseEntity();
     }
 }

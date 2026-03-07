@@ -3,7 +3,7 @@ package pl.pollub.backend.auth.user;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import pl.pollub.backend.auth.AuthService;
 import pl.pollub.backend.auth.dto.UserEmailEditDto;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     @Getter
     private final UsersRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
     private final AuthService authService;
     private final UserDeletionMediator userDeletionMediator;
 
@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserByIdOrThrow(long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new HttpException(404, "Użytkownik nie znaleziony"));
+                .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND.value(), "Użytkownik nie znaleziony"));
     }
 
     @Override
@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public String updateUsername(Long userId, UserUsernameEditDto usernameEditDto) {
         if (usernameExists(usernameEditDto.getUsername())) {
-            throw new HttpException(409, "Nazwa użytkownika jest zajęta.");
+            throw new HttpException(HttpStatus.CONFLICT.value(), "Nazwa użytkownika jest zajęta.");
         }
 
         User user = getUserByIdOrThrow(userId);
@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public String updateEmail(Long userId, UserEmailEditDto emailEditDto) {
         if (emailExists(emailEditDto.getEmail())) {
-            throw new HttpException(409, "Adres e-mail jest zajęty.");
+            throw new HttpException(HttpStatus.CONFLICT.value(), "Adres e-mail jest zajęty.");
         }
 
         User user = getUserByIdOrThrow(userId);
@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
         User user = getUserByIdOrThrow(userId);
 
         if (!authService.verifyPassword(user.getPassword(), oldPassword)) {
-            throw new HttpException(401, "Hasło jest nieprawidłowe");
+            throw new HttpException(HttpStatus.UNAUTHORIZED.value(), "Hasło jest nieprawidłowe");
         }
 
         user.setPassword(passwordEncoder.encode(newPassword));
@@ -107,7 +107,7 @@ public class UserServiceImpl implements UserService {
         try {
             role = Role.valueOf(roleDto.getRole());
         } catch (IllegalArgumentException e) {
-            throw new HttpException(400, "Nieprawidłowa rola użytkownika.");
+            throw new HttpException(HttpStatus.BAD_REQUEST.value(), "Nieprawidłowa rola użytkownika.");
         }
 
         User user = getUserByIdOrThrow(userId);

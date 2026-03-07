@@ -1,6 +1,7 @@
 package pl.pollub.backend.auth.user.deletion.handlers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.auth.user.deletion.UserDeletionContext;
@@ -35,7 +36,7 @@ public class GroupOwnershipTransferHandler implements UserDeletionHandler {
             User newOwner = ownedGroup.getUsers().stream()
                     .filter(member -> !Objects.equals(member.getId(), deletedUser.getId()))
                     .findFirst()
-                    .orElseThrow(() -> new HttpException(409,
+                    .orElseThrow(() -> new HttpException(HttpStatus.CONFLICT,
                         "Nie można usunąć użytkownika. Grupa " + ownedGroup.getName() +
                         " nie ma innego członka do przejęcia własności."));
 

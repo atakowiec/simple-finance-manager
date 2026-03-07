@@ -1,5 +1,6 @@
 package pl.pollub.backend.group.membership.state;
 
+import org.springframework.http.HttpStatus;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.enums.MembershipStatus;
@@ -33,19 +34,19 @@ public class NoneState implements MemberState {
     @Override
     public MemberState accept(User user, GroupInvite invite) {
         // Invalid: cannot accept from NONE state
-        throw new HttpException(409, "Cannot accept invitation from NONE state - no pending invitation");
+        throw new HttpException(HttpStatus.CONFLICT.value(), "Cannot accept invitation from NONE state - no pending invitation");
     }
 
     @Override
     public MemberState deny(User user, GroupInvite invite) {
         // Invalid: cannot deny from NONE state
-        throw new HttpException(409, "Cannot deny invitation from NONE state - no pending invitation");
+        throw new HttpException(HttpStatus.CONFLICT.value(), "Cannot deny invitation from NONE state - no pending invitation");
     }
 
     @Override
     public MemberState leave(User user, Group group) {
         // Invalid: user is not in group
-        throw new HttpException(409, "User is not in this group - cannot leave");
+        throw new HttpException(HttpStatus.CONFLICT.value(), "User is not in this group - cannot leave");
     }
 
     @Override
