@@ -5,6 +5,7 @@ import pl.pollub.backend.transaction.dto.TransactionDto;
 
 import java.nio.charset.StandardCharsets;
 
+// start open close principle
 /**
  * Concrete Decorator for CSV formatting.
  */

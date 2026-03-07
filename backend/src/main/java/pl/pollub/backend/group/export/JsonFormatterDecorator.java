@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import pl.pollub.backend.group.dto.ImportExportDto;
 
+// start single responsibility principle
 /**
  * Concrete Decorator for JSON formatting.
  */

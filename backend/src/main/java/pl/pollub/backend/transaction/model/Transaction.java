@@ -13,6 +13,8 @@ import pl.pollub.backend.transaction.dto.TransactionDto;
 
 import java.time.LocalDate;
 
+// start liskov substitution principle
+// start dependency inversion principle - klasa abstrakcyjna
 /**
  * Base class for all transactions.
  */

@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// start interface segregation principle
 public interface TransactionService<T extends Transaction> {
     GroupService getGroupService();
 

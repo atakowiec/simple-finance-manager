@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+// start single responsibility principle
 /**
  * Handler responsible for transferring group ownership and removing user memberships.
  */

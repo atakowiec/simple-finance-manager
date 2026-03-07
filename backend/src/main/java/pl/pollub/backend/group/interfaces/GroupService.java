@@ -9,6 +9,7 @@ import pl.pollub.backend.group.model.Group;
 
 import java.util.List;
 
+// start dependency inversion principle
 /**
  * Service for managing groups. It provides methods for creating, updating and deleting groups.
  */

@@ -4,6 +4,8 @@ import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.group.model.GroupInvite;
 
+// start open close principle, Abstrakcja i sterowanie danymi
+
 /**
  * State interface for group membership.
  * Implements the State Design Pattern to manage membership status transitions

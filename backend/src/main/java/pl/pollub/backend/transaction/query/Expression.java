@@ -2,6 +2,7 @@ package pl.pollub.backend.transaction.query;
 
 import pl.pollub.backend.transaction.model.Transaction;
 
+// start open close principle, Abstrakcja i sterowanie danymi
 /**
  * Abstract Expression interface for the Interpreter pattern.
  * Represents a query expression that can be evaluated against a transaction.

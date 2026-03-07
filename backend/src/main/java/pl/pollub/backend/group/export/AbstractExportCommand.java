@@ -2,6 +2,8 @@ package pl.pollub.backend.group.export;
 
 import pl.pollub.backend.group.dto.ImportExportDto;
 
+// start liskov substitution principle
+// start dependency inversion principle
 /**
  * Template Method base for export commands.
  * Keeps command selection/execution intact while sharing export workflow.

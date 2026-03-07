@@ -3,6 +3,8 @@ package pl.pollub.backend.mail.interfaces;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 
+// start liskov substitution principle
+// start dependency inversion principle
 /**
  * Abstraction in the Bridge design pattern.
  */

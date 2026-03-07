@@ -9,6 +9,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+// start single responsibility principle
 /**
  * Parser for Transaction Query Language.
  * Parses query strings into Expression objects using the Interpreter pattern.
