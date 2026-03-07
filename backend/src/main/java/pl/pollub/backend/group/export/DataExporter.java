@@ -6,6 +6,7 @@ import pl.pollub.backend.group.dto.ImportExportDto;
 /**
  * Component interface for the Decorator design pattern.
  */
+@FunctionalInterface
 public interface DataExporter {
     byte[] export(ImportExportDto data);
 }

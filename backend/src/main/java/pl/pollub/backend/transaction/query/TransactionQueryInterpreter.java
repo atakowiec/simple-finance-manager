@@ -28,6 +28,7 @@ public class TransactionQueryInterpreter {
     public <T extends Transaction> List<T> filter(List<T> transactions, String query) {
         Expression expression = parser.parse(query);
 
+        // start functional interface
         return transactions.stream()
                 .filter(expression::interpret)
                 .collect(Collectors.toList());

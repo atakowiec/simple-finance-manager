@@ -38,6 +38,7 @@ class AbstractExportCommandTest {
             return "stub";
         }
 
+        // start a functional interface
         @Override
         protected DataExporter createExporter() {
             return data -> payload;
