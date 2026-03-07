@@ -17,6 +17,7 @@ import pl.pollub.backend.auth.AuthService;
 import pl.pollub.backend.auth.user.User;
 
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * Filter for JWT authentication. It extracts the JWT token from the request, validates it and sets the user in the security context.
@@ -31,37 +32,88 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public void doFilterInternal(@NonNull HttpServletRequest request,
                                  @NonNull HttpServletResponse response,
                                  @NonNull FilterChain filterChain) throws ServletException, IOException {
-        // why do I have to do this?
-        Claims tokenClaims;
+        Optional<Claims> tokenClaims = extractTokenClaims(request);
+        if (tokenClaims.isEmpty()) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        Optional<String> userId = extractUserIdFromClaims(tokenClaims.get());
+        if (userId.isEmpty() || isAlreadyAuthenticated()) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        Optional<User> user = retrieveUser(userId.get());
+        if (user.isEmpty()) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        setAuthenticationContext(user.get(), request);
+        jwtService.addTokenToResponse(response, user.get());
+
+        filterChain.doFilter(request, response);
+    }
+
+    /**
+     * Extracts and validates JWT token claims from the request.
+     *
+     * @param request the HTTP request
+     * @return Optional containing the claims if valid, empty otherwise
+     */
+    private Optional<Claims> extractTokenClaims(HttpServletRequest request) {
         try {
-            tokenClaims = jwtService.resolveClaims(request);
+            Claims claims = jwtService.resolveClaims(request);
+            return Optional.of(claims);
         } catch (Exception e) {
-            filterChain.doFilter(request, response);
-            return;
+            return Optional.empty();
         }
+    }
 
-        final String stringUserId = tokenClaims.getSubject();
+    /**
+     * Extracts the user ID from the token claims.
+     *
+     * @param claims the JWT token claims
+     * @return Optional containing the user ID string if present, empty otherwise
+     */
+    private Optional<String> extractUserIdFromClaims(Claims claims) {
+        String userId = claims.getSubject();
+        return Optional.ofNullable(userId);
+    }
 
-        if (stringUserId == null || SecurityContextHolder.getContext().getAuthentication() != null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+    /**
+     * Checks if the security context already has an authenticated user.
+     *
+     * @return true if already authenticated, false otherwise
+     */
+    private boolean isAlreadyAuthenticated() {
+        return SecurityContextHolder.getContext().getAuthentication() != null;
+    }
 
-
-        User user;
+    /**
+     * Retrieves the user from the database by user ID.
+     *
+     * @param stringUserId the user ID as a string
+     * @return Optional containing the user if found, empty otherwise
+     */
+    private Optional<User> retrieveUser(String stringUserId) {
         try {
             long userId = Long.parseLong(stringUserId);
-            user = this.authService.getUserById(userId);
+            User user = this.authService.getUserById(userId);
+            return Optional.ofNullable(user);
         } catch (Exception e) {
-            filterChain.doFilter(request, response);
-            return;
+            return Optional.empty();
         }
+    }
 
-        if(user == null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
+    /**
+     * Creates an authentication token and sets it in the security context.
+     *
+     * @param user the authenticated user
+     * @param request the HTTP request
+     */
+    private void setAuthenticationContext(User user, HttpServletRequest request) {
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                 user,
                 null,
@@ -73,10 +125,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         );
 
         SecurityContextHolder.getContext().setAuthentication(authToken);
-
-        // generate new token and set it in response
-        jwtService.addTokenToResponse(response, user);
-
-        filterChain.doFilter(request, response);
     }
 }

@@ -132,25 +132,26 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void importTransactions(User user, Long groupId, ImportExportDto importExportDto) {
         Group group = getGroupByIdOrThrow(groupId);
+        Map<Long, TransactionCategory> categories = loadCategories();
+
+        boolean hasCurrentMonthImportedExpense = importExpensesFromDto(user, group, importExportDto.getExpenses(), categories);
+        importIncomesFromDto(user, group, importExportDto.getIncomes(), categories);
+
+        notifyIfNeeded(user, group, hasCurrentMonthImportedExpense);
+    }
+
+    private Map<Long, TransactionCategory> loadCategories() {
+        return categoryService.getAllCategories().stream()
+                .collect(Collectors.toMap(TransactionCategory::getId, v -> v));
+    }
+
+    private boolean importExpensesFromDto(User user, Group group, List<TransactionDto> expenses, Map<Long, TransactionCategory> categories) {
         LocalDate startOfTheMonth = LocalDate.now().withDayOfMonth(1);
         boolean hasCurrentMonthImportedExpense = false;
 
-        Map<Long, TransactionCategory> categories = categoryService.getAllCategories().stream()
-                .collect(Collectors.toMap(TransactionCategory::getId, v -> v));
-
-        for (TransactionDto expense : importExportDto.getExpenses()) {
-            TransactionCategory category = categories.get(expense.getCategory().getId());
-
-            if (category == null)
-                throw new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono kategorii o podanym identyfikatorze: " + expense.getCategory().getId());
-
-            Expense newExpense = new Expense();
-            newExpense.setName(expense.getName());
-            newExpense.setAmount(expense.getAmount());
-            newExpense.setCategory(category);
-            newExpense.setDate(expense.getDate());
-            newExpense.setGroup(group);
-            newExpense.setUser(user);
+        for (TransactionDto expense : expenses) {
+            TransactionCategory category = validateCategory(expense.getCategory().getId(), categories);
+            Expense newExpense = createExpenseEntity(user, group, expense, category);
 
             if (expense.getDate() != null && !expense.getDate().isBefore(startOfTheMonth)) {
                 hasCurrentMonthImportedExpense = true;
@@ -159,23 +160,47 @@ public class GroupServiceImpl implements GroupService {
             expenseRepository.save(newExpense);
         }
 
-        for (TransactionDto income : importExportDto.getIncomes()) {
-            TransactionCategory category = categories.get(income.getCategory().getId());
+        return hasCurrentMonthImportedExpense;
+    }
 
-            if (category == null)
-                throw new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono kategorii o podanym identyfikatorze: " + income.getCategory().getId());
-
-            Income newIncome = new Income();
-            newIncome.setName(income.getName());
-            newIncome.setAmount(income.getAmount());
-            newIncome.setCategory(category);
-            newIncome.setDate(income.getDate());
-            newIncome.setGroup(group);
-            newIncome.setUser(user);
-
+    private void importIncomesFromDto(User user, Group group, List<TransactionDto> incomes, Map<Long, TransactionCategory> categories) {
+        for (TransactionDto income : incomes) {
+            TransactionCategory category = validateCategory(income.getCategory().getId(), categories);
+            Income newIncome = createIncomeEntity(user, group, income, category);
             incomeRepository.save(newIncome);
         }
+    }
 
+    private TransactionCategory validateCategory(Long categoryId, Map<Long, TransactionCategory> categories) {
+        TransactionCategory category = categories.get(categoryId);
+        if (category == null)
+            throw new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono kategorii o podanym identyfikatorze: " + categoryId);
+        return category;
+    }
+
+    private Expense createExpenseEntity(User user, Group group, TransactionDto expense, TransactionCategory category) {
+        Expense newExpense = new Expense();
+        newExpense.setName(expense.getName());
+        newExpense.setAmount(expense.getAmount());
+        newExpense.setCategory(category);
+        newExpense.setDate(expense.getDate());
+        newExpense.setGroup(group);
+        newExpense.setUser(user);
+        return newExpense;
+    }
+
+    private Income createIncomeEntity(User user, Group group, TransactionDto income, TransactionCategory category) {
+        Income newIncome = new Income();
+        newIncome.setName(income.getName());
+        newIncome.setAmount(income.getAmount());
+        newIncome.setCategory(category);
+        newIncome.setDate(income.getDate());
+        newIncome.setGroup(group);
+        newIncome.setUser(user);
+        return newIncome;
+    }
+
+    private void notifyIfNeeded(User user, Group group, boolean hasCurrentMonthImportedExpense) {
         if (hasCurrentMonthImportedExpense) {
             expenseLimitSubject.notifyObservers(new ExpenseLimitEvent(user, group));
         }

@@ -32,35 +32,46 @@ public class ExpenseLimitEmailObserver implements ExpenseLimitObserver {
             return;
         }
 
-        LocalDate startOfTheMonth = LocalDate.now().withDayOfMonth(1);
-        Double totalExpenses = expenseRepository.getTotalByGroupAndMinDate(group, startOfTheMonth);
+        Double totalExpenses = calculateTotalExpenses(group);
+        double remainingPart = calculateRemainingPart(totalExpenses, group.getExpenseLimit());
 
-        if (totalExpenses == null) {
-            totalExpenses = 0.0;
-        }
-
-        double remainingPart = 1 - (totalExpenses / group.getExpenseLimit());
         if (remainingPart > 0.1) {
             return;
         }
 
-        Mail mail;
+        Mail mail = selectMailType(event, group, totalExpenses, remainingPart);
+        sendMailWithErrorHandling(mail);
+    }
+
+    private Double calculateTotalExpenses(Group group) {
+        LocalDate startOfTheMonth = LocalDate.now().withDayOfMonth(1);
+        Double totalExpenses = expenseRepository.getTotalByGroupAndMinDate(group, startOfTheMonth);
+        return totalExpenses != null ? totalExpenses : 0.0;
+    }
+
+    private double calculateRemainingPart(Double totalExpenses, Double expenseLimit) {
+        return 1 - (totalExpenses / expenseLimit);
+    }
+
+    private Mail selectMailType(ExpenseLimitEvent event, Group group, Double totalExpenses, double remainingPart) {
         if (remainingPart < 0) {
-            mail = LimitExceededMail.builder()
+            return LimitExceededMail.builder()
                     .sender(mailSenderImplementation)
                     .user(event.user())
                     .group(group)
                     .totalExpenses(totalExpenses)
                     .build();
         } else {
-            mail = CloseToLimitMail.builder()
+            return CloseToLimitMail.builder()
                     .sender(mailSenderImplementation)
                     .user(event.user())
                     .group(group)
                     .totalExpenses(totalExpenses)
                     .build();
         }
+    }
 
+    private void sendMailWithErrorHandling(Mail mail) {
         try {
             mailService.sendMail(mail);
         } catch (Exception e) {

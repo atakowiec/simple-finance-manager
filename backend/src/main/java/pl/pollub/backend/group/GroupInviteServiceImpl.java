@@ -37,29 +37,33 @@ public class GroupInviteServiceImpl implements GroupInviteService {
         Group group = groupService.getGroupByIdOrThrow(groupId);
         groupService.checkMembershipOrThrow(user, group);
 
-        User target = userService.getUserById(userId);
-
-        if (target == null)
-            throw new HttpException(404, "Nie znaleziono podanego użytkownika");
-
-        // Check if invitation already exists
+        User target = getUserOrThrow(userId);
         GroupInvite existingInvite = inviteRepository.findGroupInviteByInviteeAndGroup(target, group);
 
-        // Create invitation object
-        GroupInvite invite = new GroupInvite();
-        invite.setGroup(group);
-        invite.setInviter(user);
-        invite.setInvitee(target);
-        invite.setCreatedAt(LocalDateTime.now());
+        GroupInvite invite = createInviteObject(user, group, target);
 
-        // Use State Pattern: Let the state object validate the operation
         UserMembership membership = UserMembership.create(target, group, existingInvite);
         membership.inviteUser(user, invite);
 
-        // Save the invitation
         inviteRepository.save(invite);
 
         return membership.getStatus();
+    }
+
+    private User getUserOrThrow(Long userId) {
+        User target = userService.getUserById(userId);
+        if (target == null)
+            throw new HttpException(404, "Nie znaleziono podanego użytkownika");
+        return target;
+    }
+
+    private GroupInvite createInviteObject(User inviter, Group group, User invitee) {
+        GroupInvite invite = new GroupInvite();
+        invite.setGroup(group);
+        invite.setInviter(inviter);
+        invite.setInvitee(invitee);
+        invite.setCreatedAt(LocalDateTime.now());
+        return invite;
     }
 
     @Override
@@ -67,17 +71,9 @@ public class GroupInviteServiceImpl implements GroupInviteService {
         Group group = groupService.getGroupByIdOrThrow(groupId);
         groupService.checkMembershipOrThrow(user, group);
 
-        User target = userService.getUserById(userId);
+        User target = getUserOrThrow(userId);
+        GroupInvite invite = getInviteOrThrow(target, group);
 
-        if (target == null)
-            throw new HttpException(404, "Nie znaleziono podanego użytkownika");
-
-        GroupInvite invite = inviteRepository.findGroupInviteByInviteeAndGroup(target, group);
-
-        if (invite == null)
-            throw new HttpException(404, "Ten użytkownik nie ma zaproszenia do grupy");
-
-        // Use State Pattern: Let the state object validate the operation
         UserMembership membership = UserMembership.create(target, group, invite);
         membership.denyInvitation(invite);
 
@@ -86,41 +82,48 @@ public class GroupInviteServiceImpl implements GroupInviteService {
         return membership.getStatus();
     }
 
+    private GroupInvite getInviteOrThrow(User target, Group group) {
+        GroupInvite invite = inviteRepository.findGroupInviteByInviteeAndGroup(target, group);
+        if (invite == null)
+            throw new HttpException(404, "Ten użytkownik nie ma zaproszenia do grupy");
+        return invite;
+    }
+
     @Override
     public MembershipStatus denyInvitation(User user, Long inviteId) {
-        GroupInvite groupInvite = inviteRepository.findById(inviteId)
-                .orElseThrow(() -> new HttpException(404, "Nie znaleziono zaproszenia"));
-
-        if (!groupInvite.getInvitee().equals(user))
-            throw new HttpException(HttpStatus.UNAUTHORIZED, "To zaproszenie nie dotyczy ciebie!");
+        GroupInvite groupInvite = getInviteByIdOrThrow(inviteId);
+        validateInviteOwnership(user, groupInvite);
 
         Group group = groupService.getGroupByIdOrThrow(groupInvite.getGroup().getId());
 
-        // Use State Pattern: Let the state object validate the operation
         UserMembership membership = UserMembership.create(user, group, groupInvite);
         membership.denyInvitation(groupInvite);
 
-        // Delete invitation
         inviteRepository.delete(groupInvite);
 
         return membership.getStatus();
     }
 
-    @Override
-    public MembershipStatus acceptInvitation(User user, Long inviteId) {
-        GroupInvite groupInvite = inviteRepository.findById(inviteId)
+    private GroupInvite getInviteByIdOrThrow(Long inviteId) {
+        return inviteRepository.findById(inviteId)
                 .orElseThrow(() -> new HttpException(404, "Nie znaleziono zaproszenia"));
+    }
 
+    private void validateInviteOwnership(User user, GroupInvite groupInvite) {
         if (!groupInvite.getInvitee().equals(user))
             throw new HttpException(HttpStatus.UNAUTHORIZED, "To zaproszenie nie dotyczy ciebie!");
+    }
+
+    @Override
+    public MembershipStatus acceptInvitation(User user, Long inviteId) {
+        GroupInvite groupInvite = getInviteByIdOrThrow(inviteId);
+        validateInviteOwnership(user, groupInvite);
 
         Group group = groupService.getGroupByIdOrThrow(groupInvite.getGroup().getId());
 
-        // Use State Pattern: Let the state object validate the operation
         UserMembership membership = UserMembership.create(user, group, groupInvite);
         membership.acceptInvitation(groupInvite);
 
-        // Delete invitation and save group
         inviteRepository.delete(groupInvite);
         groupService.save(group);
 
@@ -132,8 +135,12 @@ public class GroupInviteServiceImpl implements GroupInviteService {
         Group group = groupService.getGroupByIdOrThrow(groupId);
         groupService.checkMembershipOrThrow(user, group);
 
-        List<InviteTargetDto> result = new ArrayList<>();
         List<Object[]> dbResult = userService.getUserRepository().findUsersByNicknameWithInviteStatus(query, groupId, Pageable.ofSize(10));
+        return fetchInviteTargets(user, group, dbResult);
+    }
+
+    private List<InviteTargetDto> fetchInviteTargets(User user, Group group, List<Object[]> dbResult) {
+        List<InviteTargetDto> result = new ArrayList<>();
 
         for (Object[] row : dbResult) {
             User inviteeUser = (User) row[0];
@@ -142,20 +149,26 @@ public class GroupInviteServiceImpl implements GroupInviteService {
             if (inviteeUser.equals(user))
                 continue;
 
-            InviteTargetDto dto = new InviteTargetDto();
-            dto.setId(inviteeUser.getId());
-            dto.setUsername(inviteeUser.getUsername());
-
-            if (group.getUsers().stream().anyMatch(inviteeUser::equals)) {
-                dto.setMembershipStatus(MembershipStatus.IN_GROUP);
-            } else {
-                dto.setMembershipStatus(isInvited ? MembershipStatus.INVITED : MembershipStatus.NONE);
-            }
-
+            InviteTargetDto dto = mapUserToDto(inviteeUser, group, isInvited);
             result.add(dto);
         }
 
         return result;
+    }
+
+    private InviteTargetDto mapUserToDto(User inviteeUser, Group group, boolean isInvited) {
+        InviteTargetDto dto = new InviteTargetDto();
+        dto.setId(inviteeUser.getId());
+        dto.setUsername(inviteeUser.getUsername());
+        dto.setMembershipStatus(determineMembershipStatus(group, inviteeUser, isInvited));
+        return dto;
+    }
+
+    private MembershipStatus determineMembershipStatus(Group group, User inviteeUser, boolean isInvited) {
+        if (group.getUsers().stream().anyMatch(inviteeUser::equals)) {
+            return MembershipStatus.IN_GROUP;
+        }
+        return isInvited ? MembershipStatus.INVITED : MembershipStatus.NONE;
     }
 
     @Override

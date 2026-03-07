@@ -22,9 +22,7 @@ import java.util.Map;
 // start interface segregation principle
 public interface TransactionService<T extends Transaction> {
     GroupService getGroupService();
-
     CategoryService getCategoryService();
-
     TransactionRepository<T> getTransactionRepository();
     TransactionFactory<T> getTransactionFactory();
 
@@ -140,18 +138,16 @@ public interface TransactionService<T extends Transaction> {
         List<Object[]> result = getTransactionRepository().sumAllByGroupAndMinDate(group, minDate);
         Map<Long, Double> rawStats = new HashMap<>();
 
-        for (Object[] row : result) {
+        for (Object[] row : result)
             rawStats.put((Long) row[0], (Double) row[1]);
-        }
 
         Map<String, Double> stats = new HashMap<>();
         List<TransactionCategory> allCategories = getCategoryService().getAllCategories(); // This now returns only root categories
 
         for (TransactionCategory root : allCategories) {
             Double total = calculateRecursiveTotal(root, rawStats);
-            if (total > 0) {
+            if (total > 0)
                 stats.put(root.getName(), total);
-            }
         }
 
         return stats;

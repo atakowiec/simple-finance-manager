@@ -67,27 +67,35 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String handleLogin(LoginDto loginDto, HttpServletResponse res) {
-        User user;
+        User user = findUserByIdentifier(loginDto.getIdentifier());
+        validateLoginPassword(user, loginDto);
+        return createLoginResponse(user, res);
+    }
 
-        if (loginDto.getIdentifier().contains("@")) {
-            user = usersRepository.findByEmail(loginDto.getIdentifier())
+    private User findUserByIdentifier(String identifier) {
+        if (identifier.contains("@")) {
+            return usersRepository.findByEmail(identifier)
                     .orElseThrow(() -> {
-                        log.warn("User tried to login with non-existing email: {}", loginDto.getIdentifier());
+                        log.warn("User tried to login with non-existing email: {}", identifier);
                         return new HttpException(HttpStatus.UNAUTHORIZED, "Niepoprawne dane logowania");
                     });
         } else {
-            user = usersRepository.findByUsername(loginDto.getIdentifier())
+            return usersRepository.findByUsername(identifier)
                     .orElseThrow(() -> {
-                        log.warn("User tried to login with non-existing username: {}", loginDto.getIdentifier());
+                        log.warn("User tried to login with non-existing username: {}", identifier);
                         return new HttpException(HttpStatus.UNAUTHORIZED, "Niepoprawne dane logowania");
                     });
         }
+    }
 
+    private void validateLoginPassword(User user, LoginDto loginDto) {
         if (!verifyPassword(user.getPassword(), loginDto.getPassword())) {
             log.warn("User tried to login with incorrect password: {}", loginDto.getIdentifier());
             throw new HttpException(HttpStatus.UNAUTHORIZED, "Niepoprawne dane logowania");
         }
+    }
 
+    private String createLoginResponse(User user, HttpServletResponse res) {
         String token = jwtService.createToken(user);
         jwtService.addTokenToResponse(res, token);
         log.info("User logged in: {}", user.getUsername());
@@ -102,6 +110,12 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String handleRegister(RegisterDto registerDto, HttpServletResponse res) {
+        validateRegistration(registerDto);
+        User user = createUser(registerDto);
+        return createRegisterResponse(user, res);
+    }
+
+    private void validateRegistration(RegisterDto registerDto) {
         if (isUsernameTaken(registerDto.getUsername())) {
             log.warn("User tried to register with already taken username: {}", registerDto.getUsername());
             throw new HttpException(HttpStatus.CONFLICT, "username");
@@ -111,7 +125,9 @@ public class AuthServiceImpl implements AuthService {
             log.warn("User tried to register with already taken email: {}", registerDto.getEmail());
             throw new HttpException(HttpStatus.CONFLICT, "email");
         }
+    }
 
+    private User createUser(RegisterDto registerDto) {
         String hashedPassword = hashPassword(registerDto.getPassword());
 
         User user = new User();
@@ -120,7 +136,10 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(hashedPassword);
         user.setRole(Role.USER);
         usersRepository.save(user);
+        return user;
+    }
 
+    private String createRegisterResponse(User user, HttpServletResponse res) {
         res.setStatus(201);
         String token = jwtService.createToken(user);
         jwtService.addTokenToResponse(res, token);

@@ -46,12 +46,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public String updateCategory(Long id, CategoryUpdateDto categoryUpdateDto) {
         TransactionCategory category = getCategoryByIdOrThrow(id);
-
         TransactionCategory foundCategory = categoryRepository.getByNameAndCategoryType(categoryUpdateDto.getName(), categoryUpdateDto.getCategoryType());
 
-        if (foundCategory != null && !foundCategory.getId().equals(id)) {
+        if (foundCategory != null && !foundCategory.getId().equals(id))
             throw new HttpException(409, "Kategoria o tej nazwie już istnieje.");
-        }
 
         category.setName(categoryUpdateDto.getName());
 
@@ -59,15 +57,13 @@ public class CategoryServiceImpl implements CategoryService {
             category.setIcon(iconFlyweightFactory.getOrAdd(categoryUpdateDto.getIcon()));
 
         if (categoryUpdateDto.getParentId() != null) {
-            if (categoryUpdateDto.getParentId().equals(id)) {
+            if (categoryUpdateDto.getParentId().equals(id))
                 throw new HttpException(400, "Kategoria nie może być swoim własnym rodzicem.");
-            }
+
             TransactionCategory parent = getCategoryByIdOrThrow(categoryUpdateDto.getParentId());
             category.setParent(parent);
-        } else {
+        } else
             category.setParent(null);
-        }
-
         categoryRepository.save(category);
         return "Kategoria została zaktualizowana.";
     }
