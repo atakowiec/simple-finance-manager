@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.pollub.backend.auth.dto.UserEmailEditDto;
 import pl.pollub.backend.auth.dto.UserRoleDto;
@@ -20,6 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
 @Tag(name = "Admin", description = "Zarządzanie użytkownikami przez administratora")
 public class AdminController {
     private final UserService userService;
@@ -65,4 +67,3 @@ public class AdminController {
         return ResponseEntity.ok(message);
     }
 }
-

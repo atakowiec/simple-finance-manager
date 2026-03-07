@@ -10,4 +10,6 @@ import java.util.List;
  */
 public interface GroupRepository extends JpaRepository<Group, Long> {
     List<Group> findByUsers_Id(Long userId);
+
+    List<Group> findByOwner_Id(Long ownerId);
 }

@@ -1,7 +1,9 @@
 package pl.pollub.backend.transaction.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.group.model.Group;
@@ -20,7 +22,6 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>, Transac
     <S extends Expense> S save(@NonNull S expense);
 
     @Override
-    @NonNull
     void deleteById(@NonNull Long id);
 
     @Override
@@ -43,4 +44,8 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>, Transac
     @Override
     @Query("SELECT SUM(e.amount) FROM Expense e WHERE e.group = :group AND e.date >= :minDate")
     Double getTotalByGroupAndMinDate(Group group, LocalDate minDate);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE Expense e SET e.user = :anonymizedUser WHERE e.user = :targetUser")
+    int anonymizeUserTransactions(@Param("targetUser") User targetUser, @Param("anonymizedUser") User anonymizedUser);
 }

@@ -19,4 +19,8 @@ public interface GroupInviteRepository extends JpaRepository<GroupInvite, Long> 
     List<GroupInvite> findAllByInvitee(User user);
 
     void deleteAllByGroup(Group group);
+
+    void deleteAllByInvitee(User invitee);
+
+    void deleteAllByInviter(User inviter);
 }

@@ -10,6 +10,7 @@ import pl.pollub.backend.auth.dto.UserEmailEditDto;
 import pl.pollub.backend.auth.dto.UserPasswordChangeDto;
 import pl.pollub.backend.auth.dto.UserRoleDto;
 import pl.pollub.backend.auth.dto.UserUsernameEditDto;
+import pl.pollub.backend.auth.user.deletion.UserDeletionMediator;
 import pl.pollub.backend.categories.dto.UserDto;
 import pl.pollub.backend.exception.HttpException;
 
@@ -27,6 +28,7 @@ public class UserServiceImpl implements UserService {
     private final UsersRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
+    private final UserDeletionMediator userDeletionMediator;
 
 
     @Override
@@ -114,10 +116,9 @@ public class UserServiceImpl implements UserService {
         return "Rola użytkownika została zaktualizowana.";
     }
 
+    @Override
     public String deleteUser(Long userId) {
         User user = getUserByIdOrThrow(userId);
-
-        userRepository.delete(user);
-        return "Użytkownik został pomyślnie usunięty.";
+        return userDeletionMediator.deleteUser(user);
     }
 }
