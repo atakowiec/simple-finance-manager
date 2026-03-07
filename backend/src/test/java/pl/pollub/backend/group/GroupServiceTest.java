@@ -27,7 +27,9 @@ import pl.pollub.backend.transaction.model.Expense;
 import pl.pollub.backend.transaction.model.Income;
 import pl.pollub.backend.transaction.repository.ExpenseRepository;
 import pl.pollub.backend.transaction.repository.IncomeRepository;
+import pl.pollub.backend.transaction.observer.ExpenseLimitSubject;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -48,6 +50,8 @@ class GroupServiceTest {
     private CategoryService categoryService; // mockito needs to know what to inject
     @Mock
     private GroupCaretaker groupCaretaker;
+    @Mock
+    private ExpenseLimitSubject expenseLimitSubject;
 
     @InjectMocks
     private GroupServiceImpl groupServiceImpl;
@@ -237,6 +241,7 @@ class GroupServiceTest {
 
         Assertions.assertEquals(newExpenseLimit, group.getExpenseLimit());
         Mockito.verify(groupRepository, Mockito.times(1)).save(Mockito.any());
+        Mockito.verify(expenseLimitSubject, Mockito.times(1)).notifyObservers(Mockito.any());
     }
 
     @Test
@@ -346,6 +351,7 @@ class GroupServiceTest {
 
             TransactionDto expenseDto = new TransactionDto();
             expenseDto.setCategory(categoryDto);
+            expenseDto.setDate(LocalDate.now());
             importExportDto.getExpenses().add(expenseDto);
         }
 
@@ -361,6 +367,7 @@ class GroupServiceTest {
 
         Mockito.verify(expenseRepository, Mockito.times(5)).save(Mockito.any());
         Mockito.verify(incomeRepository, Mockito.times(5)).save(Mockito.any());
+        Mockito.verify(expenseLimitSubject, Mockito.times(1)).notifyObservers(Mockito.any());
     }
 
     @Test
@@ -463,3 +470,4 @@ class GroupServiceTest {
         Mockito.verify(groupRepository, Mockito.times(0)).save(loggedUserGroup);
     }
 }
+

@@ -17,7 +17,10 @@ import pl.pollub.backend.categories.model.TransactionCategory;
 import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.GroupServiceImpl;
 import pl.pollub.backend.group.model.Group;
+import pl.pollub.backend.transaction.dto.TransactionCreateDto;
 import pl.pollub.backend.transaction.dto.TransactionUpdateDto;
+import pl.pollub.backend.transaction.factory.ExpenseFactory;
+import pl.pollub.backend.transaction.observer.ExpenseLimitSubject;
 import pl.pollub.backend.transaction.model.Expense;
 import pl.pollub.backend.transaction.repository.ExpenseRepository;
 import pl.pollub.backend.transaction.service.ExpenseServiceImpl;
@@ -41,6 +44,12 @@ class ExpenseServiceTest {
 
     @Mock
     private CategoryRepository categoryRepository;
+
+    @Mock
+    private ExpenseLimitSubject expenseLimitSubject;
+
+    @Mock
+    private ExpenseFactory expenseFactory;
 
     @InjectMocks
     private ExpenseServiceImpl expenseService;
@@ -89,6 +98,8 @@ class ExpenseServiceTest {
 
         Mockito.doThrow(new HttpException(403, "Forbidden")).when(groupService).checkMembershipOrThrow(Mockito.any(), Mockito.any());
         Mockito.doNothing().when(groupService).checkMembershipOrThrow(user, group);
+
+        Mockito.when(expenseRepository.save(Mockito.any())).thenAnswer(invocation -> invocation.getArgument(0));
     }
 
     @Test
@@ -178,5 +189,56 @@ class ExpenseServiceTest {
         HttpException httpException = Assertions.assertThrows(HttpException.class, () -> expenseService.deleteTransaction(notExistingExpense.getId(), user));
 
         Assertions.assertEquals(404, httpException.getHttpStatus().value());
+    }
+
+    @Test
+    void createExpense_CurrentMonth_NotifiesObservers() {
+        TransactionCategory category = new TransactionCategory();
+        category.setId(1L);
+
+        TransactionCreateDto createDto = new TransactionCreateDto();
+        createDto.setName("Coffee");
+        createDto.setAmount(12.0);
+        createDto.setCategoryId(1L);
+        createDto.setGroupId(groupId);
+        createDto.setDate(LocalDate.now());
+
+        Expense createdExpense = new Expense();
+        createdExpense.setGroup(group);
+        createdExpense.setUser(user);
+        createdExpense.setCategory(category);
+
+        Mockito.when(categoryService.getCategoryByIdOrThrow(1L)).thenReturn(category);
+        Mockito.when(expenseFactory.create(Mockito.any(), Mockito.eq(user), Mockito.eq(category), Mockito.eq(group))).thenReturn(createdExpense);
+
+        Expense result = expenseService.createTransaction(createDto, user);
+
+        Assertions.assertNotNull(result);
+        Mockito.verify(expenseLimitSubject, Mockito.times(1)).notifyObservers(Mockito.any());
+    }
+
+    @Test
+    void createExpense_PreviousMonth_DoesNotNotifyObservers() {
+        TransactionCategory category = new TransactionCategory();
+        category.setId(1L);
+
+        TransactionCreateDto createDto = new TransactionCreateDto();
+        createDto.setName("Old expense");
+        createDto.setAmount(20.0);
+        createDto.setCategoryId(1L);
+        createDto.setGroupId(groupId);
+        createDto.setDate(LocalDate.now().minusMonths(1));
+
+        Expense createdExpense = new Expense();
+        createdExpense.setGroup(group);
+        createdExpense.setUser(user);
+        createdExpense.setCategory(category);
+
+        Mockito.when(categoryService.getCategoryByIdOrThrow(1L)).thenReturn(category);
+        Mockito.when(expenseFactory.create(Mockito.any(), Mockito.eq(user), Mockito.eq(category), Mockito.eq(group))).thenReturn(createdExpense);
+
+        expenseService.createTransaction(createDto, user);
+
+        Mockito.verifyNoInteractions(expenseLimitSubject);
     }
 }

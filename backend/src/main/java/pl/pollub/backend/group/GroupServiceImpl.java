@@ -22,6 +22,8 @@ import pl.pollub.backend.transaction.model.Expense;
 import pl.pollub.backend.transaction.model.Income;
 import pl.pollub.backend.transaction.repository.ExpenseRepository;
 import pl.pollub.backend.transaction.repository.IncomeRepository;
+import pl.pollub.backend.transaction.observer.ExpenseLimitEvent;
+import pl.pollub.backend.transaction.observer.ExpenseLimitSubject;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -43,6 +45,7 @@ public class GroupServiceImpl implements GroupService {
     private final GroupInviteRepository groupInviteRepository;
     private final CategoryService categoryService;
     private final GroupCaretaker groupCaretaker;
+    private final ExpenseLimitSubject expenseLimitSubject;
 
     @Override
     public Group getGroupByIdOrThrow(long groupId) {
@@ -102,6 +105,7 @@ public class GroupServiceImpl implements GroupService {
         saveGroupState(group);
         group.setExpenseLimit(expenseLimit);
         groupRepository.save(group);
+        expenseLimitSubject.notifyObservers(new ExpenseLimitEvent(user, group));
         return group;
     }
 
@@ -127,6 +131,8 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void importTransactions(User user, Long groupId, ImportExportDto importExportDto) {
         Group group = getGroupByIdOrThrow(groupId);
+        LocalDate startOfTheMonth = LocalDate.now().withDayOfMonth(1);
+        boolean hasCurrentMonthImportedExpense = false;
 
         Map<Long, TransactionCategory> categories = categoryService.getAllCategories().stream()
                 .collect(Collectors.toMap(TransactionCategory::getId, v -> v));
@@ -144,6 +150,10 @@ public class GroupServiceImpl implements GroupService {
             newExpense.setDate(expense.getDate());
             newExpense.setGroup(group);
             newExpense.setUser(user);
+
+            if (expense.getDate() != null && !expense.getDate().isBefore(startOfTheMonth)) {
+                hasCurrentMonthImportedExpense = true;
+            }
 
             expenseRepository.save(newExpense);
         }
@@ -163,6 +173,10 @@ public class GroupServiceImpl implements GroupService {
             newIncome.setUser(user);
 
             incomeRepository.save(newIncome);
+        }
+
+        if (hasCurrentMonthImportedExpense) {
+            expenseLimitSubject.notifyObservers(new ExpenseLimitEvent(user, group));
         }
     }
 
