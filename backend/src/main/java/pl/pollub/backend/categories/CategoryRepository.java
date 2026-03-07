@@ -11,4 +11,6 @@ public interface CategoryRepository extends JpaRepository<TransactionCategory, L
     TransactionCategory getByNameAndCategoryType(String name, CategoryType categoryType);
 
     boolean existsByNameAndCategoryType(String name, CategoryType categoryType);
+
+    TransactionCategory findByName(String categoryName);
 }
