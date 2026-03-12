@@ -17,6 +17,7 @@ import pl.pollub.backend.auth.user.UsersRepository;
 import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.util.SimpleJsonBuilder;
 
+import java.util.Set;
 /**
  * Service for managing user authentication.
  */
@@ -100,12 +101,14 @@ public class AuthServiceImpl implements AuthService {
         jwtService.addTokenToResponse(res, token);
         log.info("User logged in: {}", user.getUsername());
 
-        return SimpleJsonBuilder.of("id", user.getId())
+        SimpleJsonBuilder builder = SimpleJsonBuilder.of("id", user.getId())
                 .add("username", user.getUsername())
                 .add("email", user.getEmail())
                 .add("role", user.getRole().name())
-                .add("token", token)
-                .toJson();
+                .add("token", token);
+
+        log.debug("Login response payload: {}", builder.toRedactedJson(Set.of("email", "token")));
+        return builder.toJson();
     }
 
     @Override
@@ -146,12 +149,14 @@ public class AuthServiceImpl implements AuthService {
         jwtService.addTokenToResponse(res, token);
         log.info("User registered: {}", user.getUsername());
 
-        return SimpleJsonBuilder.of("id", user.getId())
+        SimpleJsonBuilder builder = SimpleJsonBuilder.of("id", user.getId())
                 .add("username", user.getUsername())
                 .add("email", user.getEmail())
                 .add("role", user.getRole().name())
-                .add("token", token)
-                .toJson();
+                .add("token", token);
+
+        log.debug("Register response payload: {}", builder.toRedactedJson(Set.of("email", "token")));
+        return builder.toJson();
     }
 
     @Override

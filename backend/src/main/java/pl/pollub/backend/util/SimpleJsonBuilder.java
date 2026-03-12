@@ -7,12 +7,16 @@ import pl.pollub.backend.util.json.JsonArray;
 import pl.pollub.backend.util.json.JsonComponent;
 import pl.pollub.backend.util.json.JsonObject;
 import pl.pollub.backend.util.json.JsonValue;
+import pl.pollub.backend.util.json.decorators.PrettyPrintJsonDecorator;
+import pl.pollub.backend.util.json.decorators.RedactingJsonDecorator;
 
 import java.lang.reflect.Array;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 // start builder
+
 /**
  * Simple JSON builder that allows to create JSON objects in a more readable way.
  */
@@ -32,7 +36,8 @@ public class SimpleJsonBuilder {
 
     /**
      * Creates a new JSON object with a single key-value pair.
-     * @param key key of the JSON object
+     *
+     * @param key   key of the JSON object
      * @param value value of the JSON object
      * @return JSON builder with the specified key-value pair
      */
@@ -42,6 +47,7 @@ public class SimpleJsonBuilder {
 
     /**
      * Creates a new JSON object with the specified key-value pairs.
+     *
      * @param map key-value pairs of the JSON object
      * @return JSON builder with the specified key-value pairs
      */
@@ -51,6 +57,7 @@ public class SimpleJsonBuilder {
 
     /**
      * Creates an empty JSON object.
+     *
      * @return empty JSON builder
      */
     public static SimpleJsonBuilder empty() {
@@ -59,7 +66,8 @@ public class SimpleJsonBuilder {
 
     /**
      * Adds a new key-value pair to the JSON object.
-     * @param key key of the JSON object
+     *
+     * @param key   key of the JSON object
      * @param value value of the JSON object
      * @return JSON builder with the new key-value pair
      */
@@ -70,6 +78,7 @@ public class SimpleJsonBuilder {
 
     /**
      * Returns Map representation of the JSON object.
+     *
      * @return JSON object as a Map
      */
     public Map<String, Object> build() {
@@ -86,6 +95,7 @@ public class SimpleJsonBuilder {
 
     /**
      * Converts the JSON object to a JSON string.
+     *
      * @return JSON string
      */
     public String toJson() {
@@ -94,6 +104,17 @@ public class SimpleJsonBuilder {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Converts the JSON object to a JSON string with selected fields redacted.
+     *
+     * @param keysToRedact keys to be redacted
+     * @return redacted JSON string
+     */
+    public String toRedactedJson(Set<String> keysToRedact) {
+        JsonComponent redacted = new RedactingJsonDecorator(root, keysToRedact);
+        return new PrettyPrintJsonDecorator(redacted).toPrettyJson();
     }
 
     JsonComponent toComponent() {
