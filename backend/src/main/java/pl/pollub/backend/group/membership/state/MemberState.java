@@ -5,6 +5,7 @@ import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.group.model.GroupInvite;
 
 // start open close principle, Abstrakcja i sterowanie danymi
+// start singleton
 
 /**
  * State interface for group membership.

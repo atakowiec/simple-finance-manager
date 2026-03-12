@@ -1,7 +1,5 @@
 package pl.pollub.backend.group.export;
 
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -12,13 +10,27 @@ import java.util.stream.Collectors;
 /**
  * Resolves export commands by requested format.
  */
-@Component
-public class ExportCommandFactory {
+public final class ExportCommandFactory {
+    private static ExportCommandFactory instance;
+
     private final Map<String, ExportCommand> commandsByFormat;
 
-    public ExportCommandFactory(List<ExportCommand> commands) {
+    private ExportCommandFactory(List<ExportCommand> commands) {
         this.commandsByFormat = commands.stream()
                 .collect(Collectors.toMap(command -> command.getFormat().toLowerCase(Locale.ROOT), Function.identity()));
+    }
+
+    public static synchronized void init(List<ExportCommand> commands) {
+        if (instance == null) {
+            instance = new ExportCommandFactory(commands);
+        }
+    }
+
+    public static ExportCommandFactory getInstance() {
+        if (instance == null) {
+            throw new IllegalStateException("ExportCommandFactory is not initialized");
+        }
+        return instance;
     }
 
     public ExportCommand getCommand(String format) {

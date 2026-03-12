@@ -1,7 +1,6 @@
 package pl.pollub.backend.group.export;
 
 // start facade
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.group.dto.ImportExportDto;
@@ -13,10 +12,15 @@ import pl.pollub.backend.group.interfaces.GroupService;
  * and export commands.
  */
 @Component
-@RequiredArgsConstructor
 public class GroupExportFacade {
     private final GroupService groupService;
     private final ExportCommandFactory exportCommandFactory;
+
+    public GroupExportFacade(GroupService groupService, java.util.List<ExportCommand> commands) {
+        this.groupService = groupService;
+        ExportCommandFactory.init(commands);
+        this.exportCommandFactory = ExportCommandFactory.getInstance();
+    }
 
     public GroupExportResponse exportGroupData(User user, Long groupId, String format) {
         ImportExportDto exportDto = groupService.exportTransactions(user, groupId);

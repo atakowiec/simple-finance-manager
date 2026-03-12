@@ -7,6 +7,7 @@ import pl.pollub.backend.mail.interfaces.FullHtmlMail;
 import pl.pollub.backend.mail.interfaces.Mail;
 import pl.pollub.backend.mail.interfaces.MailRequest;
 import pl.pollub.backend.mail.interfaces.MailSenderImplementation;
+import pl.pollub.backend.util.CurrencyFormatter;
 
 /**
  * Refined Abstraction in the Bridge design pattern.
@@ -66,10 +67,13 @@ public class CloseToLimitMail extends Mail implements FullHtmlMail {
 
     @Override
     public String getHtml() {
-        return String.format("<p>Niebezpiecznie blisko limitu w grupie %s. <br><b>Wydano %.2f, a limit wynosi %.2f</b></p>",
+        CurrencyFormatter formatter = CurrencyFormatter.getInstance();
+        String totalFormatted = formatter.format(totalExpenses);
+        String limitFormatted = formatter.format(group.getExpenseLimit());
+        return String.format("<p>Niebezpiecznie blisko limitu w grupie %s. <br><b>Wydano %s, a limit wynosi %s</b></p>",
                 group.getName(),
-                totalExpenses,
-                group.getExpenseLimit());
+                totalFormatted,
+                limitFormatted);
     }
 
     @Override

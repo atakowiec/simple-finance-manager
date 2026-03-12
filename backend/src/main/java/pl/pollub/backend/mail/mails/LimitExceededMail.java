@@ -9,6 +9,7 @@ import pl.pollub.backend.mail.interfaces.FullHtmlMail;
 import pl.pollub.backend.mail.interfaces.Mail;
 import pl.pollub.backend.mail.interfaces.MailRequest;
 import pl.pollub.backend.mail.interfaces.MailSenderImplementation;
+import pl.pollub.backend.util.CurrencyFormatter;
 
 /**
  * Refined Abstraction in the Bridge design pattern.
@@ -68,11 +69,14 @@ public class LimitExceededMail extends Mail implements FullHtmlMail {
 
     @Override
     public String getHtml() {
-        return String.format("<p>Witaj %s!</p><p>W grupie %s przekroczono limit. <br><b>Wydano %.2f, a limit wynosi %.2f</b></p>",
+        CurrencyFormatter formatter = CurrencyFormatter.getInstance();
+        String totalFormatted = formatter.format(totalExpenses);
+        String limitFormatted = formatter.format(group.getExpenseLimit());
+        return String.format("<p>Witaj %s!</p><p>W grupie %s przekroczono limit. <br><b>Wydano %s, a limit wynosi %s</b></p>",
                 contact.getDisplayName(),
                 group.getName(),
-                totalExpenses,
-                group.getExpenseLimit());
+                totalFormatted,
+                limitFormatted);
     }
 
     @Override
