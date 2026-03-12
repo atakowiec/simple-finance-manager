@@ -7,13 +7,14 @@ import org.springframework.stereotype.Service;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.auth.user.UserService;
 import pl.pollub.backend.exception.HttpException;
+import pl.pollub.backend.group.adapter.InviteTargetRowAdapter;
 import pl.pollub.backend.group.dto.InviteTargetDto;
 import pl.pollub.backend.group.enums.MembershipStatus;
 import pl.pollub.backend.group.interfaces.GroupInviteService;
 import pl.pollub.backend.group.interfaces.GroupService;
+import pl.pollub.backend.group.membership.UserMembership;
 import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.group.model.GroupInvite;
-import pl.pollub.backend.group.membership.UserMembership;
 import pl.pollub.backend.group.repository.GroupInviteRepository;
 
 import java.time.LocalDateTime;
@@ -31,6 +32,7 @@ public class GroupInviteServiceImpl implements GroupInviteService {
     private final GroupInviteRepository inviteRepository;
     private final GroupService groupService;
     private final UserService userService;
+    private final InviteTargetRowAdapter inviteTargetRowAdapter = new InviteTargetRowAdapter();
 
     @Override
     public MembershipStatus inviteUser(User user, Long groupId, Long userId) {
@@ -144,31 +146,15 @@ public class GroupInviteServiceImpl implements GroupInviteService {
 
         for (Object[] row : dbResult) {
             User inviteeUser = (User) row[0];
-            boolean isInvited = (boolean) row[1];
 
             if (inviteeUser.equals(user))
                 continue;
 
-            InviteTargetDto dto = mapUserToDto(inviteeUser, group, isInvited);
+            InviteTargetDto dto = inviteTargetRowAdapter.adapt(row, group);
             result.add(dto);
         }
 
         return result;
-    }
-
-    private InviteTargetDto mapUserToDto(User inviteeUser, Group group, boolean isInvited) {
-        InviteTargetDto dto = new InviteTargetDto();
-        dto.setId(inviteeUser.getId());
-        dto.setUsername(inviteeUser.getUsername());
-        dto.setMembershipStatus(determineMembershipStatus(group, inviteeUser, isInvited));
-        return dto;
-    }
-
-    private MembershipStatus determineMembershipStatus(Group group, User inviteeUser, boolean isInvited) {
-        if (group.getUsers().stream().anyMatch(inviteeUser::equals)) {
-            return MembershipStatus.IN_GROUP;
-        }
-        return isInvited ? MembershipStatus.INVITED : MembershipStatus.NONE;
     }
 
     @Override

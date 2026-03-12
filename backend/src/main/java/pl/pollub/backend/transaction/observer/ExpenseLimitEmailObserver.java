@@ -21,9 +21,7 @@ import java.time.LocalDate;
 public class ExpenseLimitEmailObserver implements ExpenseLimitObserver {
     private final ExpenseRepository expenseRepository;
     private final MailService mailService;
-    private final MailSenderImplementation mailSenderImplementation;
-    private final LimitExceededMail limitExceededPrototype;
-    private final CloseToLimitMail closeToLimitPrototype;
+    private final ExpenseLimitMailAdapter mailAdapter;
 
     public ExpenseLimitEmailObserver(
             ExpenseRepository expenseRepository,
@@ -32,14 +30,15 @@ public class ExpenseLimitEmailObserver implements ExpenseLimitObserver {
     ) {
         this.expenseRepository = expenseRepository;
         this.mailService = mailService;
-        this.mailSenderImplementation = mailSenderImplementation;
+
         // Prototype instances with shared sender configuration
-        this.limitExceededPrototype = LimitExceededMail.builder()
+        LimitExceededMail limitExceededPrototype = LimitExceededMail.builder()
                 .sender(mailSenderImplementation)
                 .build();
-        this.closeToLimitPrototype = CloseToLimitMail.builder()
+        CloseToLimitMail closeToLimitPrototype = CloseToLimitMail.builder()
                 .sender(mailSenderImplementation)
                 .build();
+        this.mailAdapter = new ExpenseLimitMailAdapter(limitExceededPrototype, closeToLimitPrototype);
     }
 
     @Override
@@ -57,7 +56,7 @@ public class ExpenseLimitEmailObserver implements ExpenseLimitObserver {
             return;
         }
 
-        Mail mail = selectMailType(event, totalExpenses, remainingPart);
+        Mail mail = mailAdapter.toMail(event, totalExpenses, remainingPart);
         sendMailWithErrorHandling(mail);
     }
 
@@ -69,20 +68,6 @@ public class ExpenseLimitEmailObserver implements ExpenseLimitObserver {
 
     private double calculateRemainingPart(Double totalExpenses, Double expenseLimit) {
         return 1.0 - (totalExpenses / expenseLimit);
-    }
-
-    private Mail selectMailType(ExpenseLimitEvent event, Double totalExpenses, double remainingPart) {
-        if (remainingPart < 0) {
-            return limitExceededPrototype.clone()
-                    .withUser(event.user())
-                    .withGroup(event.group())
-                    .withTotalExpenses(totalExpenses);
-        } else {
-            return closeToLimitPrototype.clone()
-                    .withUser(event.user())
-                    .withGroup(event.group())
-                    .withTotalExpenses(totalExpenses);
-        }
     }
 
     private void sendMailWithErrorHandling(Mail mail) {
