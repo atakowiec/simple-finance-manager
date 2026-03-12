@@ -8,8 +8,6 @@ import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.auth.user.deletion.handlers.*;
 import pl.pollub.backend.exception.HttpException;
 
-import java.util.List;
-
 /**
  * Concrete mediator implementation for user deletion workflow.
  * Coordinates multiple handlers to execute the deletion in the correct order.
@@ -38,18 +36,21 @@ public class UserDeletionMediatorImpl implements UserDeletionMediator {
 
         UserDeletionContext context = new UserDeletionContext();
 
-        // Execute handlers in order - mediator pattern coordination
-        List<UserDeletionHandler> handlers = List.of(
-                groupOwnershipTransferHandler,
-                anonymizedUserProviderHandler,
-                transactionAnonymizationHandler,
-                groupInviteCleanupHandler,
-                userEntityRemovalHandler
-        );
+        // Execute workflow as a composite tree of tasks
+        CompositeDeletionTask groupCleanup = new CompositeDeletionTask("Group cleanup")
+                .add(groupOwnershipTransferHandler)
+                .add(groupInviteCleanupHandler);
 
-        for (UserDeletionHandler handler : handlers) {
-            handler.handle(user, context);
-        }
+        CompositeDeletionTask anonymization = new CompositeDeletionTask("Anonymization")
+                .add(anonymizedUserProviderHandler)
+                .add(transactionAnonymizationHandler);
+
+        CompositeDeletionTask root = new CompositeDeletionTask("User deletion workflow")
+                .add(groupCleanup)
+                .add(anonymization)
+                .add(userEntityRemovalHandler);
+
+        root.handle(user, context);
 
         return buildResultMessage(context);
     }

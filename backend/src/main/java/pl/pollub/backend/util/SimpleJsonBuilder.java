@@ -3,7 +3,13 @@ package pl.pollub.backend.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.HashMap;
+import pl.pollub.backend.util.json.JsonArray;
+import pl.pollub.backend.util.json.JsonComponent;
+import pl.pollub.backend.util.json.JsonObject;
+import pl.pollub.backend.util.json.JsonValue;
+
+import java.lang.reflect.Array;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 // start builder
@@ -11,14 +17,17 @@ import java.util.Map;
  * Simple JSON builder that allows to create JSON objects in a more readable way.
  */
 public class SimpleJsonBuilder {
-    private final Map<String, Object> json;
+    private final JsonObject root;
 
     private SimpleJsonBuilder() {
-        this.json = new HashMap<>();
+        this.root = new JsonObject();
     }
 
     private SimpleJsonBuilder(Map<String, ?> map) {
-        this.json = new HashMap<>(map);
+        this.root = new JsonObject();
+        for (Map.Entry<String, ?> entry : map.entrySet()) {
+            root.add(entry.getKey(), toComponent(entry.getValue()));
+        }
     }
 
     /**
@@ -55,7 +64,7 @@ public class SimpleJsonBuilder {
      * @return JSON builder with the new key-value pair
      */
     public SimpleJsonBuilder add(String key, Object value) {
-        json.put(key, value);
+        root.add(key, toComponent(value));
         return this;
     }
 
@@ -64,7 +73,15 @@ public class SimpleJsonBuilder {
      * @return JSON object as a Map
      */
     public Map<String, Object> build() {
-        return json;
+        Object raw = root.toRaw();
+        if (raw instanceof Map<?, ?> rawMap) {
+            Map<String, Object> result = new LinkedHashMap<>();
+            for (Map.Entry<?, ?> entry : rawMap.entrySet()) {
+                result.put(String.valueOf(entry.getKey()), entry.getValue());
+            }
+            return result;
+        }
+        throw new IllegalStateException("Root JSON component is not an object");
     }
 
     /**
@@ -73,9 +90,49 @@ public class SimpleJsonBuilder {
      */
     public String toJson() {
         try {
-            return new ObjectMapper().writeValueAsString(json);
+            return new ObjectMapper().writeValueAsString(root.toRaw());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    JsonComponent toComponent() {
+        return root;
+    }
+
+    private static JsonComponent toComponent(Object value) {
+        if (value == null) {
+            return new JsonValue(null);
+        }
+        if (value instanceof JsonComponent component) {
+            return component;
+        }
+        if (value instanceof SimpleJsonBuilder builder) {
+            return builder.toComponent();
+        }
+        if (value instanceof Map<?, ?> map) {
+            JsonObject object = new JsonObject();
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                object.add(String.valueOf(entry.getKey()), toComponent(entry.getValue()));
+            }
+            return object;
+        }
+        if (value instanceof Iterable<?> iterable) {
+            JsonArray array = new JsonArray();
+            for (Object item : iterable) {
+                array.add(toComponent(item));
+            }
+            return array;
+        }
+        Class<?> valueClass = value.getClass();
+        if (valueClass.isArray()) {
+            JsonArray array = new JsonArray();
+            int length = Array.getLength(value);
+            for (int i = 0; i < length; i++) {
+                array.add(toComponent(Array.get(value, i)));
+            }
+            return array;
+        }
+        return new JsonValue(value);
     }
 }
