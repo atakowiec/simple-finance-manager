@@ -9,13 +9,14 @@ import pl.pollub.backend.mail.interfaces.MailRequest;
 import pl.pollub.backend.mail.interfaces.MailSenderImplementation;
 import pl.pollub.backend.util.CurrencyFormatter;
 
+// start builder
 /**
  * Refined Abstraction in the Bridge design pattern.
  */
-public class CloseToLimitMail extends Mail implements FullHtmlMail {
-    private final User user;
-    private final Group group;
-    private final Double totalExpenses;
+public class CloseToLimitMail extends Mail implements FullHtmlMail, Cloneable {
+    private User user;
+    private Group group;
+    private Double totalExpenses;
 
     private CloseToLimitMail(Builder builder) {
         super(builder.sender);
@@ -58,6 +59,30 @@ public class CloseToLimitMail extends Mail implements FullHtmlMail {
     // start L1 builder
     public static Builder builder() {
         return new Builder();
+    }
+
+    public CloseToLimitMail withUser(User user) {
+        this.user = user;
+        return this;
+    }
+
+    public CloseToLimitMail withGroup(Group group) {
+        this.group = group;
+        return this;
+    }
+
+    public CloseToLimitMail withTotalExpenses(Double totalExpenses) {
+        this.totalExpenses = totalExpenses;
+        return this;
+    }
+
+    @Override
+    public CloseToLimitMail clone() {
+        try {
+            return (CloseToLimitMail) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException("Cloning mail failed", e);
+        }
     }
 
     @Override

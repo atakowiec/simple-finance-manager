@@ -18,7 +18,7 @@ import java.util.List;
 @Entity
 @Table(name = "`groups`")
 @Data
-public class Group implements DtoConvertible<GroupDto> {
+public class Group implements DtoConvertible<GroupDto>, Cloneable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -57,6 +57,20 @@ public class Group implements DtoConvertible<GroupDto> {
         groupDto.setUsers(users.stream().map((user -> new GroupMemberDto(user, owner))).toList());
         groupDto.setExpenseLimit(expenseLimit);
         return groupDto;
+    }
+
+    @Override
+    public Group clone() {
+        try {
+            Group cloned = (Group) super.clone();
+            cloned.setId(null);
+            if (cloned.getUsers() != null) {
+                cloned.setUsers(List.copyOf(cloned.getUsers()));
+            }
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException("Cloning group failed", e);
+        }
     }
 }
 

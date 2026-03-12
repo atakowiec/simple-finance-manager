@@ -1,6 +1,5 @@
 package pl.pollub.backend.transaction.observer;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import pl.pollub.backend.config.constants.ExpenseLimitConstants;
@@ -19,11 +18,29 @@ import java.time.LocalDate;
  * Observer that sends warning e-mails when expense limits are close or exceeded.
  */
 @Component
-@RequiredArgsConstructor
 public class ExpenseLimitEmailObserver implements ExpenseLimitObserver {
     private final ExpenseRepository expenseRepository;
     private final MailService mailService;
     private final MailSenderImplementation mailSenderImplementation;
+    private final LimitExceededMail limitExceededPrototype;
+    private final CloseToLimitMail closeToLimitPrototype;
+
+    public ExpenseLimitEmailObserver(
+            ExpenseRepository expenseRepository,
+            MailService mailService,
+            MailSenderImplementation mailSenderImplementation
+    ) {
+        this.expenseRepository = expenseRepository;
+        this.mailService = mailService;
+        this.mailSenderImplementation = mailSenderImplementation;
+        // Prototype instances with shared sender configuration
+        this.limitExceededPrototype = LimitExceededMail.builder()
+                .sender(mailSenderImplementation)
+                .build();
+        this.closeToLimitPrototype = CloseToLimitMail.builder()
+                .sender(mailSenderImplementation)
+                .build();
+    }
 
     @Override
     public void update(ExpenseLimitEvent event) {
@@ -56,19 +73,15 @@ public class ExpenseLimitEmailObserver implements ExpenseLimitObserver {
 
     private Mail selectMailType(ExpenseLimitEvent event, Double totalExpenses, double remainingPart) {
         if (remainingPart < 0) {
-            return LimitExceededMail.builder()
-                    .sender(mailSenderImplementation)
-                    .user(event.user())
-                    .group(event.group())
-                    .totalExpenses(totalExpenses)
-                    .build();
+            return limitExceededPrototype.clone()
+                    .withUser(event.user())
+                    .withGroup(event.group())
+                    .withTotalExpenses(totalExpenses);
         } else {
-            return CloseToLimitMail.builder()
-                    .sender(mailSenderImplementation)
-                    .user(event.user())
-                    .group(event.group())
-                    .totalExpenses(totalExpenses)
-                    .build();
+            return closeToLimitPrototype.clone()
+                    .withUser(event.user())
+                    .withGroup(event.group())
+                    .withTotalExpenses(totalExpenses);
         }
     }
 

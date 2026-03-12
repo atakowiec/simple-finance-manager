@@ -8,23 +8,24 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.categories.CategoryService;
 import pl.pollub.backend.categories.model.TransactionCategory;
+import pl.pollub.backend.config.constants.ExpenseLimitConstants;
 import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.dto.GroupCreateDto;
 import pl.pollub.backend.group.dto.ImportExportDto;
 import pl.pollub.backend.group.interfaces.GroupService;
+import pl.pollub.backend.group.membership.UserMembership;
 import pl.pollub.backend.group.memento.GroupCaretaker;
 import pl.pollub.backend.group.memento.GroupMemento;
-import pl.pollub.backend.group.membership.UserMembership;
 import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.group.repository.GroupInviteRepository;
 import pl.pollub.backend.group.repository.GroupRepository;
 import pl.pollub.backend.transaction.dto.TransactionDto;
 import pl.pollub.backend.transaction.model.Expense;
 import pl.pollub.backend.transaction.model.Income;
-import pl.pollub.backend.transaction.repository.ExpenseRepository;
-import pl.pollub.backend.transaction.repository.IncomeRepository;
 import pl.pollub.backend.transaction.observer.ExpenseLimitEvent;
 import pl.pollub.backend.transaction.observer.ExpenseLimitSubject;
+import pl.pollub.backend.transaction.repository.ExpenseRepository;
+import pl.pollub.backend.transaction.repository.IncomeRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -47,6 +48,8 @@ public class GroupServiceImpl implements GroupService {
     private final CategoryService categoryService;
     private final GroupCaretaker groupCaretaker;
     private final ExpenseLimitSubject expenseLimitSubject;
+    // Prototype instance for creating new groups with default settings
+    private final Group groupPrototype = createGroupPrototype();
 
     private record ImportContext(User user, Group group, Map<Long, TransactionCategory> categories) {}
 
@@ -70,7 +73,8 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group createGroup(User user, GroupCreateDto groupCreateDto) {
-        Group group = new Group();
+        // Use Prototype pattern to create a new group based on a template
+        Group group = groupPrototype.clone();
         group.setName(groupCreateDto.getName());
         group.setOwner(user);
         group.setColor(groupCreateDto.getColor());
@@ -295,5 +299,11 @@ public class GroupServiceImpl implements GroupService {
                 group.getExpenseLimit()
         );
         groupCaretaker.saveMemento(group.getId(), memento);
+    }
+
+    private Group createGroupPrototype() {
+        Group prototype = new Group();
+        prototype.setExpenseLimit(ExpenseLimitConstants.NO_EXPENSE_LIMIT);
+        return prototype;
     }
 }
