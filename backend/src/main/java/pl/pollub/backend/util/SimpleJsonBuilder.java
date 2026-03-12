@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.Map;
 
+// start builder
 /**
  * Simple JSON builder that allows to create JSON objects in a more readable way.
  */

@@ -4,7 +4,6 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 import pl.pollub.backend.config.constants.ValidationConstants;
@@ -14,7 +13,6 @@ import pl.pollub.backend.config.constants.ValidationConstants;
  * Encapsulates all required data for the comprehensive creation process.
  */
 @Data
-@Builder
 public class UserOnboardingDto {
 
     // User data
@@ -49,6 +47,76 @@ public class UserOnboardingDto {
 
     @NotNull(message = "Kategoria jest wymagana")
     private Long categoryId;
+
+    private UserOnboardingDto(Builder builder) {
+        this.username = builder.username;
+        this.password = builder.password;
+        this.email = builder.email;
+        this.groupName = builder.groupName;
+        this.expenseLimit = builder.expenseLimit;
+        this.expenseName = builder.expenseName;
+        this.amount = builder.amount;
+        this.categoryId = builder.categoryId;
+    }
+
+    public static class Builder {
+        private String username;
+        private String password;
+        private String email;
+        private String groupName;
+        private double expenseLimit;
+        private String expenseName;
+        private Double amount;
+        private Long categoryId;
+
+        public Builder username(String username) {
+            this.username = username;
+            return this;
+        }
+
+        public Builder password(String password) {
+            this.password = password;
+            return this;
+        }
+
+        public Builder email(String email) {
+            this.email = email;
+            return this;
+        }
+
+        public Builder groupName(String groupName) {
+            this.groupName = groupName;
+            return this;
+        }
+
+        public Builder expenseLimit(double expenseLimit) {
+            this.expenseLimit = expenseLimit;
+            return this;
+        }
+
+        public Builder expenseName(String expenseName) {
+            this.expenseName = expenseName;
+            return this;
+        }
+
+        public Builder amount(Double amount) {
+            this.amount = amount;
+            return this;
+        }
+
+        public Builder categoryId(Long categoryId) {
+            this.categoryId = categoryId;
+            return this;
+        }
+
+        public UserOnboardingDto build() {
+            return new UserOnboardingDto(this);
+        }
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
 }
 
 

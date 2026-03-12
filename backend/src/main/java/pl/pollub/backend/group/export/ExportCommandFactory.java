@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+// start factory
 // start open close principle, Abstrakcja i sterowanie danymi
 /**
  * Resolves export commands by requested format.

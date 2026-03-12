@@ -13,6 +13,7 @@ import pl.pollub.backend.group.dto.GroupCreateDto;
 import pl.pollub.backend.group.interfaces.GroupService;
 import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.terrible.dto.UserOnboardingDto;
+import pl.pollub.backend.terrible.dto.UserOnboardingResultDto;
 import pl.pollub.backend.transaction.dto.TransactionCreateDto;
 import pl.pollub.backend.transaction.model.Expense;
 import pl.pollub.backend.transaction.service.interfaces.ExpenseService;
@@ -32,7 +33,7 @@ public class UserOnboardingService {
     private final ExpenseService expenseService;
 
     @Transactional
-    public Expense createUserGroupAndExpense(UserOnboardingDto createDto) {
+    public UserOnboardingResultDto createUserGroupAndExpense(UserOnboardingDto createDto) {
         log.info("Starting onboarding flow for username: {}", createDto.getUsername());
 
         validateExpenseLimit(createDto.getExpenseLimit());
@@ -51,7 +52,18 @@ public class UserOnboardingService {
         Expense expense = createExpense(user, group, createDto);
 
         log.info("Onboarding flow completed for username: {}", createDto.getUsername());
-        return expense;
+        return UserOnboardingResultDto.builder()
+                .userId(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .groupId(group.getId())
+                .groupName(group.getName())
+                .expenseLimit(group.getExpenseLimit())
+                .expenseId(expense.getId())
+                .expenseName(expense.getName())
+                .amount(expense.getAmount())
+                .categoryId(expense.getCategory() != null ? expense.getCategory().getId() : null)
+                .build();
     }
 
     private void validateRegistration(UserOnboardingDto createDto) {
@@ -82,22 +94,6 @@ public class UserOnboardingService {
         transactionCreateDto.setGroupId(group.getId());
 
         return expenseService.createTransaction(transactionCreateDto, user);
-    }
-
-    @Transactional
-    public Expense runExample() {
-        UserOnboardingDto exampleDto = UserOnboardingDto.builder()
-                .username("john_doe_example")
-                .password("SecurePass123!")
-                .email("john.doe@example.com")
-                .groupName("Family Budget 2026")
-                .expenseLimit(5000.0)
-                .expenseName("Monthly Groceries")
-                .amount(350.75)
-                .categoryId(1L)
-                .build();
-
-        return createUserGroupAndExpense(exampleDto);
     }
 
     private void validateExpenseLimit(double expenseLimit) {

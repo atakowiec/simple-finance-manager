@@ -164,6 +164,7 @@ public interface TransactionService<T extends Transaction> {
         return total;
     }
 
+    // start factory method
     /**
      * Creates a new transation for the specified user.
      *

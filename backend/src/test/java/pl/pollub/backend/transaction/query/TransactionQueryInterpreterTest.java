@@ -26,7 +26,7 @@ class TransactionQueryInterpreterTest {
 
     @BeforeEach
     void setUp() {
-        parser = new TransactionQueryParser();
+        parser = new TransactionQueryParser(new ExpressionFactory());
         interpreter = new TransactionQueryInterpreter(parser);
 
         // Create test data
