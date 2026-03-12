@@ -26,10 +26,21 @@ public class TransactionQueryInterpreter {
      * @return filtered list of transactions matching the query
      */
     public <T extends Transaction> List<T> filter(List<T> transactions, String query) {
+        return filter(new InMemoryTransactionQuerySource<>(transactions), query);
+    }
+
+    /**
+     * Filters transactions from a data source using a query string.
+     *
+     * @param source query data source
+     * @param query query string in Transaction Query Language
+     * @return filtered list of transactions matching the query
+     */
+    public <T extends Transaction> List<T> filter(TransactionQueryDataSource<T> source, String query) {
         Expression expression = parser.parse(query);
 
         // start functional interface
-        return transactions.stream()
+        return source.load().stream()
                 .filter(expression::interpret)
                 .collect(Collectors.toList());
     }

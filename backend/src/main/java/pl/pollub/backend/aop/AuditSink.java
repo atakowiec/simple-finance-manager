@@ -1,0 +1,12 @@
+package pl.pollub.backend.aop;
+
+/**
+ * Implementor for Bridge pattern - audit sink.
+ */
+public interface AuditSink {
+    void info(String message);
+
+    void warn(String message);
+
+    void debug(String message);
+}

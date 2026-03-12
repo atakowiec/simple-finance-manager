@@ -5,14 +5,16 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
 public class MutationAuditAspect {
-    private static final Logger LOG = LoggerFactory.getLogger(MutationAuditAspect.class);
+    private final AuditReporter reporter;
+
+    public MutationAuditAspect(AuditReporter reporter) {
+        this.reporter = reporter;
+    }
 
     @Pointcut("execution(public * pl.pollub.backend..*ServiceImpl.create*(..)) || " +
               "execution(public * pl.pollub.backend..*ServiceImpl.update*(..)) || " +
@@ -31,12 +33,12 @@ public class MutationAuditAspect {
 
     @AfterReturning("mutatingServiceOperation()")
     public void auditMutationSuccess(JoinPoint joinPoint) {
-        LOG.info("[AOP][mutation] Success: {}", joinPoint.getSignature().toShortString());
+        reporter.mutationSuccess(joinPoint.getSignature().toShortString());
     }
 
     @AfterThrowing(pointcut = "mutatingServiceOperation()", throwing = "exception")
     public void auditMutationFailure(JoinPoint joinPoint, Throwable exception) {
-        LOG.warn("[AOP][mutation] Failure: {} -> {}", joinPoint.getSignature().toShortString(), exception.getClass().getSimpleName());
+        reporter.mutationFailure(joinPoint.getSignature().toShortString(), exception);
     }
 }
 
