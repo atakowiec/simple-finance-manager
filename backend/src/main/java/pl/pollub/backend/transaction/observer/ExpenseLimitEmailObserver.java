@@ -10,6 +10,8 @@ import pl.pollub.backend.mail.interfaces.Mail;
 import pl.pollub.backend.mail.interfaces.MailSenderImplementation;
 import pl.pollub.backend.mail.mails.CloseToLimitMail;
 import pl.pollub.backend.mail.mails.LimitExceededMail;
+import pl.pollub.backend.notification.NotificationSubscriptionService;
+import pl.pollub.backend.notification.NotificationType;
 import pl.pollub.backend.transaction.repository.ExpenseRepository;
 
 import java.time.LocalDate;
@@ -22,14 +24,17 @@ public class ExpenseLimitEmailObserver implements ExpenseLimitObserver {
     private final ExpenseRepository expenseRepository;
     private final MailService mailService;
     private final ExpenseLimitMailAdapter mailAdapter;
+    private final NotificationSubscriptionService subscriptionService;
 
     public ExpenseLimitEmailObserver(
             ExpenseRepository expenseRepository,
             MailService mailService,
-            MailSenderImplementation mailSenderImplementation
+            MailSenderImplementation mailSenderImplementation,
+            NotificationSubscriptionService subscriptionService
     ) {
         this.expenseRepository = expenseRepository;
         this.mailService = mailService;
+        this.subscriptionService = subscriptionService;
 
         // Prototype instances with shared sender configuration
         LimitExceededMail limitExceededPrototype = LimitExceededMail.builder()
@@ -44,6 +49,10 @@ public class ExpenseLimitEmailObserver implements ExpenseLimitObserver {
     @Override
     public void update(ExpenseLimitEvent event) {
         Group group = event.group();
+
+        if (!subscriptionService.isSubscribed(event.user(), NotificationType.EXPENSE_LIMIT_EMAIL)) {
+            return;
+        }
 
         if (group.getExpenseLimit() <= 0) {
             return;
