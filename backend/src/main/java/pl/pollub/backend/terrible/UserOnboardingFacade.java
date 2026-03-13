@@ -19,12 +19,13 @@ import pl.pollub.backend.transaction.model.Expense;
 import pl.pollub.backend.transaction.service.interfaces.ExpenseService;
 
 /**
- * Orchestrates onboarding flow: create user, create group, create first expense.
+ * Facade that orchestrates the onboarding flow:
+ * create user, create group, create first expense.
  */
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserOnboardingService {
+public class UserOnboardingFacade {
 
     private static final double MAX_EXPENSE_LIMIT = 1_000_000.0;
 

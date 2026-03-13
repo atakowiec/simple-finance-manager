@@ -1,9 +1,7 @@
 package pl.pollub.backend.auth;
 
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import pl.pollub.backend.auth.dto.LoginDto;
 import pl.pollub.backend.auth.dto.RegisterDto;
 import pl.pollub.backend.auth.user.User;
 
@@ -58,24 +56,6 @@ public interface AuthService extends UserDetailsService {
      * @return true if the password is correct, false otherwise.
      */
     boolean verifyPassword(String hashedPassword, String currentPassword);
-
-    /**
-     * Handles the login request.
-     *
-     * @param loginDto the login data.
-     * @param res      the response.
-     * @return the json response containing the token and user data.
-     */
-    String handleLogin(LoginDto loginDto, HttpServletResponse res);
-
-    /**
-     * Handles the registration request.
-     *
-     * @param registerDto the registration data.
-     * @param res         the response.
-     * @return the json response containing the token and user data.
-     */
-    String handleRegister(RegisterDto registerDto, HttpServletResponse res);
 
     void save(User user);
 

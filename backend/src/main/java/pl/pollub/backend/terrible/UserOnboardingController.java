@@ -22,13 +22,13 @@ import pl.pollub.backend.terrible.dto.UserOnboardingResultDto;
 @RequestMapping("/onboarding")
 @Tag(name = "Onboarding", description = "Tworzenie użytkownika, grupy i pierwszego wydatku")
 public class UserOnboardingController {
-    private final UserOnboardingService onboardingService;
+    private final UserOnboardingFacade onboardingFacade;
 
     @Operation(summary = "Utwórz użytkownika, grupę i pierwszy wydatek")
     @ApiResponse(responseCode = "201", description = "Utworzono użytkownika, grupę i wydatek")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserOnboardingResultDto createAll(@Valid @RequestBody UserOnboardingDto createDto) {
-        return onboardingService.createUserGroupAndExpense(createDto);
+        return onboardingFacade.createUserGroupAndExpense(createDto);
     }
 }

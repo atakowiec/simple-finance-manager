@@ -12,9 +12,6 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.categories.CategoryService;
-import pl.pollub.backend.categories.dto.CategoryDto;
-import pl.pollub.backend.categories.model.CategoryType;
-import pl.pollub.backend.categories.model.TransactionCategory;
 import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.dto.GroupCreateDto;
 import pl.pollub.backend.group.dto.ImportExportDto;
@@ -22,14 +19,12 @@ import pl.pollub.backend.group.memento.GroupCaretaker;
 import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.group.repository.GroupInviteRepository;
 import pl.pollub.backend.group.repository.GroupRepository;
-import pl.pollub.backend.transaction.dto.TransactionDto;
 import pl.pollub.backend.transaction.model.Expense;
 import pl.pollub.backend.transaction.model.Income;
+import pl.pollub.backend.transaction.observer.ExpenseLimitSubject;
 import pl.pollub.backend.transaction.repository.ExpenseRepository;
 import pl.pollub.backend.transaction.repository.IncomeRepository;
-import pl.pollub.backend.transaction.observer.ExpenseLimitSubject;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -48,6 +43,8 @@ class GroupServiceTest {
     private IncomeRepository incomeRepository;
     @Mock
     private CategoryService categoryService; // mockito needs to know what to inject
+    @Mock
+    private GroupImportFacade importFacade;
     @Mock
     private GroupCaretaker groupCaretaker;
     @Mock
@@ -325,49 +322,6 @@ class GroupServiceTest {
 
         Mockito.verifyNoInteractions(expenseRepository);
         Mockito.verifyNoInteractions(incomeRepository);
-    }
-
-    @Test
-    void importTransactions_TransactionsInPayload_SavesExpenses() {
-        mockTransactionRepositories();
-
-        List<TransactionCategory> categories = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            TransactionCategory transactionCategory = new TransactionCategory();
-            transactionCategory.setId((long) i);
-            transactionCategory.setCategoryType(i >= 5 ? CategoryType.EXPENSE : CategoryType.INCOME);
-            transactionCategory.setName("Category " + i);
-            categories.add(transactionCategory);
-        }
-
-        Mockito.when(categoryService.getAllCategories()).thenReturn(categories);
-
-        ImportExportDto importExportDto = new ImportExportDto();
-        importExportDto.setExpenses(new ArrayList<>());
-        importExportDto.setIncomes(new ArrayList<>());
-
-        for (long i = 0; i < 5; i++) {
-            CategoryDto categoryDto = new CategoryDto(i, "Category " + i, CategoryType.EXPENSE, new ArrayList<>());
-
-            TransactionDto expenseDto = new TransactionDto();
-            expenseDto.setCategory(categoryDto);
-            expenseDto.setDate(LocalDate.now());
-            importExportDto.getExpenses().add(expenseDto);
-        }
-
-        for (long i = 5; i < 10; i++) {
-            CategoryDto categoryDto = new CategoryDto(i, "Category " + i, CategoryType.INCOME, new ArrayList<>());
-
-            TransactionDto transactionDto = new TransactionDto();
-            transactionDto.setCategory(categoryDto);
-            importExportDto.getIncomes().add(transactionDto);
-        }
-
-        groupService.importTransactions(loggedUser, loggedUserGroup.getId(), importExportDto);
-
-        Mockito.verify(expenseRepository, Mockito.times(5)).save(Mockito.any());
-        Mockito.verify(incomeRepository, Mockito.times(5)).save(Mockito.any());
-        Mockito.verify(expenseLimitSubject, Mockito.times(1)).notifyObservers(Mockito.any());
     }
 
     @Test

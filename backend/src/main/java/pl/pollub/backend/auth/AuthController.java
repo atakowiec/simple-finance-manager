@@ -25,20 +25,20 @@ import pl.pollub.backend.auth.user.User;
 @Slf4j(topic = "AuthController")
 @Tag(name = "Autoryzacja", description = "Zarządzanie autoryzacją")
 public class AuthController {
-    private final AuthService authService;
+    private final AuthFacade authFacade;
 
     @Operation(description = "Rejestracja nowego użytkownika")
     @ApiResponse(responseCode = "201", description = "Zarejestrowano użytkownika")
     @PostMapping("/register")
     public String register(@Valid @RequestBody RegisterDto registerDto, HttpServletResponse res) {
-        return authService.handleRegister(registerDto, res);
+        return authFacade.handleRegister(registerDto, res);
     }
 
     @Operation(description = "Logowanie użytkownika")
     @ApiResponse(responseCode = "200", description = "Zalogowano użytkownika")
     @PostMapping("/login")
     public String login(@Valid @RequestBody LoginDto loginDto, HttpServletResponse res) {
-        return authService.handleLogin(loginDto, res);
+        return authFacade.handleLogin(loginDto, res);
     }
 
     @Operation(description = "Weryfikacja tokenu użytkownika")
