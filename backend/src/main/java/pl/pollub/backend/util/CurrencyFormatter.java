@@ -1,8 +1,9 @@
 package pl.pollub.backend.util;
 
+import pl.pollub.backend.util.currency.CurrencyDescriptor;
+import pl.pollub.backend.util.currency.CurrencyDescriptorFlyweightFactory;
+
 import java.text.NumberFormat;
-import java.util.Currency;
-import java.util.Locale;
 
 // start singleton
 /**
@@ -10,8 +11,8 @@ import java.util.Locale;
  */
 public final class CurrencyFormatter {
     private static final CurrencyFormatter INSTANCE = new CurrencyFormatter();
-    private static final Locale DEFAULT_LOCALE = new Locale("pl", "PL");
-    private static final Currency DEFAULT_CURRENCY = Currency.getInstance("PLN");
+    private static final CurrencyDescriptor DEFAULT_DESCRIPTOR =
+            CurrencyDescriptorFlyweightFactory.getDefault();
 
     private CurrencyFormatter() {
     }
@@ -21,15 +22,16 @@ public final class CurrencyFormatter {
     }
 
     public String format(Double amount) {
-        if (amount == null) {
-            return format(0.0);
-        }
-        return format(amount.doubleValue());
+        return format(amount, DEFAULT_DESCRIPTOR);
     }
 
-    private String format(double amount) {
-        NumberFormat formatter = NumberFormat.getCurrencyInstance(DEFAULT_LOCALE);
-        formatter.setCurrency(DEFAULT_CURRENCY);
-        return formatter.format(amount);
+    public String format(Double amount, CurrencyDescriptor descriptor) {
+        CurrencyDescriptor resolved = descriptor != null ? descriptor : DEFAULT_DESCRIPTOR;
+        double value = amount != null ? amount.doubleValue() : 0.0;
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(resolved.locale());
+        formatter.setCurrency(resolved.currency());
+        formatter.setMinimumFractionDigits(resolved.fractionDigits());
+        formatter.setMaximumFractionDigits(resolved.fractionDigits());
+        return formatter.format(value);
     }
 }
