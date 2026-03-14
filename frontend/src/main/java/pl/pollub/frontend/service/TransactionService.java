@@ -35,7 +35,7 @@ public class TransactionService {
         return JsonUtil.GSON.fromJson(response.body(), type);
     }
 
-    public HttpResponse<String> addExpense(String name, double amount, TransactionCategory category, LocalDate date, long groupId) {
+    public HttpResponse<String> addExpense(String name, String amount, TransactionCategory category, LocalDate date, long groupId) {
         String body = SimpleJsonBuilder.empty()
                 .add("name", name)
                 .add("amount", amount)
@@ -47,7 +47,7 @@ public class TransactionService {
         return httpService.post("/expenses", body);
     }
 
-    public HttpResponse<String> addIncome(String name, double amount, TransactionCategory category, LocalDate date, long groupId) {
+    public HttpResponse<String> addIncome(String name, String amount, TransactionCategory category, LocalDate date, long groupId) {
         String body = SimpleJsonBuilder.empty()
                 .add("name", name)
                 .add("amount", amount)
@@ -59,7 +59,7 @@ public class TransactionService {
         return httpService.post("/incomes", body);
     }
 
-    public HttpResponse<String> updateIncome(Long incomeId, String name, double amount, TransactionCategory category, LocalDate date, long groupId) {
+    public HttpResponse<String> updateIncome(Long incomeId, String name, String amount, TransactionCategory category, LocalDate date, long groupId) {
         String body = SimpleJsonBuilder.empty()
                 .add("name", name)
                 .add("amount", amount)
@@ -71,7 +71,7 @@ public class TransactionService {
         return httpService.put("/incomes/" + incomeId, body);
     }
 
-    public HttpResponse<String> updateExpense(Long expenseId, String name, double amount, TransactionCategory category, LocalDate date, long groupId) {
+    public HttpResponse<String> updateExpense(Long expenseId, String name, String amount, TransactionCategory category, LocalDate date, long groupId) {
         String body = SimpleJsonBuilder.empty()
                 .add("name", name)
                 .add("amount", amount)

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.pollub.backend.categories.CategoryService;
 import pl.pollub.backend.group.interfaces.GroupService;
+import pl.pollub.backend.transaction.amount.AmountExpressionInterpreter;
 import pl.pollub.backend.transaction.factory.IncomeFactory;
 import pl.pollub.backend.transaction.factory.TransactionFactory;
 import pl.pollub.backend.transaction.model.Income;
@@ -22,6 +23,7 @@ public class IncomeServiceImpl implements IncomeService {
     private final IncomeRepository incomeRepository;
     private final GroupService groupService;
     private final CategoryService categoryService;
+    private final AmountExpressionInterpreter amountExpressionInterpreter;
     private final IncomeFactory incomeFactory;
 
     @Override

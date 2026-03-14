@@ -90,7 +90,7 @@ public class UserOnboardingFacade {
     private Expense createExpense(User user, Group group, UserOnboardingDto createDto) {
         TransactionCreateDto transactionCreateDto = new TransactionCreateDto();
         transactionCreateDto.setName(createDto.getExpenseName());
-        transactionCreateDto.setAmount(createDto.getAmount());
+        transactionCreateDto.setAmount(String.valueOf(createDto.getAmount()));
         transactionCreateDto.setCategoryId(createDto.getCategoryId());
         transactionCreateDto.setGroupId(group.getId());
 

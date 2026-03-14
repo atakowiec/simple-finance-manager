@@ -13,7 +13,7 @@ public class AddExpenseController extends AbstractAddTransactionController {
     private CategoryService categoryService;
 
     @Override
-    protected HttpResponse<String> addTransaction(String name, double amount, TransactionCategory category, LocalDate date) {
+    protected HttpResponse<String> addTransaction(String name, String amount, TransactionCategory category, LocalDate date) {
         return super.transactionService.addExpense(name, amount, category, date, getGroup().getId());
     }
 

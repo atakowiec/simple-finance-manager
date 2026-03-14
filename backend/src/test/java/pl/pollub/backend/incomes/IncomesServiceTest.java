@@ -17,6 +17,7 @@ import pl.pollub.backend.categories.model.TransactionCategory;
 import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.GroupServiceImpl;
 import pl.pollub.backend.group.model.Group;
+import pl.pollub.backend.transaction.amount.AmountExpressionInterpreter;
 import pl.pollub.backend.transaction.dto.TransactionUpdateDto;
 import pl.pollub.backend.transaction.model.Income;
 import pl.pollub.backend.transaction.repository.IncomeRepository;
@@ -41,6 +42,9 @@ class IncomesServiceTest {
 
     @Mock
     private CategoryService categoryService; // mockito needs to know what to inject
+
+    @Mock
+    private AmountExpressionInterpreter amountExpressionInterpreter;
 
     @InjectMocks
     private IncomeServiceImpl incomeService;
@@ -88,6 +92,8 @@ class IncomesServiceTest {
 
         Mockito.doThrow(new HttpException(403, "Forbidden")).when(groupService).checkMembershipOrThrow(Mockito.any(), Mockito.any());
         Mockito.doNothing().when(groupService).checkMembershipOrThrow(user, group);
+        Mockito.when(amountExpressionInterpreter.interpret(Mockito.anyString()))
+                .thenAnswer(invocation -> Double.parseDouble(invocation.getArgument(0, String.class)));
     }
 
     @Test
@@ -135,7 +141,7 @@ class IncomesServiceTest {
         TransactionUpdateDto updatedIncome = new TransactionUpdateDto();
         updatedIncome.setDate(LocalDate.parse("2021-01-01"));
         updatedIncome.setName("New name");
-        updatedIncome.setAmount(100.0);
+        updatedIncome.setAmount("100.0");
         updatedIncome.setCategoryId(1L);
 
         Mockito.when(incomeRepository.save(Mockito.any())).thenReturn(existingIncome);

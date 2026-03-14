@@ -26,8 +26,9 @@
                 <Insets top="20.0"/>
             </VBox.margin>
             <Label styleClass="modalKey" text="Kwota:"/>
-            <TextField fx:id="amountInput" prefWidth="200.0"/>
+            <TextField fx:id="amountInput" prefWidth="200.0" promptText="np. 100+100-20"/>
         </HBox>
+        <Label text="Mozesz wpisac wyrazenie, np. 100+100-20"/>
         <HBox alignment="CENTER_LEFT" spacing="20.0">
             <VBox.margin>
                 <Insets top="20.0"/>

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.categories.CategoryService;
 import pl.pollub.backend.group.interfaces.GroupService;
+import pl.pollub.backend.transaction.amount.AmountExpressionInterpreter;
 import pl.pollub.backend.transaction.dto.TransactionCreateDto;
 import pl.pollub.backend.transaction.dto.TransactionUpdateDto;
 import pl.pollub.backend.transaction.factory.TransactionFactory;
@@ -54,6 +55,11 @@ public class IncomeServiceProxy implements IncomeService {
     @Override
     public TransactionFactory<Income> getTransactionFactory() {
         return incomeService.getTransactionFactory();
+    }
+
+    @Override
+    public AmountExpressionInterpreter getAmountExpressionInterpreter() {
+        return incomeService.getAmountExpressionInterpreter();
     }
 
     @Override

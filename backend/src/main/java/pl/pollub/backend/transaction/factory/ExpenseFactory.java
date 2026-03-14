@@ -10,7 +10,6 @@ public class ExpenseFactory implements TransactionFactory<Expense> {
     public Expense create(TransactionCreateDto dto, TransactionFactoryContext context) {
         Expense expense = new Expense();
         expense.setName(dto.getName());
-        expense.setAmount(dto.getAmount());
         expense.setCategory(context.category());
         expense.setUser(context.user());
         expense.setDate(dto.getDate());

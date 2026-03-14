@@ -8,6 +8,7 @@ import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.categories.CategoryService;
 import pl.pollub.backend.group.interfaces.GroupService;
 import pl.pollub.backend.group.model.Group;
+import pl.pollub.backend.transaction.amount.AmountExpressionInterpreter;
 import pl.pollub.backend.transaction.dto.TransactionCreateDto;
 import pl.pollub.backend.transaction.dto.TransactionUpdateDto;
 import pl.pollub.backend.transaction.factory.TransactionFactory;
@@ -55,6 +56,11 @@ public class ExpenseServiceProxy implements ExpenseService {
     @Override
     public TransactionFactory<Expense> getTransactionFactory() {
         return expenseService.getTransactionFactory();
+    }
+
+    @Override
+    public AmountExpressionInterpreter getAmountExpressionInterpreter() {
+        return expenseService.getAmountExpressionInterpreter();
     }
 
     @Override

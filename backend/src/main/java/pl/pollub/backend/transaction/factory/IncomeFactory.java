@@ -10,7 +10,6 @@ public class IncomeFactory implements TransactionFactory<Income> {
     public Income create(TransactionCreateDto dto, TransactionFactoryContext context) {
         Income income = new Income();
         income.setName(dto.getName());
-        income.setAmount(dto.getAmount());
         income.setCategory(context.category());
         income.setUser(context.user());
         income.setDate(dto.getDate());

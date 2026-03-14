@@ -17,6 +17,7 @@ import pl.pollub.backend.categories.model.TransactionCategory;
 import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.GroupServiceImpl;
 import pl.pollub.backend.group.model.Group;
+import pl.pollub.backend.transaction.amount.AmountExpressionInterpreter;
 import pl.pollub.backend.transaction.dto.TransactionCreateDto;
 import pl.pollub.backend.transaction.dto.TransactionUpdateDto;
 import pl.pollub.backend.transaction.factory.ExpenseFactory;
@@ -50,6 +51,9 @@ class ExpenseServiceTest {
 
     @Mock
     private ExpenseFactory expenseFactory;
+
+    @Mock
+    private AmountExpressionInterpreter amountExpressionInterpreter;
 
     @InjectMocks
     private ExpenseServiceImpl expenseService;
@@ -100,6 +104,8 @@ class ExpenseServiceTest {
         Mockito.doNothing().when(groupService).checkMembershipOrThrow(user, group);
 
         Mockito.when(expenseRepository.save(Mockito.any())).thenAnswer(invocation -> invocation.getArgument(0));
+        Mockito.when(amountExpressionInterpreter.interpret(Mockito.anyString()))
+                .thenAnswer(invocation -> Double.parseDouble(invocation.getArgument(0, String.class)));
     }
 
     @Test
@@ -147,7 +153,7 @@ class ExpenseServiceTest {
         TransactionUpdateDto updatedExpense = new TransactionUpdateDto();
         updatedExpense.setDate(LocalDate.parse("2021-01-01"));
         updatedExpense.setName("New name");
-        updatedExpense.setAmount(100.0);
+        updatedExpense.setAmount("100.0");
         updatedExpense.setCategoryId(1L);
 
         Mockito.when(expenseRepository.save(Mockito.any())).thenReturn(existingExpense);
@@ -198,7 +204,7 @@ class ExpenseServiceTest {
 
         TransactionCreateDto createDto = new TransactionCreateDto();
         createDto.setName("Coffee");
-        createDto.setAmount(12.0);
+        createDto.setAmount("12.0");
         createDto.setCategoryId(1L);
         createDto.setGroupId(groupId);
         createDto.setDate(LocalDate.now());
@@ -227,7 +233,7 @@ class ExpenseServiceTest {
 
         TransactionCreateDto createDto = new TransactionCreateDto();
         createDto.setName("Old expense");
-        createDto.setAmount(20.0);
+        createDto.setAmount("20.0");
         createDto.setCategoryId(1L);
         createDto.setGroupId(groupId);
         createDto.setDate(LocalDate.now().minusMonths(1));

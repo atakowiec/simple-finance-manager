@@ -13,8 +13,8 @@ import java.time.LocalDate;
 public class TransactionUpdateDto {
     @NotBlank
     private String name;
-    @NotNull
-    private Double amount;
+    @NotBlank
+    private String amount;
     @NotNull
     private Long categoryId;
 

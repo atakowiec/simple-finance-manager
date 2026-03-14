@@ -8,6 +8,7 @@ import pl.pollub.backend.categories.model.TransactionCategory;
 import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.interfaces.GroupService;
 import pl.pollub.backend.group.model.Group;
+import pl.pollub.backend.transaction.amount.AmountExpressionInterpreter;
 import pl.pollub.backend.transaction.dto.TransactionCreateDto;
 import pl.pollub.backend.transaction.dto.TransactionUpdateDto;
 import pl.pollub.backend.transaction.factory.TransactionFactory;
@@ -26,6 +27,7 @@ public interface TransactionService<T extends Transaction> {
     CategoryService getCategoryService();
     TransactionRepository<T> getTransactionRepository();
     TransactionFactory<T> getTransactionFactory();
+    AmountExpressionInterpreter getAmountExpressionInterpreter();
 
     default T getTransactionByIdAndUserOrThrow(Long id, User user) {
         return getTransactionRepository().findByIdAndUser(id, user)
@@ -72,7 +74,7 @@ public interface TransactionService<T extends Transaction> {
             transaction.setName(updateDto.getName());
         }
         if (updateDto.getAmount() != null) {
-            transaction.setAmount(updateDto.getAmount());
+            transaction.setAmount(resolveAmountOrThrow(updateDto.getAmount()));
         }
         if (updateDto.getCategoryId() != null) {
             TransactionCategory category = getCategoryService().getCategoryByIdOrThrow(updateDto.getCategoryId());
@@ -173,6 +175,7 @@ public interface TransactionService<T extends Transaction> {
      * @return created transation
      */
     default T createTransaction(@Valid TransactionCreateDto createDto, User user) {
+        double resolvedAmount = resolveAmountOrThrow(createDto.getAmount());
         TransactionCategory category = getCategoryService().getCategoryByIdOrThrow(createDto.getCategoryId());
 
         Group group = getGroupService().getGroupByIdOrThrow(createDto.getGroupId());
@@ -180,8 +183,17 @@ public interface TransactionService<T extends Transaction> {
 
         // start L1 Factory method
         T transaction = getTransactionFactory().create(createDto, new TransactionFactoryContext(user, category, group));
+        transaction.setAmount(resolvedAmount);
 
         return save(transaction);
+    }
+
+    private double resolveAmountOrThrow(String amountExpression) {
+        double amount = getAmountExpressionInterpreter().interpret(amountExpression);
+        if (amount <= 0) {
+            throw new HttpException(HttpStatus.BAD_REQUEST, "Kwota musi być większa niż 0");
+        }
+        return amount;
     }
 
     /**

@@ -8,6 +8,7 @@ import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.categories.CategoryService;
 import pl.pollub.backend.group.interfaces.GroupService;
 import pl.pollub.backend.group.model.Group;
+import pl.pollub.backend.transaction.amount.AmountExpressionInterpreter;
 import pl.pollub.backend.transaction.observer.ExpenseLimitEvent;
 import pl.pollub.backend.transaction.observer.ExpenseLimitSubject;
 import pl.pollub.backend.transaction.dto.TransactionCreateDto;
@@ -30,6 +31,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final GroupService groupService;
     private final CategoryService categoryService;
+    private final AmountExpressionInterpreter amountExpressionInterpreter;
     private final ExpenseLimitSubject expenseLimitSubject;
     private final ExpenseFactory expenseFactory;
 

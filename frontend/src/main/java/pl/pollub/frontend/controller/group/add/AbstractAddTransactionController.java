@@ -63,20 +63,7 @@ public abstract class AbstractAddTransactionController extends AbstractGroupCont
             return;
         }
 
-        double amountValue;
-        try {
-            amountValue = Double.parseDouble(amount);
-        } catch (NumberFormatException e) {
-            setError("Niepoprawna kwota!");
-            return;
-        }
-
-        if(amountValue <= 0) {
-            setError("Kwota musi być większa od zera!");
-            return;
-        }
-
-        HttpResponse<String> response = addTransaction(name, amountValue, category, date);
+        HttpResponse<String> response = addTransaction(name, amount, category, date);
 
         if(response.statusCode() != 201) {
             setError("Wystąpił błąd podczas dodawania transakcji!");
@@ -91,7 +78,7 @@ public abstract class AbstractAddTransactionController extends AbstractGroupCont
         errorLabel.setText(message);
     }
 
-    protected abstract HttpResponse<String> addTransaction(String name, double amount, TransactionCategory category, LocalDate date);
+    protected abstract HttpResponse<String> addTransaction(String name, String amount, TransactionCategory category, LocalDate date);
 
     protected abstract List<TransactionCategory> getCategories();
 }

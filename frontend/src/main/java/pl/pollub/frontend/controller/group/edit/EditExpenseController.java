@@ -83,15 +83,8 @@ public class EditExpenseController {
         }
 
         try {
-            double amount = Double.parseDouble(amountText);
-
-            if (amount <= 0) {
-                errorLabel.setText("Kwota musi być dodatnia.");
-                return;
-            }
-
             Long incomeId = (long) transaction.getId();
-            var response = transactionService.updateExpense(incomeId, name, amount, category, date, transaction.getGroupId());
+            var response = transactionService.updateExpense(incomeId, name, amountText, category, date, transaction.getGroupId());
 
             if (response.statusCode() == 200) {
                 errorLabel.setText("Wydatek został zaktualizowany.");
@@ -99,8 +92,6 @@ public class EditExpenseController {
             } else {
                 errorLabel.setText("Błąd podczas aktualizacji: " + response.body());
             }
-        } catch (NumberFormatException e) {
-            errorLabel.setText("Niepoprawna kwota.");
         } catch (Exception e) {
             errorLabel.setText("Błąd podczas aktualizacji wydatku.");
         }
