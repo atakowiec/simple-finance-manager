@@ -13,6 +13,10 @@ public interface CategoryService {
 
     String updateCategory(Long id, CategoryUpdateDto categoryUpdateDto);
 
+    String undoCategoryChange(Long id);
+
+    boolean canUndoCategory(Long id);
+
     String deleteCategory(Long id);
 
     List<TransactionCategory> getAllCategories();

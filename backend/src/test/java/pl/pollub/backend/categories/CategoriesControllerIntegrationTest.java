@@ -11,6 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import pl.pollub.backend.categories.dto.CategoryCreateDto;
 import pl.pollub.backend.categories.dto.CategoryDto;
+import pl.pollub.backend.categories.dto.CategoryUpdateDto;
 import pl.pollub.backend.categories.model.CategoryType;
 import pl.pollub.backend.categories.model.TransactionCategory;
 
@@ -107,5 +108,41 @@ class CategoriesControllerIntegrationTest {
         mockMvc.perform(get("/categories"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(categoryDtos)));
+    }
+
+    @Test
+    void updateThenUndoCategory_everythingCorrect_returnsUndoMessage() throws Exception {
+        CategoryUpdateDto updateDto = new CategoryUpdateDto();
+        updateDto.setName("Updated Category");
+        updateDto.setCategoryType(CategoryType.EXPENSE);
+
+        when(categoryService.updateCategory(eq(1L), any(CategoryUpdateDto.class)))
+                .thenReturn("Kategoria została zaktualizowana.");
+        when(categoryService.undoCategoryChange(1L))
+                .thenReturn("Cofnięto ostatnią zmianę kategorii.");
+
+        mockMvc.perform(put("/categories/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Kategoria została zaktualizowana."));
+
+        mockMvc.perform(post("/categories/1/undo"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Cofnięto ostatnią zmianę kategorii."));
+
+        verify(categoryService, times(1)).updateCategory(eq(1L), any(CategoryUpdateDto.class));
+        verify(categoryService, times(1)).undoCategoryChange(1L);
+    }
+
+    @Test
+    void canUndoCategory_returnsBooleanStatus() throws Exception {
+        when(categoryService.canUndoCategory(1L)).thenReturn(true);
+
+        mockMvc.perform(get("/categories/1/can-undo"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("true"));
+
+        verify(categoryService, times(1)).canUndoCategory(1L);
     }
 }

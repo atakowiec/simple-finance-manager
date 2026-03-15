@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import pl.pollub.backend.categories.dto.CategoryCreateDto;
 import pl.pollub.backend.categories.dto.CategoryUpdateDto;
 import pl.pollub.backend.categories.model.TransactionCategory;
+import pl.pollub.backend.categories.memento.CategoryCaretaker;
+import pl.pollub.backend.categories.memento.CategoryMemento;
 import pl.pollub.backend.exception.HttpException;
 
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final IconFlyweightFactory iconFlyweightFactory;
+    private final CategoryCaretaker categoryCaretaker;
 
     @Override
     public TransactionCategory getCategoryByIdOrThrow(Long id) {
@@ -48,25 +51,63 @@ public class CategoryServiceImpl implements CategoryService {
     public String updateCategory(Long id, CategoryUpdateDto categoryUpdateDto) {
         TransactionCategory category = getCategoryByIdOrThrow(id);
         TransactionCategory foundCategory = categoryRepository.getByNameAndCategoryType(categoryUpdateDto.getName(), categoryUpdateDto.getCategoryType());
+        TransactionCategory newParent = null;
 
         if (foundCategory != null && !foundCategory.getId().equals(id))
             throw new HttpException(HttpStatus.CONFLICT.value(), "Kategoria o tej nazwie już istnieje.");
-
-        category.setName(categoryUpdateDto.getName());
-
-        if (categoryUpdateDto.getIcon() != null)
-            category.setIcon(iconFlyweightFactory.getOrAdd(categoryUpdateDto.getIcon()));
 
         if (categoryUpdateDto.getParentId() != null) {
             if (categoryUpdateDto.getParentId().equals(id))
                 throw new HttpException(HttpStatus.BAD_REQUEST.value(), "Kategoria nie może być swoim własnym rodzicem.");
 
-            TransactionCategory parent = getCategoryByIdOrThrow(categoryUpdateDto.getParentId());
-            category.setParent(parent);
-        } else
-            category.setParent(null);
+            newParent = getCategoryByIdOrThrow(categoryUpdateDto.getParentId());
+        }
+
+        saveCategoryState(category);
+
+        category.setName(categoryUpdateDto.getName());
+        category.setCategoryType(categoryUpdateDto.getCategoryType());
+
+        if (categoryUpdateDto.getIcon() != null)
+            category.setIcon(iconFlyweightFactory.getOrAdd(categoryUpdateDto.getIcon()));
+
+        category.setParent(newParent);
         categoryRepository.save(category);
         return "Kategoria została zaktualizowana.";
+    }
+
+    @Override
+    public String undoCategoryChange(Long id) {
+        TransactionCategory category = getCategoryByIdOrThrow(id);
+        CategoryMemento memento = categoryCaretaker.getLastMemento(id);
+
+        if (memento == null) {
+            throw new HttpException(HttpStatus.BAD_REQUEST.value(), "Brak historii zmian kategorii do cofnięcia");
+        }
+
+        category.setName(memento.getName());
+        category.setCategoryType(memento.getCategoryType());
+
+        if (memento.getIcon() != null) {
+            category.setIcon(iconFlyweightFactory.getOrAdd(memento.getIcon()));
+        } else {
+            category.setIcon(null);
+        }
+
+        if (memento.getParentId() != null) {
+            TransactionCategory parent = getCategoryByIdOrThrow(memento.getParentId());
+            category.setParent(parent);
+        } else {
+            category.setParent(null);
+        }
+
+        categoryRepository.save(category);
+        return "Cofnięto ostatnią zmianę kategorii.";
+    }
+
+    @Override
+    public boolean canUndoCategory(Long id) {
+        return categoryCaretaker.hasHistory(id);
     }
 
     @Override
@@ -77,6 +118,7 @@ public class CategoryServiceImpl implements CategoryService {
         // With CascadeType.ALL, children will be deleted too.
         
         categoryRepository.delete(category);
+        categoryCaretaker.clearHistory(id);
         return "Kategoria została usunięta.";
     }
 
@@ -85,5 +127,15 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.findAll().stream()
                 .filter(category -> category.getParent() == null)
                 .toList();
+    }
+
+    private void saveCategoryState(TransactionCategory category) {
+        CategoryMemento memento = CategoryMemento.create(
+                category.getName(),
+                category.getCategoryType(),
+                category.getIcon(),
+                category.getParent() == null ? null : category.getParent().getId()
+        );
+        categoryCaretaker.saveMemento(category.getId(), memento);
     }
 }

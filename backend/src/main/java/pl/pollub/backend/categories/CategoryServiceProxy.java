@@ -47,6 +47,18 @@ public class CategoryServiceProxy implements CategoryService {
     }
 
     @Override
+    public String undoCategoryChange(Long id) {
+        String result = categoryService.undoCategoryChange(id);
+        invalidateCache("undo");
+        return result;
+    }
+
+    @Override
+    public boolean canUndoCategory(Long id) {
+        return categoryService.canUndoCategory(id);
+    }
+
+    @Override
     public String deleteCategory(Long id) {
         String result = categoryService.deleteCategory(id);
         invalidateCache("delete");

@@ -52,6 +52,22 @@ public class CategoriesController {
         return ResponseEntity.ok(message);
     }
 
+    @Operation(summary = "Cofnij ostatnią zmianę kategorii")
+    @ApiResponse(responseCode = "200", description = "Cofnięto zmianę kategorii")
+    @PostMapping("/{id}/undo")
+    public ResponseEntity<String> undoCategoryChange(@PathVariable Long id) {
+        String message = categoryService.undoCategoryChange(id);
+        return ResponseEntity.ok(message);
+    }
+
+    @Operation(summary = "Sprawdź czy można cofnąć zmianę kategorii")
+    @ApiResponse(responseCode = "200", description = "Status możliwości cofnięcia")
+    @GetMapping("/{id}/can-undo")
+    public ResponseEntity<Boolean> canUndoCategory(@PathVariable Long id) {
+        boolean canUndo = categoryService.canUndoCategory(id);
+        return ResponseEntity.ok(canUndo);
+    }
+
     @Operation(summary = "Usuń kategorię")
     @ApiResponse(responseCode = "200", description = "Usunięto kategorię")
     @DeleteMapping("/{id}")
