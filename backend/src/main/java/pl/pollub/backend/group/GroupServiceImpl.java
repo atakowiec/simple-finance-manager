@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pl.pollub.backend.activity.ActivityEventData;
 import pl.pollub.backend.activity.ActivityEventType;
 import pl.pollub.backend.activity.ActivityMediator;
@@ -14,12 +13,12 @@ import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.dto.GroupCreateDto;
 import pl.pollub.backend.group.dto.GroupMemberDto;
 import pl.pollub.backend.group.dto.ImportExportDto;
+import pl.pollub.backend.group.deletion.GroupDeletionMediator;
 import pl.pollub.backend.group.interfaces.GroupService;
 import pl.pollub.backend.group.membership.UserMembership;
 import pl.pollub.backend.group.memento.GroupCaretaker;
 import pl.pollub.backend.group.memento.GroupMemento;
 import pl.pollub.backend.group.model.Group;
-import pl.pollub.backend.group.repository.GroupInviteRepository;
 import pl.pollub.backend.group.repository.GroupRepository;
 import pl.pollub.backend.transaction.dto.TransactionDto;
 import pl.pollub.backend.transaction.model.Expense;
@@ -56,11 +55,11 @@ public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
     private final ExpenseRepository expenseRepository;
     private final IncomeRepository incomeRepository;
-    private final GroupInviteRepository groupInviteRepository;
     private final GroupCaretaker groupCaretaker;
     private final ExpenseLimitSubject expenseLimitSubject;
     private final GroupImportFacade groupImportFacade;
     private final ActivityMediator activityMediator;
+    private final GroupDeletionMediator groupDeletionMediator;
     private final Group groupPrototype = createGroupPrototype();
 
     @Override
@@ -233,7 +232,6 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Transactional
     public void removeGroup(User user, Long groupId) {
         Group group = getGroupByIdOrThrow(groupId);
 
@@ -241,20 +239,7 @@ public class GroupServiceImpl implements GroupService {
             throw new HttpException(HttpStatus.FORBIDDEN, "Musisz być właścicielem grupy aby to zrobić!");
         }
 
-        activityMediator.notify(
-                ActivityEventType.GROUP_DELETED,
-                ActivityEventData.builder()
-                        .user(user)
-                        .group(group)
-                        .resourceName(group.getName())
-                        .build()
-        );
-
-        groupInviteRepository.deleteAllByGroup(group);
-        expenseRepository.deleteAllByGroup(group);
-        incomeRepository.deleteAllByGroup(group);
-        groupCaretaker.clearHistory(groupId);
-        groupRepository.delete(group);
+        groupDeletionMediator.deleteGroup(user, group);
     }
 
     @Override

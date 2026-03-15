@@ -170,9 +170,7 @@ public class GroupsService {
         List<GroupStatEntry> result = new ArrayList<>();
 
         for (Map.Entry<String, Double> entry : statMap.entrySet()) {
-            int categoryId = Integer.parseInt(entry.getKey());
-
-            GroupStatEntry statEntry = new GroupStatEntry(categoryService.getExpenseCategoryById(categoryId).getName(), entry.getValue());
+            GroupStatEntry statEntry = new GroupStatEntry(entry.getKey(), entry.getValue());
             result.add(statEntry);
         }
 

@@ -14,6 +14,7 @@ import pl.pollub.backend.activity.ActivityMediator;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.categories.CategoryService;
 import pl.pollub.backend.exception.HttpException;
+import pl.pollub.backend.group.deletion.GroupDeletionMediator;
 import pl.pollub.backend.group.dto.GroupCreateDto;
 import pl.pollub.backend.group.dto.ImportExportDto;
 import pl.pollub.backend.group.memento.GroupCaretaker;
@@ -53,6 +54,8 @@ class GroupServiceTest {
 
     @Mock
     private ActivityMediator activityMediator;
+    @Mock
+    private GroupDeletionMediator groupDeletionMediator;
 
     @InjectMocks
     private GroupServiceImpl groupServiceImpl;
@@ -395,11 +398,10 @@ class GroupServiceTest {
     }
 
     @Test
-    void deleteGroup_GroupHasExpensesAndIncomes_DeletesGroupAndTransactions() {
+    void deleteGroup_GroupHasExpensesAndIncomes_DelegatesDeletionWorkflowToMediator() {
         groupService.removeGroup(ownerUser, loggedUserGroup.getId());
 
-        Mockito.verify(expenseRepository, Mockito.times(1)).deleteAllByGroup(loggedUserGroup);
-        Mockito.verify(incomeRepository, Mockito.times(1)).deleteAllByGroup(loggedUserGroup);
+        Mockito.verify(groupDeletionMediator, Mockito.times(1)).deleteGroup(ownerUser, loggedUserGroup);
     }
 
     @Test
