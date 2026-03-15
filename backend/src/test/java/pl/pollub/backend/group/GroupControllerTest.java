@@ -16,6 +16,7 @@ import pl.pollub.backend.group.export.GroupExportFacade;
 import pl.pollub.backend.group.export.GroupExportResponse;
 import pl.pollub.backend.group.interfaces.GroupInviteService;
 import pl.pollub.backend.group.interfaces.GroupService;
+import pl.pollub.backend.group.model.Group;
 
 import java.util.List;
 
@@ -74,6 +75,45 @@ class GroupControllerTest {
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertArrayEquals(payload, response.getBody());
         Assertions.assertEquals("attachment; filename=export.csv", response.getHeaders().getFirst("Content-Disposition"));
+    }
+
+    @Test
+    void getGroupIcon_GroupHasIcon_ReturnsImageBytes() {
+        User user = new User();
+        user.setId(1L);
+
+        Group group = new Group();
+        group.setId(3L);
+        group.setUsers(List.of(user));
+        group.setIcon(new byte[]{1, 2, 3});
+        group.setIconContentType("image/png");
+
+        Mockito.when(groupService.getGroupByIdOrThrow(3L)).thenReturn(group);
+
+        ResponseEntity<byte[]> response = groupController.getGroupIcon(user, 3L);
+
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertArrayEquals(group.getIcon(), response.getBody());
+        Assertions.assertEquals("image/png", response.getHeaders().getContentType().toString());
+        Mockito.verify(groupService).checkMembershipOrThrow(user, group);
+    }
+
+    @Test
+    void getGroupIcon_GroupHasNoIcon_ThrowsHttp404Exception() {
+        User user = new User();
+        user.setId(1L);
+
+        Group group = new Group();
+        group.setId(4L);
+        group.setUsers(List.of(user));
+
+        Mockito.when(groupService.getGroupByIdOrThrow(4L)).thenReturn(group);
+
+        HttpException exception = Assertions.assertThrows(HttpException.class,
+                () -> groupController.getGroupIcon(user, 4L));
+
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus());
+        Mockito.verify(groupService).checkMembershipOrThrow(user, group);
     }
 }
 

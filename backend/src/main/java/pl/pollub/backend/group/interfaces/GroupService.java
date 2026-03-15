@@ -84,6 +84,16 @@ public interface GroupService {
     Group changeExpenseLimit(User user, Double expenseLimit, Long groupId);
 
     /**
+     * Changes the uploaded icon of the specified group.
+     */
+    Group changeIcon(User user, byte[] icon, String contentType, Long groupId);
+
+    /**
+     * Removes the uploaded icon from the specified group.
+     */
+    void deleteIcon(User user, Long groupId);
+
+    /**
      * Deletes the specified member from the specified group.
      *
      * @param user     user who wants to delete the member

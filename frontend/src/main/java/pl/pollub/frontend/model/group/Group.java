@@ -10,6 +10,8 @@ public class Group {
     private String name;
     private String color;
     private String createdAt;
+    private boolean hasIcon;
+    private String iconChecksum;
     private GroupMember owner;
     private List<GroupMember> users;
     private Double expenseLimit;

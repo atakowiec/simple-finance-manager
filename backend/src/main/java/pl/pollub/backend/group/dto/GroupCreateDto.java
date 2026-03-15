@@ -12,4 +12,8 @@ public class GroupCreateDto {
     private String name;
 
     private String color = "#ffffff";
+
+    private byte[] icon;
+
+    private String iconContentType;
 }

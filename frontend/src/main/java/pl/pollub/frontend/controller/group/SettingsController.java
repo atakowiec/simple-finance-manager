@@ -6,6 +6,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
 import pl.pollub.frontend.annotation.PostInitialize;
 import pl.pollub.frontend.controller.home.add.ColorListCell;
 import pl.pollub.frontend.event.EventEmitter;
@@ -18,7 +21,10 @@ import pl.pollub.frontend.service.HttpService;
 import pl.pollub.frontend.service.ModalService;
 import pl.pollub.frontend.util.JsonUtil;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
 import java.util.Map;
 
 public class SettingsController extends AbstractGroupController {
@@ -46,6 +52,12 @@ public class SettingsController extends AbstractGroupController {
     @FXML
     private Label expenseLimitError;
     @FXML
+    private Label iconError;
+    @FXML
+    private Button iconPickerButton;
+    @FXML
+    private ImageView groupIconPreview;
+    @FXML
     public Button deleteGroupButton;
     @FXML
     public Button leaveGroupButton;
@@ -53,6 +65,8 @@ public class SettingsController extends AbstractGroupController {
     public Button undoButton;
     @FXML
     private Label undoStatus;
+
+    private File selectedIconFile;
 
     @PostInitialize
     public void postInitialize() {
@@ -73,6 +87,8 @@ public class SettingsController extends AbstractGroupController {
 
         leaveGroupButton.setVisible(authService.getUser().getId() != group.getOwner().getId());
         leaveGroupButton.setManaged(authService.getUser().getId() != group.getOwner().getId());
+
+        refreshDisplayedGroupIcon();
 
         // Check if undo is available
         updateUndoButtonState();
@@ -121,6 +137,73 @@ public class SettingsController extends AbstractGroupController {
 
         getGroup().setColor(jsonResponse.get("color").getAsString());
         colorError.setText("Zapisano!");
+        eventEmitter.emit(EventType.GROUPS_UPDATE);
+        updateUndoButtonState();
+    }
+
+    public void selectIcon() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Wybierz ikonę grupy");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Pliki obrazów", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp"));
+
+        File file = fileChooser.showOpenDialog(null);
+        if (file == null) {
+            return;
+        }
+
+        selectedIconFile = file;
+        iconPickerButton.setText(file.getName());
+        groupIconPreview.setImage(new Image(file.toURI().toString()));
+        groupIconPreview.setVisible(true);
+        groupIconPreview.setManaged(true);
+        iconError.setText("");
+    }
+
+    public void saveIcon() {
+        if (selectedIconFile == null) {
+            iconError.setText("Wybierz plik ikony!");
+            return;
+        }
+
+        byte[] iconBytes = getFileBytes(selectedIconFile);
+        String contentType = resolveContentType(selectedIconFile);
+
+        if (iconBytes == null || iconBytes.length == 0) {
+            iconError.setText("Nie udało się odczytać ikony!");
+            return;
+        }
+
+        HttpResponse<String> response = groupsService.updateGroupIcon(getGroup().getId(), iconBytes, contentType);
+        if (response.statusCode() != 200) {
+            iconError.setText("Wystąpił błąd podczas zapisywania ikony!");
+            return;
+        }
+
+        JsonObject jsonResponse = JsonUtil.fromJson(response.body()).getAsJsonObject();
+        updateGroupIconMetadata(jsonResponse);
+        groupsService.invalidateGroupIcon(getGroup().getId());
+        selectedIconFile = null;
+        iconPickerButton.setText("Wybierz ikonę");
+        refreshDisplayedGroupIcon();
+        iconError.setText("Zapisano!");
+        eventEmitter.emit(EventType.GROUPS_UPDATE);
+        updateUndoButtonState();
+    }
+
+    public void deleteIcon() {
+        HttpResponse<String> response = groupsService.deleteGroupIcon(getGroup().getId());
+        if (response.statusCode() != 200) {
+            iconError.setText("Wystąpił błąd podczas usuwania ikony!");
+            return;
+        }
+
+        getGroup().setHasIcon(false);
+        getGroup().setIconChecksum(null);
+        selectedIconFile = null;
+        iconPickerButton.setText("Wybierz ikonę");
+        refreshDisplayedGroupIcon();
+        iconError.setText("Usunięto ikonę!");
+        eventEmitter.emit(EventType.GROUPS_UPDATE);
         updateUndoButtonState();
     }
 
@@ -177,17 +260,89 @@ public class SettingsController extends AbstractGroupController {
         getGroup().setName(jsonResponse.get("name").getAsString());
         getGroup().setColor(jsonResponse.get("color").getAsString());
         getGroup().setExpenseLimit(jsonResponse.get("expenseLimit").getAsDouble());
+        updateGroupIconMetadata(jsonResponse);
+        groupsService.invalidateGroupIcon(getGroup().getId());
 
         groupNameField.setText(getGroup().getName());
         colorPicker.setButtonCell(new ColorListCell(getGroup().getColor()));
 
         boolean expenseLimitSet = getGroup().getExpenseLimit() != null && getGroup().getExpenseLimit() > 0;
         expenseLimitField.setText(expenseLimitSet ? String.valueOf(getGroup().getExpenseLimit()) : "");
+        selectedIconFile = null;
+        iconPickerButton.setText("Wybierz ikonę");
+        refreshDisplayedGroupIcon();
 
         undoStatus.setText("Cofnięto ostatnią zmianę!");
         eventEmitter.emit(EventType.GROUPS_UPDATE);
 
         // Update undo button state
         updateUndoButtonState();
+    }
+
+    private void refreshDisplayedGroupIcon() {
+        Image image = null;
+
+        if (selectedIconFile != null) {
+            image = new Image(selectedIconFile.toURI().toString());
+        } else if (getGroup().isHasIcon()) {
+            image = groupsService.getGroupIconImage(getGroup());
+        }
+
+        groupIconPreview.setImage(image);
+        groupIconPreview.setVisible(image != null);
+        groupIconPreview.setManaged(image != null);
+    }
+
+    private void updateGroupIconMetadata(JsonObject jsonResponse) {
+        boolean hasIcon = jsonResponse.has("hasIcon") && jsonResponse.get("hasIcon").getAsBoolean();
+        getGroup().setHasIcon(hasIcon);
+
+        if (jsonResponse.has("iconChecksum") && !jsonResponse.get("iconChecksum").isJsonNull()) {
+            getGroup().setIconChecksum(jsonResponse.get("iconChecksum").getAsString());
+        } else {
+            getGroup().setIconChecksum(null);
+        }
+    }
+
+    private byte[] getFileBytes(File file) {
+        if (file == null) {
+            return null;
+        }
+
+        try {
+            return Files.readAllBytes(file.toPath());
+        } catch (IOException exception) {
+            return null;
+        }
+    }
+
+    private String resolveContentType(File file) {
+        if (file == null) {
+            return null;
+        }
+
+        try {
+            String detected = Files.probeContentType(file.toPath());
+            if (detected != null && !detected.isBlank()) {
+                return detected;
+            }
+        } catch (IOException ignored) {
+            // handled by extension fallback below
+        }
+
+        String fileName = file.getName().toLowerCase();
+        if (fileName.endsWith(".png")) {
+            return "image/png";
+        }
+        if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+            return "image/jpeg";
+        }
+        if (fileName.endsWith(".gif")) {
+            return "image/gif";
+        }
+        if (fileName.endsWith(".webp")) {
+            return "image/webp";
+        }
+        return null;
     }
 }

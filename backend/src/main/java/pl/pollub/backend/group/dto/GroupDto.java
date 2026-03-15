@@ -14,6 +14,8 @@ public class GroupDto {
     private String name;
     private String color;
     private String createdAt;
+    private boolean hasIcon;
+    private String iconChecksum;
     private GroupMemberDto owner;
     private List<GroupMemberDto> users;
     private double expenseLimit = ExpenseLimitConstants.NO_EXPENSE_LIMIT;

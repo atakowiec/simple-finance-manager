@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <VBox alignment="CENTER" stylesheets="@../css/home.css" xmlns="http://javafx.com/javafx/8"
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pollub.frontend.controller.home.add.AddGroupController">
@@ -18,6 +19,17 @@
         <Label styleClass="modalKey" text="Kolor:" />
         <ComboBox fx:id="colorPicker" prefWidth="200.0" visibleRowCount="8"/>
     </HBox>
+    <VBox alignment="CENTER_LEFT" spacing="10.0">
+        <VBox.margin>
+            <Insets top="20.0"/>
+        </VBox.margin>
+        <HBox alignment="CENTER_LEFT" spacing="20.0">
+            <Label styleClass="modalKey" text="Ikona:" />
+            <Button fx:id="iconPickerButton" onAction="#selectIcon" text="Wybierz ikonę" />
+            <Button onAction="#clearSelectedIcon" text="Usuń wybór" />
+        </HBox>
+        <ImageView fx:id="iconPreview" fitHeight="64.0" fitWidth="64.0" pickOnBounds="true" preserveRatio="true" />
+    </VBox>
     <Label fx:id="errorLabel">
         <VBox.margin>
             <Insets top="10.0"/>

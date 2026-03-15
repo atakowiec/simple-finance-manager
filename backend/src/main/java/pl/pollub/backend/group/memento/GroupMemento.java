@@ -12,13 +12,32 @@ import lombok.Data;
 public class GroupMemento {
     private final String name;
     private final String color;
+    private final GroupIconFlyweight iconFlyweight;
     private final double expenseLimit;
+    private boolean released;
 
     /**
      * Creates a memento from the current state.
      */
-    public static GroupMemento create(String name, String color, double expenseLimit) {
-        return new GroupMemento(name, color, expenseLimit);
+    public static GroupMemento create(String name, String color, byte[] icon, String iconContentType, double expenseLimit) {
+        return new GroupMemento(name, color, GroupIconFlyweightFactory.acquire(icon, iconContentType), expenseLimit, false);
+    }
+
+    public byte[] getIcon() {
+        return iconFlyweight == null ? null : iconFlyweight.getIcon();
+    }
+
+    public String getIconContentType() {
+        return iconFlyweight == null ? null : iconFlyweight.getContentType();
+    }
+
+    public synchronized void release() {
+        if (released) {
+            return;
+        }
+
+        GroupIconFlyweightFactory.release(iconFlyweight);
+        released = true;
     }
 }
 

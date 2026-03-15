@@ -29,7 +29,8 @@ public class GroupCaretaker {
 
         // Limit the history size to prevent memory issues
         if (history.size() >= MAX_HISTORY_SIZE) {
-            history.remove(0);
+            GroupMemento removed = history.remove(0);
+            removed.release();
         }
 
         history.push(memento);
@@ -50,6 +51,9 @@ public class GroupCaretaker {
         }
 
         GroupMemento memento = history.pop();
+        if (history.isEmpty()) {
+            groupHistories.remove(groupId);
+        }
         log.debug("Retrieved memento for group {}: {}", groupId, memento);
         return memento;
     }
@@ -69,8 +73,12 @@ public class GroupCaretaker {
      * @param groupId The ID of the group
      */
     public void clearHistory(Long groupId) {
-        groupHistories.remove(groupId);
-        log.debug("Cleared history for group {}", groupId);
+        Stack<GroupMemento> history = groupHistories.remove(groupId);
+        if (history == null) {
+            return;
+        }
+
+        history.forEach(GroupMemento::release);
     }
 }
 

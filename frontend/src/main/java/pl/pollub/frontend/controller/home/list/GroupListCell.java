@@ -3,11 +3,9 @@ package pl.pollub.frontend.controller.home.list;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.HBox;
-import pl.pollub.frontend.FinanceApplication;
 import pl.pollub.frontend.model.group.Group;
 import pl.pollub.frontend.service.ScreenService;
 
-import java.io.IOException;
 import java.util.Map;
 
 public class GroupListCell extends ListCell<Group> {
@@ -18,13 +16,9 @@ public class GroupListCell extends ListCell<Group> {
     public GroupListCell(ScreenService screenService) {
         this.screenService = screenService;
 
-        try {
-            FXMLLoader loader = new FXMLLoader(FinanceApplication.class.getResource("components/group-list-cell.fxml"));
-            root = loader.load();
-            controller = loader.getController();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        FXMLLoader loader = screenService.prepareRawView("components/group-list-cell.fxml", Map.of());
+        root = loader.getRoot();
+        controller = loader.getController();
     }
 
     @Override

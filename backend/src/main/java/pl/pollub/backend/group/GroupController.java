@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.dto.GroupCreateDto;
+import pl.pollub.backend.group.dto.GroupIconUpdateDto;
 import pl.pollub.backend.group.dto.GroupMemberDto;
 import pl.pollub.backend.group.dto.ImportExportDto;
 import pl.pollub.backend.group.dto.InviteTargetDto;
@@ -61,6 +63,39 @@ public class GroupController {
     @ResponseStatus(HttpStatus.CREATED)
     public Group createGroup(@AuthenticationPrincipal User user, @RequestBody @Valid GroupCreateDto groupCreateDto) {
         return groupService.createGroup(user, groupCreateDto);
+    }
+
+    @Operation(summary = "Pobierz ikonę grupy")
+    @ApiResponse(responseCode = "200", description = "Pobrano ikonę grupy")
+    @GetMapping("/{groupId}/icon")
+    public ResponseEntity<byte[]> getGroupIcon(@AuthenticationPrincipal User user, @PathVariable Long groupId) {
+        Group group = groupService.getGroupByIdOrThrow(groupId);
+        groupService.checkMembershipOrThrow(user, group);
+
+        if (!group.hasIcon()) {
+            throw new HttpException(HttpStatus.NOT_FOUND, "Ikona grupy nie istnieje");
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(group.getIconContentType()));
+        headers.setContentLength(group.getIcon().length);
+
+        return new ResponseEntity<>(group.getIcon(), headers, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Zmień ikonę grupy")
+    @ApiResponse(responseCode = "200", description = "Zmieniono ikonę grupy")
+    @PutMapping("/{groupId}/icon")
+    public Group changeIcon(@AuthenticationPrincipal User user, @PathVariable Long groupId, @RequestBody GroupIconUpdateDto groupIconUpdateDto) {
+        return groupService.changeIcon(user, groupIconUpdateDto.getIcon(), groupIconUpdateDto.getContentType(), groupId);
+    }
+
+    @Operation(summary = "Usuń ikonę grupy")
+    @ApiResponse(responseCode = "200", description = "Usunięto ikonę grupy")
+    @DeleteMapping("/{groupId}/icon")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteIcon(@AuthenticationPrincipal User user, @PathVariable Long groupId) {
+        groupService.deleteIcon(user, groupId);
     }
 
     @Operation(summary = "Zmień kolor grupy")

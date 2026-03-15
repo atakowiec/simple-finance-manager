@@ -32,8 +32,10 @@ import pl.pollub.backend.transaction.repository.IncomeRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -43,6 +45,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Getter
 public class GroupServiceImpl implements GroupService {
+    private static final int MAX_ICON_SIZE_BYTES = 2 * 1024 * 1024;
+    private static final Set<String> SUPPORTED_ICON_CONTENT_TYPES = Set.of(
+            "image/png",
+            "image/jpeg",
+            "image/gif",
+            "image/webp"
+    );
+
     private final GroupRepository groupRepository;
     private final ExpenseRepository expenseRepository;
     private final IncomeRepository incomeRepository;
@@ -51,7 +61,6 @@ public class GroupServiceImpl implements GroupService {
     private final ExpenseLimitSubject expenseLimitSubject;
     private final GroupImportFacade groupImportFacade;
     private final ActivityMediator activityMediator;
-    // Prototype instance for creating new groups with default settings
     private final Group groupPrototype = createGroupPrototype();
 
     @Override
@@ -62,7 +71,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void checkMembershipOrThrow(User user, Group group) {
-        if (group.getUsers().stream().noneMatch(u -> u.getId().equals(user.getId()))) {
+        if (group.getUsers().stream().noneMatch(member -> member.getId().equals(user.getId()))) {
             throw new HttpException(HttpStatus.FORBIDDEN, "Nie masz dostępu do tej grupy");
         }
     }
@@ -74,13 +83,14 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group createGroup(User user, GroupCreateDto groupCreateDto) {
-        // Use Prototype pattern to create a new group based on a template
         Group group = groupPrototype.clone();
         group.setName(groupCreateDto.getName());
         group.setOwner(user);
         group.setColor(groupCreateDto.getColor());
         group.setCreatedAt(LocalDate.now());
-        group.setUsers(List.of(user));
+        group.setUsers(new ArrayList<>(List.of(user)));
+        group.setIcon(copyIcon(groupCreateDto.getIcon()));
+        group.setIconContentType(resolveIconContentType(groupCreateDto.getIcon(), groupCreateDto.getIconContentType()));
 
         groupRepository.save(group);
 
@@ -99,20 +109,19 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public List<GroupMemberDto> getGroupOwners(User user, Long groupId) {
         Group group = getGroupByIdOrThrow(groupId);
-
         GroupOwnersIterator iterator = new GroupOwnersIterator(group.getUsers());
         List<GroupMemberDto> result = new ArrayList<>();
 
         while (iterator.hasNext()) {
             result.add(iterator.next());
         }
+
         return result;
     }
 
     @Override
     public Group changeColor(User user, String color, Long groupId) {
         Group group = getGroupByIdOrThrow(groupId);
-        // Save current state before making changes (Memento pattern)
         saveGroupState(group);
         group.setColor(color);
         groupRepository.save(group);
@@ -122,7 +131,6 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group changeName(User user, String newName, Long groupId) {
         Group group = getGroupByIdOrThrow(groupId);
-        // Save current state before making changes (Memento pattern)
         saveGroupState(group);
         group.setName(newName);
         groupRepository.save(group);
@@ -132,7 +140,6 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group changeExpenseLimit(User user, Double expenseLimit, Long groupId) {
         Group group = getGroupByIdOrThrow(groupId);
-        // Save current state before making changes (Memento pattern)
         saveGroupState(group);
         group.setExpenseLimit(expenseLimit);
         groupRepository.save(group);
@@ -141,25 +148,54 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    public Group changeIcon(User user, byte[] icon, String contentType, Long groupId) {
+        if (icon == null || icon.length == 0) {
+            throw new HttpException(HttpStatus.BAD_REQUEST, "Prześlij plik ikony grupy");
+        }
+
+        Group group = getGroupByIdOrThrow(groupId);
+        saveGroupState(group);
+        group.setIcon(copyIcon(icon));
+        group.setIconContentType(resolveIconContentType(icon, contentType));
+        groupRepository.save(group);
+        return group;
+    }
+
+    @Override
+    public void deleteIcon(User user, Long groupId) {
+        Group group = getGroupByIdOrThrow(groupId);
+        if (!group.hasIcon()) {
+            return;
+        }
+
+        saveGroupState(group);
+        group.setIcon(null);
+        group.setIconContentType(null);
+        groupRepository.save(group);
+    }
+
+    @Override
     public Group deleteMember(User user, Long groupId, Long memberId) {
         Group group = getGroupByIdOrThrow(groupId);
 
-        if (!Objects.equals(group.getOwner().getId(), user.getId()))
+        if (!Objects.equals(group.getOwner().getId(), user.getId())) {
             throw new HttpException(HttpStatus.FORBIDDEN, "Musisz być właścicielem grupy aby to zrobić!");
+        }
 
-        if (Objects.equals(group.getOwner().getId(), memberId))
+        if (Objects.equals(group.getOwner().getId(), memberId)) {
             throw new HttpException(HttpStatus.FORBIDDEN, "Nie możesz usunąć właściciela grupy!");
+        }
 
-        // Capture removed member's info before removal for the log message
         User removedMember = group.getUsers().stream()
-                .filter(m -> Objects.equals(m.getId(), memberId))
+                .filter(member -> Objects.equals(member.getId(), memberId))
                 .findFirst()
                 .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND,
                         "Nie znaleziono użytkownika o podanym identyfikatorze: " + memberId));
 
         boolean anyRemoved = group.getUsers().removeIf(member -> Objects.equals(member.getId(), memberId));
-        if (!anyRemoved)
+        if (!anyRemoved) {
             throw new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono użytkownika o podanym identyfikatorze: " + memberId);
+        }
 
         groupRepository.save(group);
 
@@ -193,7 +229,6 @@ public class GroupServiceImpl implements GroupService {
         exportDto.setExportedBy(user.getUsername());
         exportDto.setExpenses(expenses.stream().map(TransactionDto::new).collect(Collectors.toList()));
         exportDto.setIncomes(incomes.stream().map(TransactionDto::new).collect(Collectors.toList()));
-
         return exportDto;
     }
 
@@ -202,10 +237,10 @@ public class GroupServiceImpl implements GroupService {
     public void removeGroup(User user, Long groupId) {
         Group group = getGroupByIdOrThrow(groupId);
 
-        if (!Objects.equals(group.getOwner().getId(), user.getId()))
+        if (!Objects.equals(group.getOwner().getId(), user.getId())) {
             throw new HttpException(HttpStatus.FORBIDDEN, "Musisz być właścicielem grupy aby to zrobić!");
+        }
 
-        // Log before deletion so the group entity is still accessible
         activityMediator.notify(
                 ActivityEventType.GROUP_DELETED,
                 ActivityEventData.builder()
@@ -218,6 +253,7 @@ public class GroupServiceImpl implements GroupService {
         groupInviteRepository.deleteAllByGroup(group);
         expenseRepository.deleteAllByGroup(group);
         incomeRepository.deleteAllByGroup(group);
+        groupCaretaker.clearHistory(groupId);
         groupRepository.delete(group);
     }
 
@@ -225,10 +261,10 @@ public class GroupServiceImpl implements GroupService {
     public void leaveGroup(User user, Long groupId) {
         Group group = getGroupByIdOrThrow(groupId);
 
-        if (Objects.equals(group.getOwner().getId(), user.getId()))
+        if (Objects.equals(group.getOwner().getId(), user.getId())) {
             throw new HttpException(HttpStatus.FORBIDDEN, "Nie możesz opuścić grupy, której jesteś właścicielem!");
+        }
 
-        // Use State Pattern: Let the state object validate the membership transition
         UserMembership membership = UserMembership.create(user, group, null);
         membership.leaveGroup();
 
@@ -251,18 +287,20 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group undoGroupChange(User user, Long groupId) {
         Group group = getGroupByIdOrThrow(groupId);
-        checkMembershipOrThrow(user, group);
-
         GroupMemento memento = groupCaretaker.getLastMemento(groupId);
-
         if (memento == null) {
             throw new HttpException(HttpStatus.BAD_REQUEST, "Brak historii zmian do cofnięcia");
         }
 
-        // Restore the state from memento
-        group.setName(memento.getName());
-        group.setColor(memento.getColor());
-        group.setExpenseLimit(memento.getExpenseLimit());
+        try {
+            group.setName(memento.getName());
+            group.setColor(memento.getColor());
+            group.setIcon(memento.getIcon());
+            group.setIconContentType(memento.getIconContentType());
+            group.setExpenseLimit(memento.getExpenseLimit());
+        } finally {
+            memento.release();
+        }
 
         groupRepository.save(group);
         return group;
@@ -273,16 +311,12 @@ public class GroupServiceImpl implements GroupService {
         return groupCaretaker.hasHistory(groupId);
     }
 
-    /**
-     * Helper method to save the current state of a group before making changes.
-     * Part of the Memento pattern implementation.
-     *
-     * @param group the group whose state should be saved
-     */
     private void saveGroupState(Group group) {
         GroupMemento memento = GroupMemento.create(
                 group.getName(),
                 group.getColor(),
+                group.getIcon(),
+                group.getIconContentType(),
                 group.getExpenseLimit()
         );
         groupCaretaker.saveMemento(group.getId(), memento);
@@ -291,6 +325,82 @@ public class GroupServiceImpl implements GroupService {
     private Group createGroupPrototype() {
         Group prototype = new Group();
         prototype.setExpenseLimit(ExpenseLimitConstants.NO_EXPENSE_LIMIT);
+        prototype.setColor("#ffffff");
         return prototype;
+    }
+
+    private byte[] copyIcon(byte[] icon) {
+        if (icon == null || icon.length == 0) {
+            return null;
+        }
+
+        if (icon.length > MAX_ICON_SIZE_BYTES) {
+            throw new HttpException(HttpStatus.BAD_REQUEST, "Ikona grupy nie może być większa niż 2 MB");
+        }
+
+        return Arrays.copyOf(icon, icon.length);
+    }
+
+    private String resolveIconContentType(byte[] icon, String contentType) {
+        if (icon == null || icon.length == 0) {
+            return null;
+        }
+
+        String normalizedContentType = normalizeContentType(contentType);
+        if (normalizedContentType != null) {
+            if (!SUPPORTED_ICON_CONTENT_TYPES.contains(normalizedContentType)) {
+                throw new HttpException(HttpStatus.BAD_REQUEST, "Nieobsługiwany format ikony grupy");
+            }
+            return normalizedContentType;
+        }
+
+        String detectedContentType = detectImageContentType(icon);
+        if (detectedContentType == null) {
+            throw new HttpException(HttpStatus.BAD_REQUEST, "Nieobsługiwany format ikony grupy");
+        }
+
+        return detectedContentType;
+    }
+
+    private String normalizeContentType(String contentType) {
+        if (contentType == null || contentType.isBlank()) {
+            return null;
+        }
+
+        String normalized = contentType.trim().toLowerCase();
+        if ("image/jpg".equals(normalized)) {
+            return "image/jpeg";
+        }
+        return normalized;
+    }
+
+    private String detectImageContentType(byte[] icon) {
+        if (startsWith(icon, (byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A)) {
+            return "image/png";
+        }
+        if (startsWith(icon, (byte) 0xFF, (byte) 0xD8, (byte) 0xFF)) {
+            return "image/jpeg";
+        }
+        if (startsWith(icon, 'G', 'I', 'F', '8')) {
+            return "image/gif";
+        }
+        if (startsWith(icon, 'R', 'I', 'F', 'F') && icon.length > 11
+                && icon[8] == 'W' && icon[9] == 'E' && icon[10] == 'B' && icon[11] == 'P') {
+            return "image/webp";
+        }
+        return null;
+    }
+
+    private boolean startsWith(byte[] data, int... signature) {
+        if (data == null || data.length < signature.length) {
+            return false;
+        }
+
+        for (int i = 0; i < signature.length; i++) {
+            if ((data[i] & 0xFF) != (signature[i] & 0xFF)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

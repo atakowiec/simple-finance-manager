@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 
 <HBox alignment="TOP_CENTER" stylesheets="@../css/global.css, @../css/group.css, @../css/home.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.pollub.frontend.controller.group.SettingsController">
@@ -35,6 +36,16 @@
                 <Button onAction="#saveColor" text="Zapisz" />
             </HBox>
             <Label fx:id="colorError" />
+        </VBox>
+        <VBox alignment="CENTER" spacing="5.0">
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <Label text="Ikona" />
+                <Button fx:id="iconPickerButton" onAction="#selectIcon" text="Wybierz ikonę" />
+                <Button onAction="#saveIcon" text="Zapisz ikonę" />
+                <Button onAction="#deleteIcon" text="Usuń ikonę" />
+            </HBox>
+            <ImageView fx:id="groupIconPreview" fitHeight="72.0" fitWidth="72.0" pickOnBounds="true" preserveRatio="true" />
+            <Label fx:id="iconError" />
         </VBox>
         <VBox alignment="CENTER">
             <HBox alignment="CENTER_LEFT" spacing="10.0">

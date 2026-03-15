@@ -2,6 +2,7 @@ package pl.pollub.frontend.service;
 
 import com.google.gson.reflect.TypeToken;
 import javafx.application.Platform;
+import javafx.scene.image.Image;
 import lombok.Getter;
 import pl.pollub.frontend.annotation.PostInitialize;
 import pl.pollub.frontend.event.EventEmitter;
@@ -15,6 +16,7 @@ import pl.pollub.frontend.model.transaction.TransactionCategory;
 import pl.pollub.frontend.util.JsonUtil;
 import pl.pollub.frontend.util.SimpleJsonBuilder;
 
+import java.io.ByteArrayInputStream;
 import java.lang.reflect.Type;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
@@ -22,6 +24,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 @Injectable
 public class GroupsService {
@@ -39,15 +45,19 @@ public class GroupsService {
     @Getter
     private List<Group> groups = new ArrayList<>();
 
+    private final ConcurrentMap<String, Image> groupIconCache = new ConcurrentHashMap<>();
+
     @OnEvent(EventType.LOGIN)
     public void updateGroups() {
         groups = fetchGroups();
+        pruneGroupIconCache();
     }
 
     @PostInitialize
     public void startPooling() {
         pollingService.addTask(() -> {
             groups = fetchGroups();
+            pruneGroupIconCache();
             Platform.runLater(() -> eventEmitter.emit(EventType.GROUPS_UPDATE));
         });
     }
@@ -70,11 +80,51 @@ public class GroupsService {
         return JsonUtil.GSON.fromJson(response.body(), type);
     }
 
-    public HttpResponse<String> addGroup(String name, String color) {
+    public HttpResponse<String> addGroup(String name, String color, byte[] icon, String iconContentType) {
         return httpService.post("/groups", SimpleJsonBuilder.empty()
                 .add("name", name)
                 .add("color", color)
+                .add("icon", icon)
+                .add("iconContentType", iconContentType)
                 .build());
+    }
+
+    public HttpResponse<String> updateGroupIcon(Long groupId, byte[] icon, String contentType) {
+        return httpService.put("/groups/" + groupId + "/icon", SimpleJsonBuilder.empty()
+                .add("icon", icon)
+                .add("contentType", contentType)
+                .build());
+    }
+
+    public HttpResponse<String> deleteGroupIcon(Long groupId) {
+        invalidateGroupIcon(groupId);
+        return httpService.delete("/groups/" + groupId + "/icon");
+    }
+
+    public Image getGroupIconImage(Group group) {
+        if (group == null || !group.isHasIcon()) {
+            return null;
+        }
+
+        String cacheKey = buildGroupIconCacheKey(group);
+        Image cachedImage = groupIconCache.get(cacheKey);
+        if (cachedImage != null) {
+            return cachedImage;
+        }
+
+        HttpResponse<byte[]> response = httpService.getBytes("/groups/" + group.getId() + "/icon");
+        if (response.statusCode() != 200 || response.body() == null || response.body().length == 0) {
+            return null;
+        }
+
+        Image image = new Image(new ByteArrayInputStream(response.body()));
+        groupIconCache.put(cacheKey, image);
+        return image;
+    }
+
+    public void invalidateGroupIcon(Long groupId) {
+        String prefix = groupId + ":";
+        groupIconCache.keySet().removeIf(key -> key.startsWith(prefix));
     }
 
     private List<GroupStatEntry> prepareByDateData(String jsonData) {
@@ -159,6 +209,7 @@ public class GroupsService {
     }
 
     public HttpResponse<String> undoGroupChange(Long groupId) {
+        invalidateGroupIcon(groupId);
         return httpService.post("/groups/" + groupId + "/undo", null);
     }
 
@@ -170,5 +221,18 @@ public class GroupsService {
         }
 
         return false;
+    }
+
+    private String buildGroupIconCacheKey(Group group) {
+        return group.getId() + ":" + group.getIconChecksum();
+    }
+
+    private void pruneGroupIconCache() {
+        Set<String> validKeys = groups.stream()
+                .filter(Group::isHasIcon)
+                .map(this::buildGroupIconCacheKey)
+                .collect(Collectors.toSet());
+
+        groupIconCache.keySet().removeIf(key -> !validKeys.contains(key));
     }
 }

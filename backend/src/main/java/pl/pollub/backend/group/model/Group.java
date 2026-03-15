@@ -1,5 +1,6 @@
 package pl.pollub.backend.group.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import pl.pollub.backend.auth.user.User;
@@ -9,7 +10,10 @@ import pl.pollub.backend.group.dto.GroupDto;
 import pl.pollub.backend.group.dto.GroupMemberDto;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 
 /**
@@ -39,6 +43,15 @@ public class Group implements DtoConvertible<GroupDto>, Cloneable {
     @Column(name = "expense_limit")
     private double expenseLimit = ExpenseLimitConstants.NO_EXPENSE_LIMIT;
 
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @Column(name = "icon", columnDefinition = "LONGBLOB")
+    private byte[] icon;
+
+    @Column(name = "icon_content_type")
+    private String iconContentType;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "group_user",
@@ -52,11 +65,35 @@ public class Group implements DtoConvertible<GroupDto>, Cloneable {
         groupDto.setId(id);
         groupDto.setName(name);
         groupDto.setColor(color);
-        groupDto.setCreatedAt(createdAt.toString());
+        groupDto.setCreatedAt(createdAt != null ? createdAt.toString() : null);
+        groupDto.setHasIcon(hasIcon());
+        groupDto.setIconChecksum(getIconChecksum());
         groupDto.setOwner(new GroupMemberDto(owner, owner));
         groupDto.setUsers(users.stream().map((user -> new GroupMemberDto(user, owner))).toList());
         groupDto.setExpenseLimit(expenseLimit);
         return groupDto;
+    }
+
+    public boolean hasIcon() {
+        return icon != null && icon.length > 0;
+    }
+
+    public String getIconChecksum() {
+        if (!hasIcon()) {
+            return null;
+        }
+
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(icon);
+            StringBuilder builder = new StringBuilder(hash.length * 2);
+            for (byte value : hash) {
+                builder.append(String.format("%02x", value));
+            }
+            return builder.toString();
+        } catch (NoSuchAlgorithmException exception) {
+            return String.valueOf(Arrays.hashCode(icon));
+        }
     }
 
     @Override
@@ -66,6 +103,9 @@ public class Group implements DtoConvertible<GroupDto>, Cloneable {
             cloned.setId(null);
             if (cloned.getUsers() != null) {
                 cloned.setUsers(List.copyOf(cloned.getUsers()));
+            }
+            if (cloned.getIcon() != null) {
+                cloned.setIcon(Arrays.copyOf(cloned.getIcon(), cloned.getIcon().length));
             }
             return cloned;
         } catch (CloneNotSupportedException e) {

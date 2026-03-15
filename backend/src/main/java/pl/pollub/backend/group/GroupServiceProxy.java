@@ -71,6 +71,20 @@ public class GroupServiceProxy implements GroupService {
     }
 
     @Override
+    public Group changeIcon(User user, byte[] icon, String contentType, Long groupId) {
+        Group group = groupService.getGroupByIdOrThrow(groupId);
+        groupService.checkMembershipOrThrow(user, group);
+        return groupService.changeIcon(user, icon, contentType, groupId);
+    }
+
+    @Override
+    public void deleteIcon(User user, Long groupId) {
+        Group group = groupService.getGroupByIdOrThrow(groupId);
+        groupService.checkMembershipOrThrow(user, group);
+        groupService.deleteIcon(user, groupId);
+    }
+
+    @Override
     public Group deleteMember(User user, Long groupId, Long memberId) {
         Group group = groupService.getGroupByIdOrThrow(groupId);
         groupService.checkMembershipOrThrow(user, group);
@@ -112,6 +126,8 @@ public class GroupServiceProxy implements GroupService {
 
     @Override
     public Group undoGroupChange(User user, Long groupId) {
+        Group group = getGroupByIdOrThrow(groupId);
+        checkMembershipOrThrow(user, group);
         return groupService.undoGroupChange(user, groupId);
     }
 
