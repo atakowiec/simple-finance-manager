@@ -2,9 +2,7 @@ package pl.pollub.backend.transaction.observer;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import pl.pollub.backend.config.constants.ExpenseLimitConstants;
 import pl.pollub.backend.exception.HttpException;
-import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.mail.MailService;
 import pl.pollub.backend.mail.interfaces.Mail;
 import pl.pollub.backend.mail.interfaces.MailSenderImplementation;
@@ -12,27 +10,21 @@ import pl.pollub.backend.mail.mails.CloseToLimitMail;
 import pl.pollub.backend.mail.mails.LimitExceededMail;
 import pl.pollub.backend.notification.NotificationSubscriptionService;
 import pl.pollub.backend.notification.NotificationType;
-import pl.pollub.backend.transaction.repository.ExpenseRepository;
-
-import java.time.LocalDate;
 
 /**
  * Observer that sends warning e-mails when expense limits are close or exceeded.
  */
 @Component
 public class ExpenseLimitEmailObserver implements ExpenseLimitObserver {
-    private final ExpenseRepository expenseRepository;
     private final MailService mailService;
     private final ExpenseLimitMailAdapter mailAdapter;
     private final NotificationSubscriptionService subscriptionService;
 
     public ExpenseLimitEmailObserver(
-            ExpenseRepository expenseRepository,
             MailService mailService,
             MailSenderImplementation mailSenderImplementation,
             NotificationSubscriptionService subscriptionService
     ) {
-        this.expenseRepository = expenseRepository;
         this.mailService = mailService;
         this.subscriptionService = subscriptionService;
 
@@ -48,36 +40,18 @@ public class ExpenseLimitEmailObserver implements ExpenseLimitObserver {
 
     @Override
     public void update(ExpenseLimitEvent event) {
-        Group group = event.group();
-
         if (!subscriptionService.isSubscribed(event.user(), NotificationType.EXPENSE_LIMIT_EMAIL)) {
             return;
         }
 
-        if (group.getExpenseLimit() <= 0) {
+        if (!event.enteredWarning() && !event.enteredExceeded()) {
             return;
         }
 
-        Double totalExpenses = calculateTotalExpenses(group);
-        double remainingPart = calculateRemainingPart(totalExpenses, group.getExpenseLimit());
-
-        if (remainingPart > ExpenseLimitConstants.EXPENSE_WARNING_THRESHOLD) {
-            return;
-        }
-
-        Mail mail = mailAdapter.toMail(event, totalExpenses, remainingPart);
+        Mail mail = mailAdapter.toMail(event);
         sendMailWithErrorHandling(mail);
     }
 
-    private Double calculateTotalExpenses(Group group) {
-        LocalDate startOfTheMonth = LocalDate.now().withDayOfMonth(1);
-        Double totalExpenses = expenseRepository.getTotalByGroupAndMinDate(group, startOfTheMonth);
-        return totalExpenses != null ? totalExpenses : 0.0;
-    }
-
-    private double calculateRemainingPart(Double totalExpenses, Double expenseLimit) {
-        return 1.0 - (totalExpenses / expenseLimit);
-    }
 
     private void sendMailWithErrorHandling(Mail mail) {
         try {

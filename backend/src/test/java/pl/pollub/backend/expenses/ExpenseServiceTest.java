@@ -22,7 +22,9 @@ import pl.pollub.backend.transaction.dto.TransactionCreateDto;
 import pl.pollub.backend.transaction.dto.TransactionUpdateDto;
 import pl.pollub.backend.transaction.factory.ExpenseFactory;
 import pl.pollub.backend.transaction.model.Expense;
+import pl.pollub.backend.transaction.observer.ExpenseLimitLifecycleService;
 import pl.pollub.backend.transaction.observer.ExpenseLimitSubject;
+import pl.pollub.backend.transaction.observer.ExpenseLimitTriggerSource;
 import pl.pollub.backend.transaction.repository.ExpenseRepository;
 import pl.pollub.backend.transaction.service.ExpenseServiceImpl;
 import pl.pollub.backend.activity.ActivityMediator;
@@ -49,6 +51,8 @@ class ExpenseServiceTest {
 
     @Mock
     private ExpenseLimitSubject expenseLimitSubject;
+    @Mock
+    private ExpenseLimitLifecycleService expenseLimitLifecycleService;
 
     @Mock
     private ExpenseFactory expenseFactory;
@@ -227,7 +231,35 @@ class ExpenseServiceTest {
         Expense result = expenseService.createTransaction(createDto, user);
 
         Assertions.assertNotNull(result);
-        Mockito.verify(expenseLimitSubject, Mockito.times(1)).notifyObservers(Mockito.any());
+        Mockito.verify(expenseLimitLifecycleService, Mockito.times(1))
+                .evaluateAndNotify(user, group, ExpenseLimitTriggerSource.EXPENSE_CREATED);
+    }
+
+    @Test
+    void createExpense_FirstDayOfCurrentMonth_EvaluatesBudgetLifecycle() {
+        TransactionCategory category = new TransactionCategory();
+        category.setId(1L);
+
+        TransactionCreateDto createDto = new TransactionCreateDto();
+        createDto.setName("Rent");
+        createDto.setAmount("120.0");
+        createDto.setCategoryId(1L);
+        createDto.setGroupId(groupId);
+        createDto.setDate(LocalDate.now().withDayOfMonth(1));
+
+        Expense createdExpense = new Expense();
+        createdExpense.setGroup(group);
+        createdExpense.setUser(user);
+        createdExpense.setCategory(category);
+        createdExpense.setDate(createDto.getDate());
+
+        Mockito.when(categoryService.getCategoryByIdOrThrow(1L)).thenReturn(category);
+        Mockito.when(expenseFactory.create(Mockito.any(), Mockito.any())).thenReturn(createdExpense);
+
+        expenseService.createTransaction(createDto, user);
+
+        Mockito.verify(expenseLimitLifecycleService, Mockito.times(1))
+                .evaluateAndNotify(user, group, ExpenseLimitTriggerSource.EXPENSE_CREATED);
     }
 
     @Test
@@ -255,6 +287,29 @@ class ExpenseServiceTest {
 
         expenseService.createTransaction(createDto, user);
 
-        Mockito.verifyNoInteractions(expenseLimitSubject);
+        Mockito.verifyNoInteractions(expenseLimitLifecycleService);
+    }
+
+    @Test
+    void updateExpense_CurrentMonth_EvaluatesBudgetLifecycle() {
+        existingExpense.setDate(LocalDate.now());
+
+        TransactionUpdateDto updatedExpense = new TransactionUpdateDto();
+        updatedExpense.setAmount("150.0");
+
+        expenseService.updateTransaction(1L, updatedExpense, user);
+
+        Mockito.verify(expenseLimitLifecycleService, Mockito.times(1))
+                .evaluateAndNotify(user, group, ExpenseLimitTriggerSource.EXPENSE_UPDATED);
+    }
+
+    @Test
+    void deleteExpense_CurrentMonth_EvaluatesBudgetLifecycle() {
+        existingExpense.setDate(LocalDate.now());
+
+        expenseService.deleteTransaction(1L, user);
+
+        Mockito.verify(expenseLimitLifecycleService, Mockito.times(1))
+                .evaluateAndNotify(user, group, ExpenseLimitTriggerSource.EXPENSE_DELETED);
     }
 }

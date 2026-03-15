@@ -27,7 +27,9 @@ import pl.pollub.backend.group.repository.GroupInviteRepository;
 import pl.pollub.backend.group.repository.GroupRepository;
 import pl.pollub.backend.transaction.model.Expense;
 import pl.pollub.backend.transaction.model.Income;
+import pl.pollub.backend.transaction.observer.ExpenseLimitLifecycleService;
 import pl.pollub.backend.transaction.observer.ExpenseLimitSubject;
+import pl.pollub.backend.transaction.observer.ExpenseLimitTriggerSource;
 import pl.pollub.backend.transaction.repository.ExpenseRepository;
 import pl.pollub.backend.transaction.repository.IncomeRepository;
 
@@ -55,6 +57,8 @@ class GroupServiceTest {
     private GroupCaretaker groupCaretaker;
     @Mock
     private ExpenseLimitSubject expenseLimitSubject;
+    @Mock
+    private ExpenseLimitLifecycleService expenseLimitLifecycleService;
     @Mock
     private GroupMemberChangeSubject groupMemberChangeSubject;
 
@@ -259,7 +263,8 @@ class GroupServiceTest {
 
         Assertions.assertEquals(newExpenseLimit, group.getExpenseLimit());
         Mockito.verify(groupRepository, Mockito.times(1)).save(Mockito.any());
-        Mockito.verify(expenseLimitSubject, Mockito.times(1)).notifyObservers(Mockito.any());
+        Mockito.verify(expenseLimitLifecycleService, Mockito.times(1))
+                .evaluateAndNotify(loggedUser, loggedUserGroup, ExpenseLimitTriggerSource.GROUP_LIMIT_CHANGED);
     }
 
     @Test

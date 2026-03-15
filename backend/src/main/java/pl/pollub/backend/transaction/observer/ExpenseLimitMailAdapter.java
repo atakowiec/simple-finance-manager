@@ -19,16 +19,16 @@ public class ExpenseLimitMailAdapter {
         this.closeToLimitPrototype = closeToLimitPrototype;
     }
 
-    public Mail toMail(ExpenseLimitEvent event, Double totalExpenses, double remainingPart) {
-        if (remainingPart < 0) {
+    public Mail toMail(ExpenseLimitEvent event) {
+        if (event.enteredExceeded()) {
             return limitExceededPrototype.clone()
                     .withUser(event.user())
                     .withGroup(event.group())
-                    .withTotalExpenses(totalExpenses);
+                    .withTotalExpenses(event.totalExpenses());
         }
         return closeToLimitPrototype.clone()
                 .withUser(event.user())
                 .withGroup(event.group())
-                .withTotalExpenses(totalExpenses);
+                .withTotalExpenses(event.totalExpenses());
     }
 }

@@ -8,6 +8,7 @@ import pl.pollub.backend.config.constants.ExpenseLimitConstants;
 import pl.pollub.backend.conversion.DtoConvertible;
 import pl.pollub.backend.group.dto.GroupDto;
 import pl.pollub.backend.group.dto.GroupMemberDto;
+import pl.pollub.backend.transaction.observer.state.ExpenseLimitLifecycleStatus;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -42,6 +43,13 @@ public class Group implements DtoConvertible<GroupDto>, Cloneable {
 
     @Column(name = "expense_limit")
     private double expenseLimit = ExpenseLimitConstants.NO_EXPENSE_LIMIT;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "expense_limit_lifecycle_status", nullable = false)
+    private ExpenseLimitLifecycleStatus expenseLimitLifecycleStatus = ExpenseLimitLifecycleStatus.NO_LIMIT;
+
+    @Column(name = "expense_limit_state_month_start")
+    private LocalDate expenseLimitStateMonthStart;
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
@@ -107,6 +115,8 @@ public class Group implements DtoConvertible<GroupDto>, Cloneable {
             if (cloned.getIcon() != null) {
                 cloned.setIcon(Arrays.copyOf(cloned.getIcon(), cloned.getIcon().length));
             }
+            cloned.setExpenseLimitLifecycleStatus(this.expenseLimitLifecycleStatus);
+            cloned.setExpenseLimitStateMonthStart(this.expenseLimitStateMonthStart);
             return cloned;
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException("Cloning group failed", e);

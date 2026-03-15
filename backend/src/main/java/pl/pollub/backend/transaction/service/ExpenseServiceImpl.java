@@ -12,8 +12,8 @@ import pl.pollub.backend.categories.CategoryService;
 import pl.pollub.backend.group.interfaces.GroupService;
 import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.transaction.amount.AmountExpressionInterpreter;
-import pl.pollub.backend.transaction.observer.ExpenseLimitEvent;
-import pl.pollub.backend.transaction.observer.ExpenseLimitSubject;
+import pl.pollub.backend.transaction.observer.ExpenseLimitLifecycleService;
+import pl.pollub.backend.transaction.observer.ExpenseLimitTriggerSource;
 import pl.pollub.backend.transaction.dto.TransactionCreateDto;
 import pl.pollub.backend.transaction.dto.TransactionUpdateDto;
 import pl.pollub.backend.transaction.factory.ExpenseFactory;
@@ -37,7 +37,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     private final GroupService groupService;
     private final CategoryService categoryService;
     private final AmountExpressionInterpreter amountExpressionInterpreter;
-    private final ExpenseLimitSubject expenseLimitSubject;
+    private final ExpenseLimitLifecycleService expenseLimitLifecycleService;
     private final ExpenseFactory expenseFactory;
     private final ActivityMediator activityMediator;
 
@@ -67,9 +67,8 @@ public class ExpenseServiceImpl implements ExpenseService {
                         .build()
         );
 
-        Group group = getGroupService().getGroupByIdOrThrow(createDto.getGroupId());
-        if (createDto.getDate().isAfter(LocalDate.now().withDayOfMonth(1))) {
-            this.trySendLimitWarningMail(user, group);
+        if (isInCurrentMonth(createDto.getDate())) {
+            expenseLimitLifecycleService.evaluateAndNotify(user, expense.getGroup(), ExpenseLimitTriggerSource.EXPENSE_CREATED);
         }
 
         return expense;
@@ -77,6 +76,8 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public Expense updateTransaction(Long id, TransactionUpdateDto updateDto, User user) {
+        Expense existingExpense = getTransactionByIdAndUserOrThrow(id, user);
+        LocalDate originalDate = existingExpense.getDate();
         Expense expense = ExpenseService.super.updateTransaction(id, updateDto, user);
 
         activityMediator.notify(
@@ -90,6 +91,10 @@ public class ExpenseServiceImpl implements ExpenseService {
                         .build()
         );
 
+        if (isInCurrentMonth(originalDate) || isInCurrentMonth(expense.getDate())) {
+            expenseLimitLifecycleService.evaluateAndNotify(user, expense.getGroup(), ExpenseLimitTriggerSource.EXPENSE_UPDATED);
+        }
+
         return expense;
     }
 
@@ -97,22 +102,37 @@ public class ExpenseServiceImpl implements ExpenseService {
     public void deleteTransaction(Long id, User user) {
         Expense expense = getTransactionByIdAndUserOrThrow(id, user);
         getGroupService().checkMembershipOrThrow(user, expense.getGroup());
+        LocalDate expenseDate = expense.getDate();
+        Group group = expense.getGroup();
 
         activityMediator.notify(
                 ActivityEventType.EXPENSE_DELETED,
                 ActivityEventData.builder()
                         .user(user)
-                        .group(expense.getGroup())
+                        .group(group)
                         .resourceName(expense.getName())
                         .amount(expense.getAmount())
                         .build()
         );
 
         getTransactionRepository().deleteById(id);
+
+        if (isInCurrentMonth(expenseDate)) {
+            expenseLimitLifecycleService.evaluateAndNotify(user, group, ExpenseLimitTriggerSource.EXPENSE_DELETED);
+        }
     }
 
     @Override
     public void trySendLimitWarningMail(User user, Group group) {
-        expenseLimitSubject.notifyObservers(new ExpenseLimitEvent(user, group));
+        expenseLimitLifecycleService.evaluateAndNotify(user, group, ExpenseLimitTriggerSource.EXPENSE_CREATED);
+    }
+
+    private boolean isInCurrentMonth(LocalDate date) {
+        if (date == null) {
+            return false;
+        }
+
+        LocalDate now = LocalDate.now();
+        return date.getYear() == now.getYear() && date.getMonth() == now.getMonth();
     }
 }

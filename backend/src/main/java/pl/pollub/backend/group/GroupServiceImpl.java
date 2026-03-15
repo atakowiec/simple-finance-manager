@@ -26,8 +26,8 @@ import pl.pollub.backend.group.repository.GroupRepository;
 import pl.pollub.backend.transaction.dto.TransactionDto;
 import pl.pollub.backend.transaction.model.Expense;
 import pl.pollub.backend.transaction.model.Income;
-import pl.pollub.backend.transaction.observer.ExpenseLimitEvent;
-import pl.pollub.backend.transaction.observer.ExpenseLimitSubject;
+import pl.pollub.backend.transaction.observer.ExpenseLimitLifecycleService;
+import pl.pollub.backend.transaction.observer.ExpenseLimitTriggerSource;
 import pl.pollub.backend.transaction.repository.ExpenseRepository;
 import pl.pollub.backend.transaction.repository.IncomeRepository;
 
@@ -59,7 +59,7 @@ public class GroupServiceImpl implements GroupService {
     private final ExpenseRepository expenseRepository;
     private final IncomeRepository incomeRepository;
     private final GroupCaretaker groupCaretaker;
-    private final ExpenseLimitSubject expenseLimitSubject;
+    private final ExpenseLimitLifecycleService expenseLimitLifecycleService;
     private final GroupMemberChangeSubject groupMemberChangeSubject;
     private final GroupImportFacade groupImportFacade;
     private final ActivityMediator activityMediator;
@@ -146,7 +146,7 @@ public class GroupServiceImpl implements GroupService {
         saveGroupState(group);
         group.setExpenseLimit(expenseLimit);
         groupRepository.save(group);
-        expenseLimitSubject.notifyObservers(new ExpenseLimitEvent(user, group));
+        expenseLimitLifecycleService.evaluateAndNotify(user, group, ExpenseLimitTriggerSource.GROUP_LIMIT_CHANGED);
         return group;
     }
 
@@ -308,6 +308,7 @@ public class GroupServiceImpl implements GroupService {
         }
 
         groupRepository.save(group);
+        expenseLimitLifecycleService.evaluateAndNotify(user, group, ExpenseLimitTriggerSource.GROUP_LIMIT_UNDONE);
         return group;
     }
 

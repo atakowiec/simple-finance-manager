@@ -13,8 +13,8 @@ import pl.pollub.backend.transaction.dto.TransactionDto;
 import pl.pollub.backend.transaction.model.Expense;
 import pl.pollub.backend.transaction.model.Income;
 import pl.pollub.backend.transaction.model.Transaction;
-import pl.pollub.backend.transaction.observer.ExpenseLimitEvent;
-import pl.pollub.backend.transaction.observer.ExpenseLimitSubject;
+import pl.pollub.backend.transaction.observer.ExpenseLimitLifecycleService;
+import pl.pollub.backend.transaction.observer.ExpenseLimitTriggerSource;
 import pl.pollub.backend.transaction.repository.ExpenseRepository;
 import pl.pollub.backend.transaction.repository.IncomeRepository;
 
@@ -32,7 +32,7 @@ public class GroupImportFacade {
     private final CategoryService categoryService;
     private final ExpenseRepository expenseRepository;
     private final IncomeRepository incomeRepository;
-    private final ExpenseLimitSubject expenseLimitSubject;
+    private final ExpenseLimitLifecycleService expenseLimitLifecycleService;
 
     private record ImportContext(User user, Group group, Map<Long, TransactionCategory> categories) {}
 
@@ -107,7 +107,7 @@ public class GroupImportFacade {
 
     private void notifyIfNeeded(User user, Group group, boolean hasCurrentMonthImportedExpense) {
         if (hasCurrentMonthImportedExpense) {
-            expenseLimitSubject.notifyObservers(new ExpenseLimitEvent(user, group));
+            expenseLimitLifecycleService.evaluateAndNotify(user, group, ExpenseLimitTriggerSource.EXPENSE_CREATED);
         }
     }
 }
