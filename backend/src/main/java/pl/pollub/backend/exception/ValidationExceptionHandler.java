@@ -1,5 +1,7 @@
 package pl.pollub.backend.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -10,6 +12,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import pl.pollub.backend.exception.reporting.ExceptionReporter;
 import pl.pollub.backend.util.SimpleJsonBuilder;
 
 import java.util.ArrayList;
@@ -22,11 +25,14 @@ import java.util.Map;
  */
 @RestControllerAdvice
 @Order(0)
+@RequiredArgsConstructor
 public class ValidationExceptionHandler {
+    private final ExceptionReporter exceptionReporter;
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException ex, HttpServletRequest request) {
         BindingResult bindingResult = ex.getBindingResult();
+        exceptionReporter.report(ex, HttpStatus.BAD_REQUEST, request);
 
         Map<String, List<String>> errors = getErrors(bindingResult);
 

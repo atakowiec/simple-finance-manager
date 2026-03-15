@@ -10,7 +10,7 @@ import pl.pollub.backend.group.repository.GroupInviteRepository;
 /**
  * Handler responsible for cleaning up group invitations.
  */
-@Component
+@Component("userGroupInviteCleanupHandler")
 @RequiredArgsConstructor
 public class GroupInviteCleanupHandler implements UserDeletionHandler {
     private final GroupInviteRepository groupInviteRepository;

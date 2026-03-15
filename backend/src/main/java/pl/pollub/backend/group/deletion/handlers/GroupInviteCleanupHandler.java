@@ -11,7 +11,7 @@ import pl.pollub.backend.group.repository.GroupInviteRepository;
 /**
  * Removes all invites linked to the deleted group.
  */
-@Component
+@Component("groupDeletionGroupInviteCleanupHandler")
 @RequiredArgsConstructor
 public class GroupInviteCleanupHandler implements GroupDeletionHandler {
     private final GroupInviteRepository groupInviteRepository;
