@@ -1,9 +1,10 @@
-package pl.pollub.backend.group.export;
+package pl.pollub.backend.group.export.decorator;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import pl.pollub.backend.group.dto.ImportExportDto;
+import pl.pollub.backend.group.export.DataExporter;
 
 // start single responsibility principle
 /**

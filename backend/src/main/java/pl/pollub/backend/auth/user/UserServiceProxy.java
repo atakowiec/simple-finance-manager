@@ -62,6 +62,17 @@ public class UserServiceProxy implements UserService {
     }
 
     @Override
+    public String undoProfileChange(Long userId) {
+        log.info("Undoing profile change for userId={}", userId);
+        return userService.undoProfileChange(userId);
+    }
+
+    @Override
+    public boolean canUndoProfileChange(Long userId) {
+        return userService.canUndoProfileChange(userId);
+    }
+
+    @Override
     public List<UserDto> getUsers(int page, int size) {
         log.info("Listing users page={} size={}", page, size);
         return userService.getUsers(page, size);

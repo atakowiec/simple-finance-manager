@@ -1,6 +1,8 @@
-package pl.pollub.backend.group.export;
+package pl.pollub.backend.group.export.command;
 
 import pl.pollub.backend.group.dto.ImportExportDto;
+import pl.pollub.backend.group.export.DataExporter;
+import pl.pollub.backend.group.export.GroupExportResponse;
 
 // start liskov substitution principle
 // start dependency inversion principle

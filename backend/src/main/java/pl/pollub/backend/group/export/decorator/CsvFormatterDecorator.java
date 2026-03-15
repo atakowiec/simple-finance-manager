@@ -1,6 +1,8 @@
-package pl.pollub.backend.group.export;
+package pl.pollub.backend.group.export.decorator;
 
 import pl.pollub.backend.group.dto.ImportExportDto;
+import pl.pollub.backend.group.export.CombinedTransactionIterator;
+import pl.pollub.backend.group.export.DataExporter;
 import pl.pollub.backend.transaction.dto.TransactionDto;
 
 import java.nio.charset.StandardCharsets;

@@ -50,4 +50,20 @@ public class UserController {
 
         return userService.updateUserPassword(authenticatedUser.getId(), passwordChangeDto);
     }
+
+    @Operation(summary = "Cofnij ostatnią zmianę profilu użytkownika")
+    @ApiResponse(responseCode = "200", description = "Cofnięto zmianę profilu")
+    @PostMapping("/edit/undo")
+    @ResponseStatus(HttpStatus.OK)
+    public String undoProfileChange(@AuthenticationPrincipal User authenticatedUser) {
+        return userService.undoProfileChange(authenticatedUser.getId());
+    }
+
+    @Operation(summary = "Sprawdź czy można cofnąć zmianę profilu")
+    @ApiResponse(responseCode = "200", description = "Status możliwości cofnięcia")
+    @GetMapping("/edit/can-undo")
+    @ResponseStatus(HttpStatus.OK)
+    public boolean canUndoProfileChange(@AuthenticationPrincipal User authenticatedUser) {
+        return userService.canUndoProfileChange(authenticatedUser.getId());
+    }
 }

@@ -23,6 +23,10 @@ public interface UserService {
 
     String updateUserPassword(Long userId, UserPasswordChangeDto passwordChangeDto);
 
+    String undoProfileChange(Long userId);
+
+    boolean canUndoProfileChange(Long userId);
+
     List<UserDto> getUsers(int page, int size);
 
     String updateUserRole(Long userId, UserRoleDto roleDto);

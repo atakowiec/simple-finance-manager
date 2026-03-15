@@ -1,4 +1,4 @@
-package pl.pollub.backend.group.export;
+package pl.pollub.backend.group.export.command;
 
 import java.util.List;
 import java.util.Locale;

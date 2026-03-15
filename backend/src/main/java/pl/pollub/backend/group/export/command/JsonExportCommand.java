@@ -1,7 +1,10 @@
-package pl.pollub.backend.group.export;
+package pl.pollub.backend.group.export.command;
 
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import pl.pollub.backend.group.export.BaseDataExporter;
+import pl.pollub.backend.group.export.DataExporter;
+import pl.pollub.backend.group.export.decorator.JsonFormatterDecorator;
 
 /**
  * Command that exports group data as JSON.

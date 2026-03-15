@@ -11,6 +11,8 @@ import pl.pollub.backend.auth.dto.UserPasswordChangeDto;
 import pl.pollub.backend.auth.dto.UserRoleDto;
 import pl.pollub.backend.auth.dto.UserUsernameEditDto;
 import pl.pollub.backend.auth.user.deletion.UserDeletionMediator;
+import pl.pollub.backend.auth.user.memento.UserProfileCaretaker;
+import pl.pollub.backend.auth.user.memento.UserProfileMemento;
 import pl.pollub.backend.categories.dto.UserDto;
 import pl.pollub.backend.exception.HttpException;
 
@@ -29,6 +31,7 @@ public class UserServiceImpl implements UserService {
     private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
     private final AuthService authService;
     private final UserDeletionMediator userDeletionMediator;
+    private final UserProfileCaretaker userProfileCaretaker;
 
 
     @Override
@@ -60,6 +63,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = getUserByIdOrThrow(userId);
+        saveUserProfileState(user);
 
         user.setUsername(usernameEditDto.getUsername());
         userRepository.save(user);
@@ -73,6 +77,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = getUserByIdOrThrow(userId);
+        saveUserProfileState(user);
         user.setEmail(emailEditDto.getEmail());
         userRepository.save(user);
         return "Email został zaktualizowany";
@@ -89,9 +94,31 @@ public class UserServiceImpl implements UserService {
             throw new HttpException(HttpStatus.UNAUTHORIZED.value(), "Hasło jest nieprawidłowe");
         }
 
+        saveUserProfileState(user);
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         return "Hasło zostało zaktualizowane.";
+    }
+
+    @Override
+    public String undoProfileChange(Long userId) {
+        User user = getUserByIdOrThrow(userId);
+        UserProfileMemento memento = userProfileCaretaker.getLastMemento(userId);
+
+        if (memento == null) {
+            throw new HttpException(HttpStatus.BAD_REQUEST.value(), "Brak historii zmian profilu do cofnięcia");
+        }
+
+        user.setUsername(memento.getUsername());
+        user.setEmail(memento.getEmail());
+        user.setPassword(memento.getPassword());
+        userRepository.save(user);
+        return "Cofnięto ostatnią zmianę profilu użytkownika.";
+    }
+
+    @Override
+    public boolean canUndoProfileChange(Long userId) {
+        return userProfileCaretaker.hasHistory(userId);
     }
 
     public List<UserDto> getUsers(int page, int size) {
@@ -120,5 +147,14 @@ public class UserServiceImpl implements UserService {
     public String deleteUser(Long userId) {
         User user = getUserByIdOrThrow(userId);
         return userDeletionMediator.deleteUser(user);
+    }
+
+    private void saveUserProfileState(User user) {
+        UserProfileMemento memento = UserProfileMemento.create(
+                user.getUsername(),
+                user.getEmail(),
+                user.getPassword()
+        );
+        userProfileCaretaker.saveMemento(user.getId(), memento);
     }
 }
