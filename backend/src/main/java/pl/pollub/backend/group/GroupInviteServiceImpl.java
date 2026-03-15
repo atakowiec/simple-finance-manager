@@ -18,6 +18,9 @@ import pl.pollub.backend.group.interfaces.GroupService;
 import pl.pollub.backend.group.membership.UserMembership;
 import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.group.model.GroupInvite;
+import pl.pollub.backend.group.observer.GroupMemberChangeAction;
+import pl.pollub.backend.group.observer.GroupMemberChangeEvent;
+import pl.pollub.backend.group.observer.GroupMemberChangeSubject;
 import pl.pollub.backend.group.repository.GroupInviteRepository;
 
 import java.time.LocalDateTime;
@@ -36,6 +39,7 @@ public class GroupInviteServiceImpl implements GroupInviteService {
     private final GroupService groupService;
     private final UserService userService;
     private final ActivityMediator activityMediator;
+    private final GroupMemberChangeSubject groupMemberChangeSubject;
     private final InviteTargetRowAdapter inviteTargetRowAdapter = new InviteTargetRowAdapter();
 
     @Override
@@ -140,6 +144,14 @@ public class GroupInviteServiceImpl implements GroupInviteService {
                         .group(group)
                         .build()
         );
+
+        groupMemberChangeSubject.notifyObservers(new GroupMemberChangeEvent(
+                user,
+                user,
+                group,
+                GroupMemberChangeAction.JOINED,
+                new ArrayList<>(group.getUsers())
+        ));
 
         return membership.getStatus();
     }

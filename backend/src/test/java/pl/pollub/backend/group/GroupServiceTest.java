@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -19,6 +20,9 @@ import pl.pollub.backend.group.dto.GroupCreateDto;
 import pl.pollub.backend.group.dto.ImportExportDto;
 import pl.pollub.backend.group.memento.GroupCaretaker;
 import pl.pollub.backend.group.model.Group;
+import pl.pollub.backend.group.observer.GroupMemberChangeAction;
+import pl.pollub.backend.group.observer.GroupMemberChangeEvent;
+import pl.pollub.backend.group.observer.GroupMemberChangeSubject;
 import pl.pollub.backend.group.repository.GroupInviteRepository;
 import pl.pollub.backend.group.repository.GroupRepository;
 import pl.pollub.backend.transaction.model.Expense;
@@ -51,6 +55,8 @@ class GroupServiceTest {
     private GroupCaretaker groupCaretaker;
     @Mock
     private ExpenseLimitSubject expenseLimitSubject;
+    @Mock
+    private GroupMemberChangeSubject groupMemberChangeSubject;
 
     @Mock
     private ActivityMediator activityMediator;
@@ -278,8 +284,14 @@ class GroupServiceTest {
     void deleteMember_UserInGroup_DeletesMember() {
         Group group = groupService.deleteMember(ownerUser, loggedUserGroup.getId(), loggedUser.getId());
 
-        Assertions.assertFalse(group.getUsers().contains(otherUser));
+        Assertions.assertFalse(group.getUsers().contains(loggedUser));
         Mockito.verify(groupRepository, Mockito.times(1)).save(Mockito.any());
+        ArgumentCaptor<GroupMemberChangeEvent> captor = ArgumentCaptor.forClass(GroupMemberChangeEvent.class);
+        Mockito.verify(groupMemberChangeSubject, Mockito.times(1)).notifyObservers(captor.capture());
+        Assertions.assertEquals(GroupMemberChangeAction.REMOVED, captor.getValue().action());
+        Assertions.assertEquals(loggedUser, captor.getValue().member());
+        Assertions.assertTrue(captor.getValue().recipients().contains(ownerUser));
+        Assertions.assertTrue(captor.getValue().recipients().contains(loggedUser));
     }
 
     @Test
@@ -409,6 +421,12 @@ class GroupServiceTest {
         groupService.leaveGroup(loggedUser, loggedUserGroup.getId());
 
         Mockito.verify(groupRepository, Mockito.times(1)).save(loggedUserGroup);
+        ArgumentCaptor<GroupMemberChangeEvent> captor = ArgumentCaptor.forClass(GroupMemberChangeEvent.class);
+        Mockito.verify(groupMemberChangeSubject, Mockito.times(1)).notifyObservers(captor.capture());
+        Assertions.assertEquals(GroupMemberChangeAction.LEFT, captor.getValue().action());
+        Assertions.assertEquals(loggedUser, captor.getValue().member());
+        Assertions.assertTrue(captor.getValue().recipients().contains(ownerUser));
+        Assertions.assertTrue(captor.getValue().recipients().contains(loggedUser));
     }
 
     @Test

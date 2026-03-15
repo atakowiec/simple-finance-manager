@@ -4,5 +4,6 @@ package pl.pollub.backend.notification;
  * Supported notification types for user subscriptions.
  */
 public enum NotificationType {
-    EXPENSE_LIMIT_EMAIL
+    EXPENSE_LIMIT_EMAIL,
+    MEMBER_CHANGE
 }

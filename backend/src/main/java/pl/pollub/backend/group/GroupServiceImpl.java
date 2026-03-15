@@ -19,6 +19,9 @@ import pl.pollub.backend.group.membership.UserMembership;
 import pl.pollub.backend.group.memento.GroupCaretaker;
 import pl.pollub.backend.group.memento.GroupMemento;
 import pl.pollub.backend.group.model.Group;
+import pl.pollub.backend.group.observer.GroupMemberChangeAction;
+import pl.pollub.backend.group.observer.GroupMemberChangeEvent;
+import pl.pollub.backend.group.observer.GroupMemberChangeSubject;
 import pl.pollub.backend.group.repository.GroupRepository;
 import pl.pollub.backend.transaction.dto.TransactionDto;
 import pl.pollub.backend.transaction.model.Expense;
@@ -57,6 +60,7 @@ public class GroupServiceImpl implements GroupService {
     private final IncomeRepository incomeRepository;
     private final GroupCaretaker groupCaretaker;
     private final ExpenseLimitSubject expenseLimitSubject;
+    private final GroupMemberChangeSubject groupMemberChangeSubject;
     private final GroupImportFacade groupImportFacade;
     private final ActivityMediator activityMediator;
     private final GroupDeletionMediator groupDeletionMediator;
@@ -207,6 +211,14 @@ public class GroupServiceImpl implements GroupService {
                         .build()
         );
 
+        groupMemberChangeSubject.notifyObservers(new GroupMemberChangeEvent(
+                user,
+                removedMember,
+                group,
+                GroupMemberChangeAction.REMOVED,
+                createMemberChangeRecipients(group, removedMember)
+        ));
+
         return group;
     }
 
@@ -262,6 +274,14 @@ public class GroupServiceImpl implements GroupService {
                         .group(group)
                         .build()
         );
+
+        groupMemberChangeSubject.notifyObservers(new GroupMemberChangeEvent(
+                user,
+                user,
+                group,
+                GroupMemberChangeAction.LEFT,
+                createMemberChangeRecipients(group, user)
+        ));
     }
 
     @Override
@@ -305,6 +325,14 @@ public class GroupServiceImpl implements GroupService {
                 group.getExpenseLimit()
         );
         groupCaretaker.saveMemento(group.getId(), memento);
+    }
+
+    private List<User> createMemberChangeRecipients(Group group, User additionalRecipient) {
+        List<User> recipients = new ArrayList<>(group.getUsers());
+        if (additionalRecipient != null) {
+            recipients.add(additionalRecipient);
+        }
+        return recipients;
     }
 
     private Group createGroupPrototype() {
