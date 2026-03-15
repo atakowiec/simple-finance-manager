@@ -22,6 +22,7 @@ import pl.pollub.backend.transaction.dto.TransactionUpdateDto;
 import pl.pollub.backend.transaction.model.Income;
 import pl.pollub.backend.transaction.repository.IncomeRepository;
 import pl.pollub.backend.transaction.service.IncomeServiceImpl;
+import pl.pollub.backend.activity.ActivityMediator;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -45,6 +46,9 @@ class IncomesServiceTest {
 
     @Mock
     private AmountExpressionInterpreter amountExpressionInterpreter;
+
+    @Mock
+    private ActivityMediator activityMediator;
 
     @InjectMocks
     private IncomeServiceImpl incomeService;

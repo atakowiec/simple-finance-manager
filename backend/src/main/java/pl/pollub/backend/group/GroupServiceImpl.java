@@ -5,6 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.pollub.backend.activity.ActivityEventData;
+import pl.pollub.backend.activity.ActivityEventType;
+import pl.pollub.backend.activity.ActivityMediator;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.config.constants.ExpenseLimitConstants;
 import pl.pollub.backend.exception.HttpException;
@@ -47,6 +50,7 @@ public class GroupServiceImpl implements GroupService {
     private final GroupCaretaker groupCaretaker;
     private final ExpenseLimitSubject expenseLimitSubject;
     private final GroupImportFacade groupImportFacade;
+    private final ActivityMediator activityMediator;
     // Prototype instance for creating new groups with default settings
     private final Group groupPrototype = createGroupPrototype();
 
@@ -79,6 +83,16 @@ public class GroupServiceImpl implements GroupService {
         group.setUsers(List.of(user));
 
         groupRepository.save(group);
+
+        activityMediator.notify(
+                ActivityEventType.GROUP_CREATED,
+                ActivityEventData.builder()
+                        .user(user)
+                        .group(group)
+                        .resourceName(group.getName())
+                        .build()
+        );
+
         return group;
     }
 
@@ -136,11 +150,27 @@ public class GroupServiceImpl implements GroupService {
         if (Objects.equals(group.getOwner().getId(), memberId))
             throw new HttpException(HttpStatus.FORBIDDEN, "Nie możesz usunąć właściciela grupy!");
 
+        // Capture removed member's info before removal for the log message
+        User removedMember = group.getUsers().stream()
+                .filter(m -> Objects.equals(m.getId(), memberId))
+                .findFirst()
+                .orElseThrow(() -> new HttpException(HttpStatus.NOT_FOUND,
+                        "Nie znaleziono użytkownika o podanym identyfikatorze: " + memberId));
+
         boolean anyRemoved = group.getUsers().removeIf(member -> Objects.equals(member.getId(), memberId));
         if (!anyRemoved)
             throw new HttpException(HttpStatus.NOT_FOUND, "Nie znaleziono użytkownika o podanym identyfikatorze: " + memberId);
 
         groupRepository.save(group);
+
+        activityMediator.notify(
+                ActivityEventType.MEMBER_REMOVED_FROM_GROUP,
+                ActivityEventData.builder()
+                        .user(removedMember)
+                        .group(group)
+                        .additionalInfo("removed by " + user.getUsername())
+                        .build()
+        );
 
         return group;
     }
@@ -175,6 +205,16 @@ public class GroupServiceImpl implements GroupService {
         if (!Objects.equals(group.getOwner().getId(), user.getId()))
             throw new HttpException(HttpStatus.FORBIDDEN, "Musisz być właścicielem grupy aby to zrobić!");
 
+        // Log before deletion so the group entity is still accessible
+        activityMediator.notify(
+                ActivityEventType.GROUP_DELETED,
+                ActivityEventData.builder()
+                        .user(user)
+                        .group(group)
+                        .resourceName(group.getName())
+                        .build()
+        );
+
         groupInviteRepository.deleteAllByGroup(group);
         expenseRepository.deleteAllByGroup(group);
         incomeRepository.deleteAllByGroup(group);
@@ -193,6 +233,14 @@ public class GroupServiceImpl implements GroupService {
         membership.leaveGroup();
 
         groupRepository.save(group);
+
+        activityMediator.notify(
+                ActivityEventType.MEMBER_LEFT_GROUP,
+                ActivityEventData.builder()
+                        .user(user)
+                        .group(group)
+                        .build()
+        );
     }
 
     @Override

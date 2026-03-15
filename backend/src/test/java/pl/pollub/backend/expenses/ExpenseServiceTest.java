@@ -21,10 +21,11 @@ import pl.pollub.backend.transaction.amount.AmountExpressionInterpreter;
 import pl.pollub.backend.transaction.dto.TransactionCreateDto;
 import pl.pollub.backend.transaction.dto.TransactionUpdateDto;
 import pl.pollub.backend.transaction.factory.ExpenseFactory;
-import pl.pollub.backend.transaction.observer.ExpenseLimitSubject;
 import pl.pollub.backend.transaction.model.Expense;
+import pl.pollub.backend.transaction.observer.ExpenseLimitSubject;
 import pl.pollub.backend.transaction.repository.ExpenseRepository;
 import pl.pollub.backend.transaction.service.ExpenseServiceImpl;
+import pl.pollub.backend.activity.ActivityMediator;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -54,6 +55,9 @@ class ExpenseServiceTest {
 
     @Mock
     private AmountExpressionInterpreter amountExpressionInterpreter;
+
+    @Mock
+    private ActivityMediator activityMediator;
 
     @InjectMocks
     private ExpenseServiceImpl expenseService;

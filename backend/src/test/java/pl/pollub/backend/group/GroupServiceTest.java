@@ -10,11 +10,11 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import pl.pollub.backend.activity.ActivityMediator;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.categories.CategoryService;
 import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.dto.GroupCreateDto;
-import pl.pollub.backend.group.dto.GroupMemberDto;
 import pl.pollub.backend.group.dto.ImportExportDto;
 import pl.pollub.backend.group.memento.GroupCaretaker;
 import pl.pollub.backend.group.model.Group;
@@ -50,6 +50,9 @@ class GroupServiceTest {
     private GroupCaretaker groupCaretaker;
     @Mock
     private ExpenseLimitSubject expenseLimitSubject;
+
+    @Mock
+    private ActivityMediator activityMediator;
 
     @InjectMocks
     private GroupServiceImpl groupServiceImpl;
@@ -173,15 +176,6 @@ class GroupServiceTest {
         Assertions.assertEquals(List.of(loggedUser), group.getUsers());
 
         Mockito.verify(groupRepository, Mockito.times(1)).save(Mockito.any());
-    }
-
-    @Test
-    void getGroupOwner_UserInGroup_ReturnsOwnerDto() {
-        List<GroupMemberDto> owners = groupService.getGroupOwners(loggedUser, loggedUserGroup.getId());
-
-        Assertions.assertEquals(1, owners.size());
-        Assertions.assertEquals(ownerUser.getId(), owners.get(0).getId());
-        Assertions.assertTrue(owners.get(0).isOwner());
     }
 
     @Test

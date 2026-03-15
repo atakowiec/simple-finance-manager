@@ -1,5 +1,6 @@
 package pl.pollub.backend.auth.user.deletion;
 
+import lombok.Getter;
 import pl.pollub.backend.auth.user.User;
 
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.Objects;
  * Executes child tasks in order.
  */
 public class CompositeDeletionTask implements UserDeletionTask {
+    @Getter
     private final String name;
     private final List<UserDeletionTask> children = new ArrayList<>();
 
@@ -34,10 +36,6 @@ public class CompositeDeletionTask implements UserDeletionTask {
 
     public List<UserDeletionTask> getChildren() {
         return Collections.unmodifiableList(children);
-    }
-
-    public String getName() {
-        return name;
     }
 
     @Override

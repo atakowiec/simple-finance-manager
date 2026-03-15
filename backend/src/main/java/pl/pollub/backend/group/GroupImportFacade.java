@@ -12,6 +12,7 @@ import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.transaction.dto.TransactionDto;
 import pl.pollub.backend.transaction.model.Expense;
 import pl.pollub.backend.transaction.model.Income;
+import pl.pollub.backend.transaction.model.Transaction;
 import pl.pollub.backend.transaction.observer.ExpenseLimitEvent;
 import pl.pollub.backend.transaction.observer.ExpenseLimitSubject;
 import pl.pollub.backend.transaction.repository.ExpenseRepository;
@@ -85,24 +86,23 @@ public class GroupImportFacade {
 
     private Expense createExpenseEntity(ImportContext importContext, TransactionDto expense, TransactionCategory category) {
         Expense newExpense = new Expense();
-        newExpense.setName(expense.getName());
-        newExpense.setAmount(expense.getAmount());
-        newExpense.setCategory(category);
-        newExpense.setDate(expense.getDate());
-        newExpense.setGroup(importContext.group());
-        newExpense.setUser(importContext.user());
+        assignTransactionData(importContext, expense, category, newExpense);
         return newExpense;
     }
 
     private Income createIncomeEntity(ImportContext importContext, TransactionDto income, TransactionCategory category) {
         Income newIncome = new Income();
-        newIncome.setName(income.getName());
-        newIncome.setAmount(income.getAmount());
-        newIncome.setCategory(category);
-        newIncome.setDate(income.getDate());
-        newIncome.setGroup(importContext.group());
-        newIncome.setUser(importContext.user());
+        assignTransactionData(importContext, income, category, newIncome);
         return newIncome;
+    }
+
+    private <T extends Transaction> void assignTransactionData(ImportContext importContext, TransactionDto transaction, TransactionCategory category, T transactionBase) {
+        transactionBase.setName(transaction.getName());
+        transactionBase.setAmount(transaction.getAmount());
+        transactionBase.setCategory(category);
+        transactionBase.setDate(transaction.getDate());
+        transactionBase.setGroup(importContext.group());
+        transactionBase.setUser(importContext.user());
     }
 
     private void notifyIfNeeded(User user, Group group, boolean hasCurrentMonthImportedExpense) {

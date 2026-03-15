@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import pl.pollub.backend.activity.ActivityEventData;
+import pl.pollub.backend.activity.ActivityEventType;
+import pl.pollub.backend.activity.ActivityMediator;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.auth.user.UserService;
 import pl.pollub.backend.exception.HttpException;
@@ -32,6 +35,7 @@ public class GroupInviteServiceImpl implements GroupInviteService {
     private final GroupInviteRepository inviteRepository;
     private final GroupService groupService;
     private final UserService userService;
+    private final ActivityMediator activityMediator;
     private final InviteTargetRowAdapter inviteTargetRowAdapter = new InviteTargetRowAdapter();
 
     @Override
@@ -128,6 +132,14 @@ public class GroupInviteServiceImpl implements GroupInviteService {
 
         inviteRepository.delete(groupInvite);
         groupService.save(group);
+
+        activityMediator.notify(
+                ActivityEventType.MEMBER_JOINED_GROUP,
+                ActivityEventData.builder()
+                        .user(user)
+                        .group(group)
+                        .build()
+        );
 
         return membership.getStatus();
     }
