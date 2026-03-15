@@ -7,6 +7,9 @@ import pl.pollub.backend.notification.command.NotificationCommandFactory;
 import pl.pollub.backend.notification.command.NotificationCommandInvoker;
 import pl.pollub.backend.notification.dto.NotificationSubscriptionDto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Service for managing user notification subscriptions.
  */
@@ -29,5 +32,17 @@ public class NotificationSubscriptionService {
         return repository.findByUserAndType(user, type)
                 .map(NotificationSubscription::isEnabled)
                 .orElse(true);
+    }
+
+    public List<NotificationSubscriptionDto> getActiveSubscriptions(User user) {
+        List<NotificationSubscription> subscriptions = repository.findAllByUser(user);
+        ActiveNotificationSubscriptionIterator iterator = new ActiveNotificationSubscriptionIterator(subscriptions);
+        List<NotificationSubscriptionDto> activeSubscriptions = new ArrayList<>();
+
+        while (iterator.hasNext()) {
+            activeSubscriptions.add(iterator.next());
+        }
+
+        return activeSubscriptions;
     }
 }

@@ -4,6 +4,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.dto.GroupCreateDto;
+import pl.pollub.backend.group.dto.GroupMemberDto;
 import pl.pollub.backend.group.dto.ImportExportDto;
 import pl.pollub.backend.group.model.Group;
 
@@ -42,6 +43,15 @@ public interface GroupService {
      * Saves the specified group to the database
      */
     Group createGroup(User user, GroupCreateDto groupCreateDto) ;
+
+    /**
+     * Returns the owner of the specified group.
+     *
+     * @param user    user requesting owner data
+     * @param groupId id of the group
+     * @return list of owners
+     */
+    List<GroupMemberDto> getGroupOwners(User user, Long groupId);
 
     /**
      * Changes the color of the specified group.

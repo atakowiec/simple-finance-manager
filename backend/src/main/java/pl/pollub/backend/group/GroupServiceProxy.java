@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.group.dto.GroupCreateDto;
+import pl.pollub.backend.group.dto.GroupMemberDto;
 import pl.pollub.backend.group.dto.ImportExportDto;
 import pl.pollub.backend.group.interfaces.GroupService;
 import pl.pollub.backend.group.model.Group;
@@ -39,6 +40,13 @@ public class GroupServiceProxy implements GroupService {
     @Override
     public Group createGroup(User user, GroupCreateDto groupCreateDto) {
         return groupService.createGroup(user, groupCreateDto);
+    }
+
+    @Override
+    public List<GroupMemberDto>  getGroupOwners(User user, Long groupId) {
+        Group group = groupService.getGroupByIdOrThrow(groupId);
+        groupService.checkMembershipOrThrow(user, group);
+        return groupService.getGroupOwners(user, groupId);
     }
 
     @Override

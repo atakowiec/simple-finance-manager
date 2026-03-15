@@ -11,6 +11,8 @@ import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.notification.dto.NotificationSubscriptionDto;
 import pl.pollub.backend.notification.dto.NotificationSubscriptionRequest;
 
+import java.util.List;
+
 /**
  * Controller for managing notification subscriptions.
  */
@@ -29,5 +31,12 @@ public class NotificationSubscriptionController {
             @RequestBody @Valid NotificationSubscriptionRequest request
     ) {
         return subscriptionService.updateSubscription(user, request.getType(), request.isSubscribe());
+    }
+
+    @Operation(summary = "Pobierz aktywne subskrypcje powiadomień")
+    @ApiResponse(responseCode = "200", description = "Lista aktywnych subskrypcji")
+    @GetMapping("/active")
+    public List<NotificationSubscriptionDto> getActiveSubscriptions(@AuthenticationPrincipal User user) {
+        return subscriptionService.getActiveSubscriptions(user);
     }
 }

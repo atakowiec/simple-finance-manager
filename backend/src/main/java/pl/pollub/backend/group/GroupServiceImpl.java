@@ -9,6 +9,7 @@ import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.config.constants.ExpenseLimitConstants;
 import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.dto.GroupCreateDto;
+import pl.pollub.backend.group.dto.GroupMemberDto;
 import pl.pollub.backend.group.dto.ImportExportDto;
 import pl.pollub.backend.group.interfaces.GroupService;
 import pl.pollub.backend.group.membership.UserMembership;
@@ -27,6 +28,7 @@ import pl.pollub.backend.transaction.repository.IncomeRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -78,6 +80,19 @@ public class GroupServiceImpl implements GroupService {
 
         groupRepository.save(group);
         return group;
+    }
+
+    @Override
+    public List<GroupMemberDto> getGroupOwners(User user, Long groupId) {
+        Group group = getGroupByIdOrThrow(groupId);
+
+        GroupOwnersIterator iterator = new GroupOwnersIterator(group.getUsers());
+        List<GroupMemberDto> result = new ArrayList<>();
+
+        while (iterator.hasNext()) {
+            result.add(iterator.next());
+        }
+        return result;
     }
 
     @Override

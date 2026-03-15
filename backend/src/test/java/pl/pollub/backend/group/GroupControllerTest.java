@@ -11,10 +11,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.exception.HttpException;
+import pl.pollub.backend.group.dto.GroupMemberDto;
 import pl.pollub.backend.group.export.GroupExportFacade;
 import pl.pollub.backend.group.export.GroupExportResponse;
 import pl.pollub.backend.group.interfaces.GroupInviteService;
 import pl.pollub.backend.group.interfaces.GroupService;
+
+import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class GroupControllerTest {
@@ -30,6 +33,20 @@ class GroupControllerTest {
 
     @InjectMocks
     private GroupController groupController;
+
+    @Test
+    void getGroupOwner_DelegatesToService() {
+        User user = new User();
+        user.setId(1L);
+
+        List<GroupMemberDto> expectedOwners = List.of(new GroupMemberDto(10L, "owner", true));
+        Mockito.when(groupService.getGroupOwners(user, 7L)).thenReturn(expectedOwners);
+
+        List<GroupMemberDto> response = groupController.getGroupOwners(user, 7L);
+
+        Assertions.assertEquals(expectedOwners, response);
+        Mockito.verify(groupService).getGroupOwners(user, 7L);
+    }
 
     @Test
     void handleExport_UnsupportedFormat_ThrowsHttp400Exception() {

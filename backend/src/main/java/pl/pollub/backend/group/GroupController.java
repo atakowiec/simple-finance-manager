@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.exception.HttpException;
 import pl.pollub.backend.group.dto.GroupCreateDto;
+import pl.pollub.backend.group.dto.GroupMemberDto;
 import pl.pollub.backend.group.dto.ImportExportDto;
 import pl.pollub.backend.group.dto.InviteTargetDto;
 import pl.pollub.backend.group.enums.MembershipStatus;
@@ -45,6 +46,13 @@ public class GroupController {
     @GetMapping
     public List<Group> getGroups(@AuthenticationPrincipal User user) {
         return groupService.getAllGroupsForUser(user);
+    }
+
+    @Operation(summary = "Pobierz właściciela grupy")
+    @ApiResponse(responseCode = "200", description = "Dane właściciela grupy")
+    @GetMapping("/{groupId}/owner")
+    public List<GroupMemberDto> getGroupOwners(@AuthenticationPrincipal User user, @PathVariable Long groupId) {
+        return groupService.getGroupOwners(user, groupId);
     }
 
     @Operation(summary = "Stwórz nową grupę")

@@ -4,6 +4,8 @@ import pl.pollub.backend.group.dto.ImportExportDto;
 import pl.pollub.backend.transaction.dto.TransactionDto;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.List;
 
 // start open close principle
 /**
@@ -17,15 +19,19 @@ public class CsvFormatterDecorator extends DataFormatterDecorator {
     @Override
     public byte[] export(ImportExportDto data) {
         StringBuilder csv = new StringBuilder("Date,Name,Amount,Type\n");
-        
-        for (TransactionDto expense : data.getExpenses()) {
-            csv.append(String.format("%s,%s,%.2f,EXPENSE\n", 
-                expense.getDate(), expense.getName(), expense.getAmount()));
-        }
+        List<TransactionDto> expenses = data.getExpenses() != null ? data.getExpenses() : Collections.emptyList();
+        List<TransactionDto> incomes = data.getIncomes() != null ? data.getIncomes() : Collections.emptyList();
+        CombinedTransactionIterator iterator = new CombinedTransactionIterator(expenses, incomes);
+        int expenseCount = expenses.size();
+        int currentIndex = 0;
 
-        for (TransactionDto income : data.getIncomes()) {
-            csv.append(String.format("%s,%s,%.2f,INCOME\n", 
-                income.getDate(), income.getName(), income.getAmount()));
+        while (iterator.hasNext()) {
+            TransactionDto transaction = iterator.next();
+            String type = currentIndex < expenseCount ? "EXPENSE" : "INCOME";
+
+            csv.append(String.format("%s,%s,%.2f,%s\n",
+                transaction.getDate(), transaction.getName(), transaction.getAmount(), type));
+            currentIndex++;
         }
         
         return csv.toString().getBytes(StandardCharsets.UTF_8);
