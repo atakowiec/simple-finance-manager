@@ -20,5 +20,14 @@ public class NameContainsExpression implements Expression {
         }
         return transaction.getName().toLowerCase().contains(text.toLowerCase());
     }
+
+    public String getText() {
+        return text;
+    }
+
+    @Override
+    public <T> T accept(ExpressionVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }
 

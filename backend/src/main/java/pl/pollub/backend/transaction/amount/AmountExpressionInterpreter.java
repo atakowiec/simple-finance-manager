@@ -14,6 +14,16 @@ import java.util.List;
 public class AmountExpressionInterpreter {
 
     public double interpret(String rawExpression) {
+        AmountExpression expressionTree = parse(rawExpression);
+        double result = expressionTree.interpret();
+        if (!Double.isFinite(result)) {
+            throw new HttpException(HttpStatus.BAD_REQUEST, "Kwota jest poza zakresem");
+        }
+
+        return result;
+    }
+
+    public AmountExpression parse(String rawExpression) {
         if (rawExpression == null || rawExpression.isBlank()) {
             throw new HttpException(HttpStatus.BAD_REQUEST, "Kwota jest wymagana");
         }
@@ -84,12 +94,7 @@ public class AmountExpressionInterpreter {
                     : new SubtractExpression(expressionTree, right);
         }
 
-        double result = expressionTree.interpret();
-        if (!Double.isFinite(result)) {
-            throw new HttpException(HttpStatus.BAD_REQUEST, "Kwota jest poza zakresem");
-        }
-
-        return result;
+        return expressionTree;
     }
 
     private boolean isPartOfNumber(char value) {

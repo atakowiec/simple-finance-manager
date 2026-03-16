@@ -7,7 +7,6 @@ import pl.pollub.backend.transaction.model.Transaction;
  * Abstract Expression interface for the Interpreter pattern.
  * Represents a query expression that can be evaluated against a transaction.
  */
-@FunctionalInterface
 public interface Expression {
     /**
      * Interprets and evaluates the expression against a transaction.
@@ -16,5 +15,7 @@ public interface Expression {
      * @return true if the transaction matches the expression criteria
      */
     boolean interpret(Transaction transaction);
+
+    <T> T accept(ExpressionVisitor<T> visitor);
 }
 

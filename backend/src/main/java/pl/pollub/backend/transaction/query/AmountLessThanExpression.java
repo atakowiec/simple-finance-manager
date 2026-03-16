@@ -17,5 +17,14 @@ public class AmountLessThanExpression implements Expression {
     public boolean interpret(Transaction transaction) {
         return transaction.getAmount() < threshold;
     }
+
+    public double getThreshold() {
+        return threshold;
+    }
+
+    @Override
+    public <T> T accept(ExpressionVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }
 

@@ -14,5 +14,14 @@ public class NumberExpression implements AmountExpression {
     public double interpret() {
         return value;
     }
+
+    public double getValue() {
+        return value;
+    }
+
+    @Override
+    public <T> T accept(AmountExpressionVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }
 

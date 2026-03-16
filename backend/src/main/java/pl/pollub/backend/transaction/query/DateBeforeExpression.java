@@ -19,5 +19,14 @@ public class DateBeforeExpression implements Expression {
     public boolean interpret(Transaction transaction) {
         return transaction.getDate() != null && transaction.getDate().isBefore(date);
     }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    @Override
+    public <T> T accept(ExpressionVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }
 

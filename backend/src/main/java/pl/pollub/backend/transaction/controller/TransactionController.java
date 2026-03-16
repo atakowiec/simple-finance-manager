@@ -8,8 +8,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.pollub.backend.auth.user.User;
+import pl.pollub.backend.transaction.amount.AmountExpression;
+import pl.pollub.backend.transaction.amount.AmountExpressionComplexityVisitor;
+import pl.pollub.backend.transaction.amount.AmountExpressionInterpreter;
+import pl.pollub.backend.transaction.amount.AmountExpressionPrettyPrintVisitor;
 import pl.pollub.backend.transaction.dto.TransactionCreateDto;
 import pl.pollub.backend.transaction.dto.TransactionUpdateDto;
+import pl.pollub.backend.transaction.query.Expression;
+import pl.pollub.backend.transaction.query.ExpressionComplexityVisitor;
+import pl.pollub.backend.transaction.query.ExpressionPrettyPrintVisitor;
+import pl.pollub.backend.transaction.query.TransactionQueryParser;
 import pl.pollub.backend.transaction.model.Transaction;
 import pl.pollub.backend.transaction.query.TransactionQueryInterpreter;
 import pl.pollub.backend.transaction.service.interfaces.TransactionService;
@@ -20,6 +28,12 @@ import java.util.Map;
 public abstract class TransactionController<T extends Transaction> {
     @Autowired
     private TransactionQueryInterpreter queryInterpreter;
+
+    @Autowired
+    private TransactionQueryParser queryParser;
+
+    @Autowired
+    private AmountExpressionInterpreter amountExpressionInterpreter;
 
     public abstract TransactionService<T> getTransactionService();
 
@@ -39,6 +53,29 @@ public abstract class TransactionController<T extends Transaction> {
             @AuthenticationPrincipal User user) {
         List<T> allTransactions = getTransactionService().getAllTransactionsForGroup(user, groupId);
         return queryInterpreter.filter(allTransactions, query);
+    }
+
+    @Operation(summary = "Zwróć debugowy widok drzewa zapytania")
+    @ApiResponse(responseCode = "200", description = "Sformatowane zapytanie i metryki AST")
+    @GetMapping("/query/inspect")
+    public Map<String, Object> inspectQueryAst(@RequestParam String query) {
+        Expression expression = queryParser.parse(query);
+        return Map.of(
+                "pretty", expression.accept(new ExpressionPrettyPrintVisitor()),
+                "complexity", expression.accept(new ExpressionComplexityVisitor())
+        );
+    }
+
+    @Operation(summary = "Zwróć debugowy widok drzewa wyrażenia kwoty")
+    @ApiResponse(responseCode = "200", description = "Sformatowane wyrażenie i metryki AST")
+    @GetMapping("/amount/inspect")
+    public Map<String, Object> inspectAmountAst(@RequestParam String expression) {
+        AmountExpression amountExpression = amountExpressionInterpreter.parse(expression);
+        return Map.of(
+                "pretty", amountExpression.accept(new AmountExpressionPrettyPrintVisitor()),
+                "complexity", amountExpression.accept(new AmountExpressionComplexityVisitor()),
+                "result", amountExpression.interpret()
+        );
     }
 
     @Operation(summary = "Stwórz nową transakcje danego typu")

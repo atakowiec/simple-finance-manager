@@ -20,5 +20,14 @@ public class CategoryEqualsExpression implements Expression {
         }
         return transaction.getCategory().getName().equalsIgnoreCase(categoryName);
     }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    @Override
+    public <T> T accept(ExpressionVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }
 

@@ -16,5 +16,18 @@ public class AddExpression implements AmountExpression {
     public double interpret() {
         return left.interpret() + right.interpret();
     }
+
+    public AmountExpression getLeft() {
+        return left;
+    }
+
+    public AmountExpression getRight() {
+        return right;
+    }
+
+    @Override
+    public <T> T accept(AmountExpressionVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }
 

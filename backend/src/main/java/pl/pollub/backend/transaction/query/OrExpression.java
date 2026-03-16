@@ -19,5 +19,18 @@ public class OrExpression implements Expression {
     public boolean interpret(Transaction transaction) {
         return left.interpret(transaction) || right.interpret(transaction);
     }
+
+    public Expression getLeft() {
+        return left;
+    }
+
+    public Expression getRight() {
+        return right;
+    }
+
+    @Override
+    public <T> T accept(ExpressionVisitor<T> visitor) {
+        return visitor.visit(this);
+    }
 }
 
