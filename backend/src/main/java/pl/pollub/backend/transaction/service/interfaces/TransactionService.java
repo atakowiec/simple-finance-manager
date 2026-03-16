@@ -15,6 +15,7 @@ import pl.pollub.backend.transaction.factory.TransactionFactory;
 import pl.pollub.backend.transaction.factory.TransactionFactoryContext;
 import pl.pollub.backend.transaction.model.Transaction;
 import pl.pollub.backend.transaction.repository.TransactionRepository;
+import pl.pollub.backend.categories.visitor.CategoryTotalAmountVisitor;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -146,24 +147,15 @@ public interface TransactionService<T extends Transaction> {
 
         Map<String, Double> stats = new HashMap<>();
         List<TransactionCategory> allCategories = getCategoryService().getAllCategories(); // This now returns only root categories
+        CategoryTotalAmountVisitor totalAmountVisitor = new CategoryTotalAmountVisitor(rawStats);
 
         for (TransactionCategory root : allCategories) {
-            Double total = calculateRecursiveTotal(root, rawStats);
+            Double total = root.accept(totalAmountVisitor);
             if (total > 0)
                 stats.put(root.getName(), total);
         }
 
         return stats;
-    }
-
-    private Double calculateRecursiveTotal(TransactionCategory category, Map<Long, Double> rawStats) {
-        Double total = rawStats.getOrDefault(category.getId(), 0.0);
-        if (category.getChildren() != null) {
-            for (TransactionCategory child : category.getChildren()) {
-                total += calculateRecursiveTotal(child, rawStats);
-            }
-        }
-        return total;
     }
 
     // start factory method

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.pollub.backend.categories.dto.CategoryCreateDto;
 import pl.pollub.backend.categories.dto.CategoryUpdateDto;
 import pl.pollub.backend.categories.model.TransactionCategory;
+import pl.pollub.backend.categories.visitor.CategoryBreadcrumbVisitor;
 import pl.pollub.backend.exception.HttpException;
 
 import java.util.List;
@@ -74,6 +75,14 @@ public class CategoriesController {
     public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
         String message = categoryService.deleteCategory(id);
         return ResponseEntity.ok(message);
+    }
+
+    @Operation(summary = "Pobierz breadcrumb kategorii")
+    @ApiResponse(responseCode = "200", description = "Ścieżka kategorii od korzenia")
+    @GetMapping("/{id}/breadcrumb")
+    public List<String> getCategoryBreadcrumb(@PathVariable Long id) {
+        TransactionCategory category = categoryService.getCategoryByIdOrThrow(id);
+        return category.accept(new CategoryBreadcrumbVisitor());
     }
 
     @Operation(summary = "Pobierz ikonę kategorii")

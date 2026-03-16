@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.pollub.backend.categories.dto.CategoryDto;
+import pl.pollub.backend.categories.visitor.CategoryToDtoVisitor;
+import pl.pollub.backend.categories.visitor.CategoryVisitable;
+import pl.pollub.backend.categories.visitor.CategoryVisitor;
 import pl.pollub.backend.conversion.DtoConvertible;
 
 import java.util.ArrayList;
@@ -15,7 +18,7 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor
-public class TransactionCategory implements DtoConvertible<CategoryDto> {
+public class TransactionCategory implements DtoConvertible<CategoryDto>, CategoryVisitable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -48,9 +51,11 @@ public class TransactionCategory implements DtoConvertible<CategoryDto> {
 
     @Override
     public CategoryDto toDto() {
-        List<CategoryDto> childrenDto = children != null ? children.stream()
-                .map(TransactionCategory::toDto)
-                .toList() : new ArrayList<>();
-        return new CategoryDto(id, name, categoryType, childrenDto);
+        return accept(new CategoryToDtoVisitor());
+    }
+
+    @Override
+    public <T> T accept(CategoryVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 }
