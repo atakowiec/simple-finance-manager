@@ -1,5 +1,6 @@
 package pl.pollub.backend.aop;
 
+// start bridge
 /**
  * Implementor for Bridge pattern - audit sink.
  */

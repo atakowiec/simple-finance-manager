@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+// start interpreter
 /**
  * Parses and evaluates the group expense-rule DSL: WHEN <condition> THEN <action>.
  */

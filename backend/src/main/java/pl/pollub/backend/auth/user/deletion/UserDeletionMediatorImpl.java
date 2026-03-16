@@ -8,6 +8,7 @@ import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.auth.user.deletion.handlers.*;
 import pl.pollub.backend.exception.HttpException;
 
+// start mediator
 /**
  * Concrete mediator implementation for user deletion workflow.
  * Coordinates multiple handlers to execute the deletion in the correct order.

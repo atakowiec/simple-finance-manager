@@ -1,5 +1,6 @@
 package pl.pollub.backend.transaction.amount;
 
+// start visitor
 /**
  * Visitor contract for amount expression tree.
  */

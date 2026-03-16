@@ -5,6 +5,7 @@ import pl.pollub.backend.group.dto.InviteTargetDto;
 import pl.pollub.backend.group.enums.MembershipStatus;
 import pl.pollub.backend.group.model.Group;
 
+// start adapter
 /**
  * Adapter that converts raw query results into InviteTargetDto.
  */

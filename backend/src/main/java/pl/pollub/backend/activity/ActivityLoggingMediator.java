@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import pl.pollub.backend.activity.command.ActivityLogCommand;
 import pl.pollub.backend.activity.command.ActivityLogCommandFactory;
 
+// start mediator
 /**
  * Concrete Mediator that centralises all activity-log creation logic.
  *

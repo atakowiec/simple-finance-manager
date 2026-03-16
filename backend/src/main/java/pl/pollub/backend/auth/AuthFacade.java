@@ -15,6 +15,7 @@ import pl.pollub.backend.util.SimpleJsonBuilder;
 
 import java.util.Set;
 
+// start facade
 /**
  * Facade for authentication flows (login & register).
  */

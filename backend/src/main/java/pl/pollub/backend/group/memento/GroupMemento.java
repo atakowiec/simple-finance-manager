@@ -3,6 +3,7 @@ package pl.pollub.backend.group.memento;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+// start memento
 /**
  * Memento class that stores the state of a Group.
  * Part of the Memento design pattern implementation for group edit undo functionality.

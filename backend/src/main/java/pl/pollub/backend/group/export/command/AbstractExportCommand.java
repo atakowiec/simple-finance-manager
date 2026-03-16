@@ -6,6 +6,7 @@ import pl.pollub.backend.group.export.GroupExportResponse;
 
 // start liskov substitution principle
 // start dependency inversion principle
+// start template
 /**
  * Template Method base for export commands.
  * Keeps command selection/execution intact while sharing export workflow.

@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+// start composite
 /**
  * Composite node that executes child deletion tasks in order.
  */

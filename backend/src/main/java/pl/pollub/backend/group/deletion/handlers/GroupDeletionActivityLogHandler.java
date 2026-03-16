@@ -22,7 +22,7 @@ public class GroupDeletionActivityLogHandler implements GroupDeletionHandler {
     public void handle(User user, Group group, GroupDeletionContext context) {
         activityMediator.notify(
                 ActivityEventType.GROUP_DELETED,
-                ActivityEventData.builder()
+                ActivityEventData.newBuilder()
                         .user(user)
                         .group(group)
                         .resourceName(group.getName())

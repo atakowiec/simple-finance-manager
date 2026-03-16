@@ -80,26 +80,22 @@ public class CategoryServiceImpl implements CategoryService {
     public String undoCategoryChange(Long id) {
         TransactionCategory category = getCategoryByIdOrThrow(id);
         CategoryMemento memento = categoryCaretaker.getLastMemento(id);
-
-        if (memento == null) {
+        if (memento == null)
             throw new HttpException(HttpStatus.BAD_REQUEST.value(), "Brak historii zmian kategorii do cofnięcia");
-        }
 
         category.setName(memento.getName());
         category.setCategoryType(memento.getCategoryType());
 
         if (memento.getIcon() != null) {
             category.setIcon(iconFlyweightFactory.getOrAdd(memento.getIcon()));
-        } else {
+        } else
             category.setIcon(null);
-        }
 
         if (memento.getParentId() != null) {
             TransactionCategory parent = getCategoryByIdOrThrow(memento.getParentId());
             category.setParent(parent);
-        } else {
+        } else
             category.setParent(null);
-        }
 
         categoryRepository.save(category);
         return "Cofnięto ostatnią zmianę kategorii.";
@@ -113,9 +109,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public String deleteCategory(Long id) {
         TransactionCategory category = getCategoryByIdOrThrow(id);
-
-        // Optional: Check if it has children and decide what to do. 
-        // With CascadeType.ALL, children will be deleted too.
         
         categoryRepository.delete(category);
         categoryCaretaker.clearHistory(id);

@@ -4,6 +4,7 @@ import pl.pollub.backend.transaction.model.Transaction;
 
 import java.util.List;
 
+// start bridge
 /**
  * Implementor interface for Bridge pattern - query data source.
  */

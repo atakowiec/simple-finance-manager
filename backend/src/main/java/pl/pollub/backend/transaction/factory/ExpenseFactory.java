@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import pl.pollub.backend.transaction.dto.TransactionCreateDto;
 import pl.pollub.backend.transaction.model.Expense;
 
+// start factory
 @Component
 public class ExpenseFactory implements TransactionFactory<Expense> {
     @Override

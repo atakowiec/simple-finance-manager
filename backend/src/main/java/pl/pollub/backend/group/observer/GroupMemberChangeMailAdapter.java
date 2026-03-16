@@ -3,6 +3,7 @@ package pl.pollub.backend.group.observer;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.mail.interfaces.Mail;
 
+// start adapter
 /**
  * Adapter that turns GroupMemberChangeEvent data into a concrete Mail instance.
  */

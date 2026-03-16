@@ -3,6 +3,7 @@ package pl.pollub.backend.auth.user.memento;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+// start memento
 /**
  * Snapshot of mutable user profile fields used by undo operation.
  */

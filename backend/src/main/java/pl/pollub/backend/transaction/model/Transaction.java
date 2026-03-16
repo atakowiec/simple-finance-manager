@@ -15,6 +15,7 @@ import java.time.LocalDate;
 
 // start liskov substitution principle
 // start dependency inversion principle - klasa abstrakcyjna
+// start prototype
 /**
  * Base class for all transactions.
  */

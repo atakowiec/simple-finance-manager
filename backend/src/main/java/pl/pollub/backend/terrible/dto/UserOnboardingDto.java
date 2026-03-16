@@ -59,6 +59,7 @@ public class UserOnboardingDto {
         this.categoryId = builder.categoryId;
     }
 
+    // start builder
     public static class Builder {
         private String username;
         private String password;

@@ -9,6 +9,7 @@ import pl.pollub.backend.mail.interfaces.MailRequest;
 import pl.pollub.backend.mail.interfaces.MailSenderImplementation;
 import pl.pollub.backend.util.CurrencyFormatter;
 
+// start prototype
 /**
  * Mail sent when interpreted group expense rule is matched.
  */
@@ -28,6 +29,7 @@ public class ExpenseRuleTriggeredMail extends Mail implements FullHtmlMail, Clon
         this.totalIncomes = builder.totalIncomes;
     }
 
+    // start builder
     public static class Builder {
         private MailSenderImplementation sender;
         private User recipient;

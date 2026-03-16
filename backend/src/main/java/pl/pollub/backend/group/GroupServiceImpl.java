@@ -97,7 +97,7 @@ public class GroupServiceImpl implements GroupService {
 
         activityMediator.notify(
                 ActivityEventType.GROUP_CREATED,
-                ActivityEventData.builder()
+                ActivityEventData.newBuilder()
                         .user(user)
                         .group(group)
                         .resourceName(group.getName())
@@ -218,7 +218,7 @@ public class GroupServiceImpl implements GroupService {
 
         activityMediator.notify(
                 ActivityEventType.MEMBER_REMOVED_FROM_GROUP,
-                ActivityEventData.builder()
+                ActivityEventData.newBuilder()
                         .user(removedMember)
                         .group(group)
                         .additionalInfo("removed by " + user.getUsername())
@@ -283,7 +283,7 @@ public class GroupServiceImpl implements GroupService {
 
         activityMediator.notify(
                 ActivityEventType.MEMBER_LEFT_GROUP,
-                ActivityEventData.builder()
+                ActivityEventData.newBuilder()
                         .user(user)
                         .group(group)
                         .build()

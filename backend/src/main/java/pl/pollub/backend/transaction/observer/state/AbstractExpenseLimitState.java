@@ -1,5 +1,6 @@
 package pl.pollub.backend.transaction.observer.state;
 
+// start singleton
 /**
  * Shared transition logic for concrete expense-limit states.
  */

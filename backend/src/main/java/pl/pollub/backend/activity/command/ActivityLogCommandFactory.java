@@ -7,6 +7,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+// start factory
+// start sterowanie danymi
 /**
  * Resolves a command for each activity event type.
  */

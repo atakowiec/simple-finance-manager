@@ -33,6 +33,7 @@ public class UserOnboardingResultDto {
         this.categoryId = builder.categoryId;
     }
 
+    // start builder
     public static class Builder {
         private Long userId;
         private String username;

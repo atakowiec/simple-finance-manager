@@ -9,6 +9,7 @@ import pl.pollub.backend.mail.interfaces.Mail;
 import pl.pollub.backend.mail.interfaces.MailRequest;
 import pl.pollub.backend.mail.interfaces.MailSenderImplementation;
 
+// start prototype
 /**
  * Mail informing users about changes in group membership.
  */
@@ -28,6 +29,8 @@ public class MemberChangeMail extends Mail implements FullHtmlMail, Cloneable {
         this.action = builder.action;
     }
 
+    // start builder
+    // start builder
     public static class Builder {
         private MailSenderImplementation sender;
         private User recipient;

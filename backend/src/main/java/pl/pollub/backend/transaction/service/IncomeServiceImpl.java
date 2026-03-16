@@ -55,7 +55,7 @@ public class IncomeServiceImpl implements IncomeService {
 
         activityMediator.notify(
                 ActivityEventType.INCOME_CREATED,
-                ActivityEventData.builder()
+                ActivityEventData.newBuilder()
                         .user(user)
                         .group(income.getGroup())
                         .transaction(income)
@@ -79,7 +79,7 @@ public class IncomeServiceImpl implements IncomeService {
 
         activityMediator.notify(
                 ActivityEventType.INCOME_UPDATED,
-                ActivityEventData.builder()
+                ActivityEventData.newBuilder()
                         .user(user)
                         .group(income.getGroup())
                         .transaction(income)
@@ -103,7 +103,7 @@ public class IncomeServiceImpl implements IncomeService {
 
         activityMediator.notify(
                 ActivityEventType.INCOME_DELETED,
-                ActivityEventData.builder()
+                ActivityEventData.newBuilder()
                         .user(user)
                         .group(income.getGroup())
                         .resourceName(income.getName())

@@ -10,6 +10,7 @@ import pl.pollub.backend.mail.interfaces.MailSenderImplementation;
 import pl.pollub.backend.util.CurrencyFormatter;
 
 // start builder
+// start prototype
 /**
  * Refined Abstraction in the Bridge design pattern.
  */
@@ -25,6 +26,7 @@ public class CloseToLimitMail extends Mail implements FullHtmlMail, Cloneable {
         this.totalExpenses = builder.totalExpenses;
     }
 
+    // start builder
     public static class Builder {
         private MailSenderImplementation sender;
         private User user;

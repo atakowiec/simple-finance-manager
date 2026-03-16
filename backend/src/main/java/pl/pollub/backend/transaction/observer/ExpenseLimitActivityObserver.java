@@ -29,7 +29,7 @@ public class ExpenseLimitActivityObserver implements ExpenseLimitObserver {
 
         activityMediator.notify(
                 ActivityEventType.BUDGET_EXCEEDED,
-                ActivityEventData.builder()
+                ActivityEventData.newBuilder()
                         .user(event.user())
                         .group(event.group())
                         .amount(event.totalExpenses())

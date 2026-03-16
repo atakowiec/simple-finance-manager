@@ -58,7 +58,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         activityMediator.notify(
                 ActivityEventType.EXPENSE_CREATED,
-                ActivityEventData.builder()
+                ActivityEventData.newBuilder()
                         .user(user)
                         .group(expense.getGroup())
                         .transaction(expense)
@@ -82,7 +82,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         activityMediator.notify(
                 ActivityEventType.EXPENSE_UPDATED,
-                ActivityEventData.builder()
+                ActivityEventData.newBuilder()
                         .user(user)
                         .group(expense.getGroup())
                         .transaction(expense)
@@ -107,7 +107,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         activityMediator.notify(
                 ActivityEventType.EXPENSE_DELETED,
-                ActivityEventData.builder()
+                ActivityEventData.newBuilder()
                         .user(user)
                         .group(group)
                         .resourceName(expense.getName())

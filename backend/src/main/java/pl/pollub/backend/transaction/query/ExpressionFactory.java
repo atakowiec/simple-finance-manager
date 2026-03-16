@@ -7,6 +7,7 @@ import pl.pollub.backend.exception.HttpException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
+// start factory
 /**
  * Simple Factory for creating Expression objects based on field/operator/value.
  */

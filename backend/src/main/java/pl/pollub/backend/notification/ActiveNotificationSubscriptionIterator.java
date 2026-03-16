@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+// start iterator
 /**
  * Iterates over subscriptions and returns only active ones.
  */

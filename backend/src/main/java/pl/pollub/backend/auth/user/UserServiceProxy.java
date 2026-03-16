@@ -12,6 +12,7 @@ import pl.pollub.backend.categories.dto.UserDto;
 
 import java.util.List;
 
+// start Proxy
 /**
  * Proxy for UserService. Central place for access control/logging if needed.
  */

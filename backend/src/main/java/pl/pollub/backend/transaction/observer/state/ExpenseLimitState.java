@@ -1,5 +1,6 @@
 package pl.pollub.backend.transaction.observer.state;
 
+// start state
 /**
  * State abstraction for the monthly expense-limit lifecycle.
  */

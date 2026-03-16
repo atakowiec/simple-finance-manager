@@ -9,6 +9,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+// start factory
 // start flyweight
 /**
  * Flyweight factory for icon byte[] instances. Returns a shared byte[] for identical icon content.

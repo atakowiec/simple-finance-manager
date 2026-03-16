@@ -12,6 +12,7 @@ import pl.pollub.backend.conversion.DtoConvertible;
 import java.util.ArrayList;
 import java.util.List;
 
+// start composite
 /**
  * Entity representing transaction category. It is used to categorize transactions.
  */
@@ -28,7 +29,6 @@ public class TransactionCategory implements DtoConvertible<CategoryDto>, Categor
     @Enumerated(EnumType.STRING)
     private CategoryType categoryType;
 
-    // start l2 bridge
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private TransactionCategory parent;

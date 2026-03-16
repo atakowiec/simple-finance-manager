@@ -8,6 +8,7 @@ import pl.pollub.backend.group.export.command.ExportCommand;
 import pl.pollub.backend.group.export.command.ExportCommandFactory;
 import pl.pollub.backend.group.interfaces.GroupService;
 
+// start facade
 /**
  * Facade for group data export functionality.
  * Simplifies the process of exporting group data by orchestrating GroupService

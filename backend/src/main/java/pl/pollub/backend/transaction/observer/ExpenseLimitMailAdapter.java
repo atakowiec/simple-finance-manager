@@ -4,6 +4,7 @@ import pl.pollub.backend.mail.interfaces.Mail;
 import pl.pollub.backend.mail.mails.CloseToLimitMail;
 import pl.pollub.backend.mail.mails.LimitExceededMail;
 
+// start adapter
 /**
  * Adapter that turns ExpenseLimitEvent data into a concrete Mail instance.
  */

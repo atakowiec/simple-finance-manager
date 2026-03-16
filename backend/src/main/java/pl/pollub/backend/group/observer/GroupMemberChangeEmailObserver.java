@@ -16,6 +16,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+// start adapter
 /**
  * Observer that sends e-mails when group membership changes.
  */

@@ -10,6 +10,7 @@ import pl.pollub.backend.categories.model.TransactionCategory;
 
 import java.util.List;
 
+// start Proxy
 /**
  * Proxy for CategoryService that adds a simple in-memory cache.
  */

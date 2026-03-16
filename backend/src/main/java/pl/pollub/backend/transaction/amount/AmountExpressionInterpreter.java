@@ -7,6 +7,7 @@ import pl.pollub.backend.exception.HttpException;
 import java.util.ArrayList;
 import java.util.List;
 
+// start interpreter
 /**
  * Parses and evaluates amount arithmetic expressions, e.g. "100+100-20".
  */

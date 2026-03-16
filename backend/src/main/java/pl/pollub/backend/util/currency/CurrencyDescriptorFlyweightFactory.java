@@ -4,6 +4,7 @@ import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+// start flyweight
 /**
  * Flyweight factory for CurrencyDescriptor instances.
  * Returns shared descriptors for the same currency code + locale.

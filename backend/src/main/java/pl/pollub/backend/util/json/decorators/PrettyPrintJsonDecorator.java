@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import pl.pollub.backend.util.json.JsonComponent;
 
+// start decorator
 /**
  * Decorator that provides pretty-printed JSON output.
  */

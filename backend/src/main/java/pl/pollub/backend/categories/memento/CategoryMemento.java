@@ -6,6 +6,7 @@ import pl.pollub.backend.categories.model.CategoryType;
 
 import java.util.Arrays;
 
+// start memento
 /**
  * Snapshot of mutable category fields used by undo operation.
  */

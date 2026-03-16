@@ -203,7 +203,6 @@ public interface TransactionService<T extends Transaction> {
             @SuppressWarnings("unchecked")
             T cloned = (T) original.clone();
 
-            // Optionally modify the date to today or keep it
             cloned.setDate(LocalDate.now());
 
             return save(cloned);

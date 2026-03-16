@@ -3,6 +3,7 @@ package pl.pollub.backend.group.memento;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
+// start flyweight
 /**
  * Flyweight that stores canonical group icon snapshot data shared by multiple mementos.
  */

@@ -4,6 +4,7 @@ import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.notification.NotificationSubscriptionRepository;
 import pl.pollub.backend.notification.NotificationType;
 
+// start factory
 /**
  * Factory Method for creating notification commands.
  */

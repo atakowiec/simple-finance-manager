@@ -139,7 +139,7 @@ public class GroupInviteServiceImpl implements GroupInviteService {
 
         activityMediator.notify(
                 ActivityEventType.MEMBER_JOINED_GROUP,
-                ActivityEventData.builder()
+                ActivityEventData.newBuilder()
                         .user(user)
                         .group(group)
                         .build()

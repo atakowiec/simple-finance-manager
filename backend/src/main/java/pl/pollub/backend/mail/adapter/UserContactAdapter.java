@@ -3,6 +3,7 @@ package pl.pollub.backend.mail.adapter;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.mail.interfaces.Contact;
 
+// start adapter
 public class UserContactAdapter implements Contact {
     private final User user;
 
@@ -12,7 +13,7 @@ public class UserContactAdapter implements Contact {
 
     @Override
     public String getDisplayName() {
-        return user.getUsername();
+        return "[Użytkownik] " + user.getUsername();
     }
 
     @Override

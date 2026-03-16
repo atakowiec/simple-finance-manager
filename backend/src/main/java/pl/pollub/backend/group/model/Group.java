@@ -17,6 +17,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 
+// start prototype
 /**
  * Entity representing group. It holds information about group.
  */
