@@ -10,10 +10,10 @@ import pl.pollub.backend.activity.ActivityMediator;
 import pl.pollub.backend.auth.user.User;
 import pl.pollub.backend.config.constants.ExpenseLimitConstants;
 import pl.pollub.backend.exception.HttpException;
+import pl.pollub.backend.group.deletion.GroupDeletionMediator;
 import pl.pollub.backend.group.dto.GroupCreateDto;
 import pl.pollub.backend.group.dto.GroupMemberDto;
 import pl.pollub.backend.group.dto.ImportExportDto;
-import pl.pollub.backend.group.deletion.GroupDeletionMediator;
 import pl.pollub.backend.group.interfaces.GroupService;
 import pl.pollub.backend.group.membership.UserMembership;
 import pl.pollub.backend.group.memento.GroupCaretaker;
@@ -28,16 +28,13 @@ import pl.pollub.backend.transaction.model.Expense;
 import pl.pollub.backend.transaction.model.Income;
 import pl.pollub.backend.transaction.observer.ExpenseLimitLifecycleService;
 import pl.pollub.backend.transaction.observer.ExpenseLimitTriggerSource;
+import pl.pollub.backend.transaction.observer.rule.ExpenseLimitRuleInterpreter;
 import pl.pollub.backend.transaction.repository.ExpenseRepository;
 import pl.pollub.backend.transaction.repository.IncomeRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -60,6 +57,7 @@ public class GroupServiceImpl implements GroupService {
     private final IncomeRepository incomeRepository;
     private final GroupCaretaker groupCaretaker;
     private final ExpenseLimitLifecycleService expenseLimitLifecycleService;
+    private final ExpenseLimitRuleInterpreter expenseLimitRuleInterpreter;
     private final GroupMemberChangeSubject groupMemberChangeSubject;
     private final GroupImportFacade groupImportFacade;
     private final ActivityMediator activityMediator;
@@ -147,6 +145,22 @@ public class GroupServiceImpl implements GroupService {
         group.setExpenseLimit(expenseLimit);
         groupRepository.save(group);
         expenseLimitLifecycleService.evaluateAndNotify(user, group, ExpenseLimitTriggerSource.GROUP_LIMIT_CHANGED);
+        return group;
+    }
+
+    @Override
+    public Group changeExpenseLimitRule(User user, String expenseLimitRule, Long groupId) {
+        Group group = getGroupByIdOrThrow(groupId);
+        String normalizedRule = normalizeRule(expenseLimitRule);
+
+        if (normalizedRule != null) {
+            expenseLimitRuleInterpreter.parse(normalizedRule);
+        }
+
+        saveGroupState(group);
+        group.setExpenseLimitRule(normalizedRule);
+        groupRepository.save(group);
+        expenseLimitLifecycleService.evaluateAndNotify(user, group, ExpenseLimitTriggerSource.GROUP_RULE_CHANGED);
         return group;
     }
 
@@ -303,6 +317,7 @@ public class GroupServiceImpl implements GroupService {
             group.setIcon(memento.getIcon());
             group.setIconContentType(memento.getIconContentType());
             group.setExpenseLimit(memento.getExpenseLimit());
+            group.setExpenseLimitRule(memento.getExpenseLimitRule());
         } finally {
             memento.release();
         }
@@ -323,9 +338,19 @@ public class GroupServiceImpl implements GroupService {
                 group.getColor(),
                 group.getIcon(),
                 group.getIconContentType(),
-                group.getExpenseLimit()
+                group.getExpenseLimit(),
+                group.getExpenseLimitRule()
         );
         groupCaretaker.saveMemento(group.getId(), memento);
+    }
+
+    private String normalizeRule(String expenseLimitRule) {
+        if (expenseLimitRule == null) {
+            return null;
+        }
+
+        String trimmed = expenseLimitRule.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 
     private List<User> createMemberChangeRecipients(Group group, User additionalRecipient) {

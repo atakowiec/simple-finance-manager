@@ -20,6 +20,7 @@ import pl.pollub.backend.group.model.Group;
 import pl.pollub.backend.transaction.amount.AmountExpressionInterpreter;
 import pl.pollub.backend.transaction.dto.TransactionUpdateDto;
 import pl.pollub.backend.transaction.model.Income;
+import pl.pollub.backend.transaction.observer.ExpenseLimitLifecycleService;
 import pl.pollub.backend.transaction.repository.IncomeRepository;
 import pl.pollub.backend.transaction.service.IncomeServiceImpl;
 import pl.pollub.backend.activity.ActivityMediator;
@@ -49,6 +50,9 @@ class IncomesServiceTest {
 
     @Mock
     private ActivityMediator activityMediator;
+
+    @Mock
+    private ExpenseLimitLifecycleService expenseLimitLifecycleService;
 
     @InjectMocks
     private IncomeServiceImpl incomeService;

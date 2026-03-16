@@ -16,6 +16,7 @@ public record ExpenseLimitEvent(
 		ExpenseLimitLifecycleStatus currentState,
 		boolean transitioned,
 		double totalExpenses,
+		double totalIncomes,
 		LocalDate monthStart,
 		ExpenseLimitTriggerSource triggerSource
 ) {

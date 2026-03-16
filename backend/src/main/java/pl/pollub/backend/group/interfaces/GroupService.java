@@ -84,6 +84,11 @@ public interface GroupService {
     Group changeExpenseLimit(User user, Double expenseLimit, Long groupId);
 
     /**
+     * Changes interpreted expense limit rule of the specified group.
+     */
+    Group changeExpenseLimitRule(User user, String expenseLimitRule, Long groupId);
+
+    /**
      * Changes the uploaded icon of the specified group.
      */
     Group changeIcon(User user, byte[] icon, String contentType, Long groupId);

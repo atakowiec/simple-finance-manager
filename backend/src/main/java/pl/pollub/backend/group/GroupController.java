@@ -119,6 +119,13 @@ public class GroupController {
         return groupService.changeExpenseLimit(user, expenseLimit, groupId);
     }
 
+    @Operation(summary = "Zmień regułę limitu wydatków grupy")
+    @ApiResponse(responseCode = "200", description = "Zmieniono regułę limitu wydatków grupy")
+    @PatchMapping("/{groupId}/expense-limit-rule")
+    public Group changeExpenseLimitRule(@AuthenticationPrincipal User user, @RequestBody String expenseLimitRule, @PathVariable Long groupId) {
+        return groupService.changeExpenseLimitRule(user, expenseLimitRule, groupId);
+    }
+
     @Operation(summary = "Usuń członka z grupy")
     @ApiResponse(responseCode = "200", description = "Usunięto członka z grupy")
     @DeleteMapping("/{groupId}/member/{memberId}")

@@ -19,4 +19,5 @@ public class GroupDto {
     private GroupMemberDto owner;
     private List<GroupMemberDto> users;
     private double expenseLimit = ExpenseLimitConstants.NO_EXPENSE_LIMIT;
+    private String expenseLimitRule;
 }

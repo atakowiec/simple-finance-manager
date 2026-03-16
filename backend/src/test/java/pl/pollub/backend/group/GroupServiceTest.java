@@ -30,6 +30,7 @@ import pl.pollub.backend.transaction.model.Income;
 import pl.pollub.backend.transaction.observer.ExpenseLimitLifecycleService;
 import pl.pollub.backend.transaction.observer.ExpenseLimitSubject;
 import pl.pollub.backend.transaction.observer.ExpenseLimitTriggerSource;
+import pl.pollub.backend.transaction.observer.rule.ExpenseLimitRuleInterpreter;
 import pl.pollub.backend.transaction.repository.ExpenseRepository;
 import pl.pollub.backend.transaction.repository.IncomeRepository;
 
@@ -59,6 +60,8 @@ class GroupServiceTest {
     private ExpenseLimitSubject expenseLimitSubject;
     @Mock
     private ExpenseLimitLifecycleService expenseLimitLifecycleService;
+    @Mock
+    private ExpenseLimitRuleInterpreter expenseLimitRuleInterpreter;
     @Mock
     private GroupMemberChangeSubject groupMemberChangeSubject;
 
@@ -283,6 +286,18 @@ class GroupServiceTest {
         Assertions.assertEquals(404, httpException.getHttpStatus().value());
 
         Mockito.verify(groupRepository, Mockito.times(0)).save(Mockito.any());
+    }
+
+    @Test
+    void changeExpenseLimitRule_UserInGroup_ChangesRule() {
+        String rule = "WHEN totalExpenses > 1500 THEN EMAIL_OWNER";
+
+        Group group = groupService.changeExpenseLimitRule(loggedUser, rule, loggedUserGroup.getId());
+
+        Assertions.assertEquals(rule, group.getExpenseLimitRule());
+        Mockito.verify(expenseLimitRuleInterpreter, Mockito.times(1)).parse(rule);
+        Mockito.verify(expenseLimitLifecycleService, Mockito.times(1))
+                .evaluateAndNotify(loggedUser, loggedUserGroup, ExpenseLimitTriggerSource.GROUP_RULE_CHANGED);
     }
 
     @Test

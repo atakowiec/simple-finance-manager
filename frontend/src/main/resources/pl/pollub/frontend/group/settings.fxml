@@ -55,6 +55,14 @@
             </HBox>
             <Label fx:id="expenseLimitError" />
         </VBox>
+        <VBox alignment="CENTER">
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <Label text="Reguła limitu" />
+                <TextField fx:id="expenseLimitRuleField" promptText="WHEN totalExpenses > 1500 THEN EMAIL_OWNER" HBox.hgrow="ALWAYS" />
+                <Button onAction="#saveExpenseLimitRule" text="Zapisz" />
+            </HBox>
+            <Label fx:id="expenseLimitRuleError" />
+        </VBox>
         <HBox alignment="CENTER" prefHeight="0.0" VBox.vgrow="ALWAYS">
             <VBox.margin>
                 <Insets top="50.0"/>

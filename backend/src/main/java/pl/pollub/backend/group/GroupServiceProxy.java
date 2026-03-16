@@ -71,6 +71,13 @@ public class GroupServiceProxy implements GroupService {
     }
 
     @Override
+    public Group changeExpenseLimitRule(User user, String expenseLimitRule, Long groupId) {
+        Group group = groupService.getGroupByIdOrThrow(groupId);
+        groupService.checkMembershipOrThrow(user, group);
+        return groupService.changeExpenseLimitRule(user, expenseLimitRule, groupId);
+    }
+
+    @Override
     public Group changeIcon(User user, byte[] icon, String contentType, Long groupId) {
         Group group = groupService.getGroupByIdOrThrow(groupId);
         groupService.checkMembershipOrThrow(user, group);

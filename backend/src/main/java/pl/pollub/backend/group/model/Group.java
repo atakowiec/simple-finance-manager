@@ -44,6 +44,9 @@ public class Group implements DtoConvertible<GroupDto>, Cloneable {
     @Column(name = "expense_limit")
     private double expenseLimit = ExpenseLimitConstants.NO_EXPENSE_LIMIT;
 
+    @Column(name = "expense_limit_rule", length = 512)
+    private String expenseLimitRule;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "expense_limit_lifecycle_status", nullable = false)
     private ExpenseLimitLifecycleStatus expenseLimitLifecycleStatus = ExpenseLimitLifecycleStatus.NO_LIMIT;
@@ -79,6 +82,7 @@ public class Group implements DtoConvertible<GroupDto>, Cloneable {
         groupDto.setOwner(new GroupMemberDto(owner, owner));
         groupDto.setUsers(users.stream().map((user -> new GroupMemberDto(user, owner))).toList());
         groupDto.setExpenseLimit(expenseLimit);
+        groupDto.setExpenseLimitRule(expenseLimitRule);
         return groupDto;
     }
 
@@ -117,6 +121,7 @@ public class Group implements DtoConvertible<GroupDto>, Cloneable {
             }
             cloned.setExpenseLimitLifecycleStatus(this.expenseLimitLifecycleStatus);
             cloned.setExpenseLimitStateMonthStart(this.expenseLimitStateMonthStart);
+            cloned.setExpenseLimitRule(this.expenseLimitRule);
             return cloned;
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException("Cloning group failed", e);

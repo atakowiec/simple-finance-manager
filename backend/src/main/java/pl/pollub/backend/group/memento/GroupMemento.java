@@ -14,13 +14,28 @@ public class GroupMemento {
     private final String color;
     private final GroupIconFlyweight iconFlyweight;
     private final double expenseLimit;
+    private final String expenseLimitRule;
     private boolean released;
 
     /**
      * Creates a memento from the current state.
      */
-    public static GroupMemento create(String name, String color, byte[] icon, String iconContentType, double expenseLimit) {
-        return new GroupMemento(name, color, GroupIconFlyweightFactory.acquire(icon, iconContentType), expenseLimit, false);
+    public static GroupMemento create(
+            String name,
+            String color,
+            byte[] icon,
+            String iconContentType,
+            double expenseLimit,
+            String expenseLimitRule
+    ) {
+        return new GroupMemento(
+                name,
+                color,
+                GroupIconFlyweightFactory.acquire(icon, iconContentType),
+                expenseLimit,
+                expenseLimitRule,
+                false
+        );
     }
 
     public byte[] getIcon() {

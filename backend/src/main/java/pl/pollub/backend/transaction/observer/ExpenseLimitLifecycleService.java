@@ -12,6 +12,7 @@ import pl.pollub.backend.transaction.observer.state.ExpenseLimitState;
 import pl.pollub.backend.transaction.observer.state.ExpenseLimitTransition;
 import pl.pollub.backend.transaction.observer.state.WithinLimitState;
 import pl.pollub.backend.transaction.repository.ExpenseRepository;
+import pl.pollub.backend.transaction.repository.IncomeRepository;
 
 import java.time.LocalDate;
 
@@ -22,6 +23,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class ExpenseLimitLifecycleService {
     private final ExpenseRepository expenseRepository;
+    private final IncomeRepository incomeRepository;
     private final GroupRepository groupRepository;
     private final ExpenseLimitSubject expenseLimitSubject;
 
@@ -41,6 +43,7 @@ public class ExpenseLimitLifecycleService {
                 transition.currentState(),
                 transition.transitioned(),
                 metrics.totalExpenses(),
+                resolveTotalIncomes(group, monthStart),
                 monthStart,
                 triggerSource
         );
@@ -59,6 +62,11 @@ public class ExpenseLimitLifecycleService {
     private double resolveTotalExpenses(Group group, LocalDate monthStart) {
         Double totalExpenses = expenseRepository.getTotalByGroupAndMinDate(group, monthStart);
         return totalExpenses != null ? totalExpenses : 0.0;
+    }
+
+    private double resolveTotalIncomes(Group group, LocalDate monthStart) {
+        Double totalIncomes = incomeRepository.getTotalByGroupAndMinDate(group, monthStart);
+        return totalIncomes != null ? totalIncomes : 0.0;
     }
 
     private void persistGroupLifecycle(Group group, ExpenseLimitLifecycleStatus currentState, LocalDate monthStart) {

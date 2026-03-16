@@ -15,4 +15,5 @@ public class Group {
     private GroupMember owner;
     private List<GroupMember> users;
     private Double expenseLimit;
+    private String expenseLimitRule;
 }

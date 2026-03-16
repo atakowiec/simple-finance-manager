@@ -46,11 +46,15 @@ public class SettingsController extends AbstractGroupController {
     @FXML
     private TextField expenseLimitField;
     @FXML
+    private TextField expenseLimitRuleField;
+    @FXML
     private Label nameError;
     @FXML
     private Label colorError;
     @FXML
     private Label expenseLimitError;
+    @FXML
+    private Label expenseLimitRuleError;
     @FXML
     private Label iconError;
     @FXML
@@ -81,6 +85,7 @@ public class SettingsController extends AbstractGroupController {
         boolean expenseLimitSet = group.getExpenseLimit() != null && group.getExpenseLimit() > 0;
 
         expenseLimitField.setText(expenseLimitSet ? String.valueOf(group.getExpenseLimit()) : "");
+        expenseLimitRuleField.setText(group.getExpenseLimitRule() != null ? group.getExpenseLimitRule() : "");
 
         deleteGroupButton.setVisible(authService.getUser().getId() == group.getOwner().getId());
         deleteGroupButton.setManaged(authService.getUser().getId() == group.getOwner().getId());
@@ -238,6 +243,27 @@ public class SettingsController extends AbstractGroupController {
         }
     }
 
+    public void saveExpenseLimitRule() {
+        String ruleText = expenseLimitRuleField.getText() == null ? "" : expenseLimitRuleField.getText().trim();
+        HttpResponse<String> response = httpService.patch("/groups/" + getGroup().getId() + "/expense-limit-rule", ruleText);
+
+        if (response.statusCode() != 200) {
+            expenseLimitRuleError.setText("Błąd zapisu reguły. Sprawdź składnię: WHEN warunek THEN akcja");
+            return;
+        }
+
+        JsonObject jsonResponse = JsonUtil.fromJson(response.body()).getAsJsonObject();
+        if (jsonResponse.has("expenseLimitRule") && !jsonResponse.get("expenseLimitRule").isJsonNull()) {
+            getGroup().setExpenseLimitRule(jsonResponse.get("expenseLimitRule").getAsString());
+        } else {
+            getGroup().setExpenseLimitRule(null);
+        }
+
+        expenseLimitRuleField.setText(getGroup().getExpenseLimitRule() != null ? getGroup().getExpenseLimitRule() : "");
+        expenseLimitRuleError.setText("Zapisano!");
+        updateUndoButtonState();
+    }
+
     public void handleDeleteGroup() {
         modalService.showModal("modal/remove-group-view.fxml", Map.of("groupId", groupId));
     }
@@ -268,6 +294,12 @@ public class SettingsController extends AbstractGroupController {
 
         boolean expenseLimitSet = getGroup().getExpenseLimit() != null && getGroup().getExpenseLimit() > 0;
         expenseLimitField.setText(expenseLimitSet ? String.valueOf(getGroup().getExpenseLimit()) : "");
+        if (jsonResponse.has("expenseLimitRule") && !jsonResponse.get("expenseLimitRule").isJsonNull()) {
+            getGroup().setExpenseLimitRule(jsonResponse.get("expenseLimitRule").getAsString());
+        } else {
+            getGroup().setExpenseLimitRule(null);
+        }
+        expenseLimitRuleField.setText(getGroup().getExpenseLimitRule() != null ? getGroup().getExpenseLimitRule() : "");
         selectedIconFile = null;
         iconPickerButton.setText("Wybierz ikonę");
         refreshDisplayedGroupIcon();
